@@ -16,13 +16,13 @@ from sdk.adapters.gemini import GeminiAdapter
 
 # Example 1: Passing expectation
 @trace(provider="gemini")
-@expect(must_include=["paris", "france"], max_latency_ms=5000)
+@expect(must_include=["paris"], max_latency_ms=5000)
 def ask_capital():
-    """Ask about capital - should PASS (Paris contains both)."""
+    """Ask about capital - should PASS (response contains 'paris')."""
     adapter = GeminiAdapter()
     response, _ = adapter.generate(
         prompt="What is the capital of France? Answer in one word.",
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
     )
     return response
 
@@ -35,7 +35,7 @@ def ask_wrong_capital():
     adapter = GeminiAdapter()
     response, _ = adapter.generate(
         prompt="What is the capital of France? Answer in one word.",
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
     )
     return response
 
@@ -48,7 +48,7 @@ def ask_fast():
     adapter = GeminiAdapter()
     response, _ = adapter.generate(
         prompt="Say hello.",
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
     )
     return response
 

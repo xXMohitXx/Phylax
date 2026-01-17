@@ -1,12 +1,22 @@
 /**
- * Sentinel UI - Trace Inspector
+ * Sentinel UI - Professional Trace Inspector
  * 
- * Minimal JavaScript for trace list, detail view, and replay.
+ * Handles trace listing, filtering, detail view, and replay.
  */
 
 const API_BASE = '/v1';
 let currentTraceId = null;
 let traces = [];
+let currentFilter = 'all';
+let visibleCount = 5; // Pagination: show 5 at a time
+const PAGE_SIZE = 5;
+
+/**
+ * Initialize the application
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    loadTraces();
+});
 
 /**
  * Load traces from the API
@@ -14,33 +24,83 @@ let traces = [];
 async function loadTraces() {
     const traceList = document.getElementById('traceList');
     traceList.innerHTML = `
-        <li class="loading">
+        <div class="loading">
             <div class="spinner"></div>
-            <p>Loading traces...</p>
-        </li>
+        </div>
     `;
 
     try {
-        const response = await fetch(`${API_BASE}/traces?limit=50`);
+        const response = await fetch(`${API_BASE}/traces?limit=100`);
         const data = await response.json();
 
-        traces = data.traces;
-        document.getElementById('totalTraces').textContent = data.total;
+        traces = data.traces || [];
+        visibleCount = PAGE_SIZE; // Reset pagination on reload
 
-        // Count today's traces
-        const today = new Date().toISOString().split('T')[0];
-        const todayCount = traces.filter(t => t.timestamp.startsWith(today)).length;
-        document.getElementById('todayTraces').textContent = todayCount;
+        // Update stats
+        updateStats();
 
+        // Render list
         renderTraceList();
     } catch (error) {
         traceList.innerHTML = `
-            <li class="empty-state">
+            <div class="empty-state">
+                <div class="empty-state-icon">⚠️</div>
                 <h3>Error loading traces</h3>
                 <p>${error.message}</p>
-            </li>
+            </div>
         `;
     }
+}
+
+/**
+ * Update header stats
+ */
+function updateStats() {
+    document.getElementById('totalTraces').textContent = traces.length;
+
+    const passed = traces.filter(t => t.verdict?.status === 'pass').length;
+    const failed = traces.filter(t => t.verdict?.status === 'fail').length;
+
+    document.getElementById('passedTraces').textContent = passed || '-';
+    document.getElementById('failedTraces').textContent = failed || '-';
+}
+
+/**
+ * Set filter and re-render
+ */
+function setFilter(filter, element) {
+    currentFilter = filter;
+    visibleCount = PAGE_SIZE; // Reset pagination when filter changes
+
+    // Update active tab
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    if (element) {
+        element.classList.add('active');
+    }
+
+    renderTraceList();
+}
+
+/**
+ * Load more traces (pagination)
+ */
+function loadMore() {
+    visibleCount += PAGE_SIZE;
+    renderTraceList();
+}
+
+/**
+ * Get filtered traces based on current filter
+ */
+function getFilteredTraces() {
+    if (currentFilter === 'failed') {
+        return traces.filter(t => t.verdict?.status === 'fail');
+    } else if (currentFilter === 'passed') {
+        return traces.filter(t => t.verdict?.status === 'pass');
+    }
+    return traces;
 }
 
 /**
@@ -49,51 +109,85 @@ async function loadTraces() {
 function renderTraceList() {
     const traceList = document.getElementById('traceList');
 
-    if (traces.length === 0) {
+    // Apply filter
+    const filteredTraces = getFilteredTraces();
+
+    if (filteredTraces.length === 0) {
+        let emptyIcon = '📋';
+        let emptyTitle = 'No traces yet';
+        let emptyMsg = 'Make some LLM calls to see them here';
+
+        if (currentFilter === 'failed') {
+            emptyIcon = '✅';
+            emptyTitle = 'No failed traces';
+            emptyMsg = 'All traces are passing!';
+        } else if (currentFilter === 'passed') {
+            emptyIcon = '⏳';
+            emptyTitle = 'No passed traces';
+            emptyMsg = 'No traces with passing verdicts yet';
+        }
+
         traceList.innerHTML = `
-            <li class="empty-state">
-                <h3>No traces yet</h3>
-                <p>Make some LLM calls to see them here</p>
-            </li>
+            <div class="empty-state">
+                <div class="empty-state-icon">${emptyIcon}</div>
+                <h3>${emptyTitle}</h3>
+                <p>${emptyMsg}</p>
+            </div>
         `;
         return;
     }
 
-    traceList.innerHTML = traces.map(trace => {
-        const time = new Date(trace.timestamp).toLocaleString();
-        const preview = trace.request.messages?.[0]?.content?.substring(0, 50) || 'No message';
+    // Paginate - show only visibleCount
+    const visibleTraces = filteredTraces.slice(0, visibleCount);
+    const hasMore = filteredTraces.length > visibleCount;
+
+    let html = visibleTraces.map(trace => {
+        const time = formatTime(trace.timestamp);
+        const preview = trace.request.messages?.[0]?.content?.substring(0, 60) || 'No message';
         const isActive = trace.trace_id === currentTraceId ? 'active' : '';
 
-        // Verdict indicator
+        // Verdict styling
+        let verdictClass = 'pending';
         let verdictIcon = '⏳';
-        let verdictClass = 'verdict-pending';
         if (trace.verdict) {
             if (trace.verdict.status === 'pass') {
-                verdictIcon = '✅';
-                verdictClass = 'verdict-pass';
+                verdictClass = 'pass';
+                verdictIcon = '✓';
             } else {
-                verdictIcon = '❌';
-                verdictClass = 'verdict-fail';
+                verdictClass = 'fail';
+                verdictIcon = '✕';
             }
         }
 
         return `
-            <li class="trace-item ${isActive} ${verdictClass}" onclick="selectTrace('${trace.trace_id}')">
-                <div class="trace-item-header">
-                    <span class="verdict-icon">${verdictIcon}</span>
+            <div class="trace-item ${isActive} verdict-${verdictClass} fade-in" onclick="selectTrace('${trace.trace_id}')">
+                <div class="trace-header">
+                    <div class="verdict-badge ${verdictClass}">${verdictIcon}</div>
                     <span class="trace-model">${trace.request.model}</span>
-                    <span class="trace-time">${time}</span>
+                    <span class="trace-provider">${trace.request.provider}</span>
                 </div>
                 <div class="trace-preview">${escapeHtml(preview)}...</div>
                 <div class="trace-meta">
-                    <span>${trace.request.provider}</span>
-                    <span>${trace.response.latency_ms}ms</span>
-                    ${trace.replay_of ? '<span>↩ Replay</span>' : ''}
-                    ${trace.blessed ? '<span>⭐ Golden</span>' : ''}
+                    <span class="trace-meta-item">⏱ ${trace.response.latency_ms}ms</span>
+                    <span class="trace-meta-item">🕐 ${time}</span>
+                    ${trace.blessed ? '<span class="tag tag-golden">⭐ Golden</span>' : ''}
+                    ${trace.replay_of ? '<span class="tag tag-replay">↩ Replay</span>' : ''}
                 </div>
-            </li>
+            </div>
         `;
     }).join('');
+
+    // Add "Load More" button if there are more traces
+    if (hasMore) {
+        const remaining = filteredTraces.length - visibleCount;
+        html += `
+            <button class="load-more-btn" onclick="loadMore()">
+                Load More (${remaining} remaining)
+            </button>
+        `;
+    }
+
+    traceList.innerHTML = html;
 }
 
 /**
@@ -110,7 +204,6 @@ async function selectTrace(traceId) {
     detail.innerHTML = `
         <div class="loading">
             <div class="spinner"></div>
-            <p>Loading trace details...</p>
         </div>
     `;
 
@@ -120,28 +213,30 @@ async function selectTrace(traceId) {
 
         replayBtn.disabled = false;
 
-        // Verdict section
+        // Build verdict section
         let verdictHtml = '';
         if (trace.verdict) {
-            if (trace.verdict.status === 'pass') {
-                verdictHtml = `
-                    <div class="verdict-banner verdict-pass">
-                        <span class="verdict-icon">✅</span>
-                        <span class="verdict-text">VERDICT: PASS</span>
+            const isPass = trace.verdict.status === 'pass';
+            verdictHtml = `
+                <div class="verdict-banner ${isPass ? 'pass' : 'fail'} fade-in">
+                    <div class="verdict-banner-icon">${isPass ? '✓' : '✕'}</div>
+                    <div class="verdict-banner-text">
+                        <h3>VERDICT: ${isPass ? 'PASSED' : 'FAILED'}</h3>
+                        <p>${isPass ? 'All expectations met' : `Severity: ${trace.verdict.severity?.toUpperCase() || 'UNKNOWN'}`}</p>
                     </div>
-                `;
-            } else {
-                verdictHtml = `
-                    <div class="verdict-banner verdict-fail">
-                        <span class="verdict-icon">❌</span>
-                        <span class="verdict-text">VERDICT: FAIL</span>
-                        <span class="verdict-severity">(Severity: ${trace.verdict.severity})</span>
-                    </div>
-                    <div class="violations">
-                        <h4>Violations:</h4>
-                        <ul>
-                            ${trace.verdict.violations.map(v => `<li>${escapeHtml(v)}</li>`).join('')}
-                        </ul>
+                </div>
+            `;
+
+            if (!isPass && trace.verdict.violations?.length > 0) {
+                verdictHtml += `
+                    <div class="violations-list fade-in">
+                        <div class="violations-title">Violations</div>
+                        ${trace.verdict.violations.map(v => `
+                            <div class="violation-item">
+                                <span class="violation-icon">⚠</span>
+                                <span>${escapeHtml(v)}</span>
+                            </div>
+                        `).join('')}
                     </div>
                 `;
             }
@@ -150,49 +245,79 @@ async function selectTrace(traceId) {
         detail.innerHTML = `
             ${verdictHtml}
             
-            <div class="detail-section">
-                <h3>Trace Info</h3>
-                <div class="detail-content">
-ID: ${trace.trace_id}
-Timestamp: ${trace.timestamp}
-Model: ${trace.request.model}
-Provider: ${trace.request.provider}
-Latency: ${trace.response.latency_ms}ms
-Blessed: ${trace.blessed ? 'Yes ⭐' : 'No'}
-${trace.replay_of ? `Replay of: ${trace.replay_of}` : ''}
+            <div class="detail-section fade-in">
+                <h3 class="section-title">Trace Information</h3>
+                <div class="info-grid">
+                    <div class="info-item" style="grid-column: span 2;">
+                        <div class="info-label">Trace ID</div>
+                        <div class="info-value" style="font-size: 12px; word-break: break-all;">${trace.trace_id}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Timestamp</div>
+                        <div class="info-value">${formatTime(trace.timestamp)}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Model</div>
+                        <div class="info-value">${trace.request.model}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Provider</div>
+                        <div class="info-value">${trace.request.provider}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Latency</div>
+                        <div class="info-value ${trace.response.latency_ms > 2000 ? 'error' : 'success'}">${trace.response.latency_ms}ms</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">${trace.blessed ? '⭐ Golden Reference' : 'Standard Trace'}</div>
+                    </div>
                 </div>
             </div>
             
-            <div class="detail-section">
-                <h3>Parameters</h3>
-                <div class="detail-content">${JSON.stringify(trace.request.parameters, null, 2)}</div>
-            </div>
-            
-            <div class="detail-section">
-                <h3>Messages</h3>
+            <div class="detail-section fade-in">
+                <h3 class="section-title">Messages</h3>
                 ${trace.request.messages.map(msg => `
                     <div class="message ${msg.role}">
                         <div class="message-role">${msg.role}</div>
-                        <div>${escapeHtml(msg.content)}</div>
+                        <div class="message-content">${escapeHtml(msg.content)}</div>
                     </div>
                 `).join('')}
             </div>
             
-            <div class="detail-section">
-                <h3>Response</h3>
-                <div class="detail-content">${escapeHtml(trace.response.text)}</div>
+            <div class="detail-section fade-in">
+                <h3 class="section-title">Response</h3>
+                <div class="response-box">${escapeHtml(trace.response.text)}</div>
             </div>
             
             ${trace.response.usage ? `
-                <div class="detail-section">
-                    <h3>Token Usage</h3>
-                    <div class="detail-content">${JSON.stringify(trace.response.usage, null, 2)}</div>
+                <div class="detail-section fade-in">
+                    <h3 class="section-title">Token Usage</h3>
+                    <div class="info-grid">
+                        ${Object.entries(trace.response.usage).map(([key, value]) => `
+                            <div class="info-item">
+                                <div class="info-label">${key.replace(/_/g, ' ')}</div>
+                                <div class="info-value">${value}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${trace.replay_of ? `
+                <div class="detail-section fade-in">
+                    <h3 class="section-title">Lineage</h3>
+                    <div class="info-item">
+                        <div class="info-label">Replay of</div>
+                        <div class="info-value">${trace.replay_of}</div>
+                    </div>
                 </div>
             ` : ''}
         `;
     } catch (error) {
         detail.innerHTML = `
             <div class="empty-state">
+                <div class="empty-state-icon">⚠️</div>
                 <h3>Error loading trace</h3>
                 <p>${error.message}</p>
             </div>
@@ -208,7 +333,7 @@ async function replayTrace() {
 
     const replayBtn = document.getElementById('replayBtn');
     replayBtn.disabled = true;
-    replayBtn.textContent = 'Replaying...';
+    replayBtn.innerHTML = '↻ Replaying...';
 
     try {
         const response = await fetch(`${API_BASE}/replay/${currentTraceId}`, {
@@ -220,18 +345,87 @@ async function replayTrace() {
         const result = await response.json();
 
         if (response.ok) {
-            alert(`Replay successful!\nNew trace: ${result.new_trace_id}`);
+            // Show success notification
+            showNotification('Replay successful!', 'success');
             loadTraces();
             selectTrace(result.new_trace_id);
         } else {
-            alert(`Replay failed: ${result.detail}`);
+            showNotification(`Replay failed: ${result.detail}`, 'error');
         }
     } catch (error) {
-        alert(`Replay error: ${error.message}`);
+        showNotification(`Replay error: ${error.message}`, 'error');
     } finally {
         replayBtn.disabled = false;
-        replayBtn.textContent = 'Replay';
+        replayBtn.innerHTML = '↻ Replay';
     }
+}
+
+/**
+ * Show notification toast
+ */
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease-out;
+        ${type === 'success' ? 'background: #22c55e; color: white;' : ''}
+        ${type === 'error' ? 'background: #ef4444; color: white;' : ''}
+        ${type === 'info' ? 'background: #6366f1; color: white;' : ''}
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'fadeIn 0.3s ease-out reverse';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+/**
+ * Format timestamp
+ */
+function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+
+    // Format options
+    const timeOpts = { hour: '2-digit', minute: '2-digit', hour12: true };
+    const dateOpts = { month: 'short', day: 'numeric' };
+
+    // Less than 1 minute
+    if (diff < 60000) {
+        return 'Just now';
+    }
+
+    // Less than 1 hour
+    if (diff < 3600000) {
+        const mins = Math.floor(diff / 60000);
+        return `${mins}m ago`;
+    }
+
+    // Less than 24 hours - show time
+    if (diff < 86400000) {
+        return date.toLocaleTimeString('en-US', timeOpts);
+    }
+
+    // Less than 7 days - show day + time
+    if (diff < 604800000) {
+        const days = Math.floor(diff / 86400000);
+        return `${days}d ago, ${date.toLocaleTimeString('en-US', timeOpts)}`;
+    }
+
+    // Otherwise show full date
+    return `${date.toLocaleDateString('en-US', dateOpts)}, ${date.toLocaleTimeString('en-US', timeOpts)}`;
 }
 
 /**
@@ -243,6 +437,3 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
-
-// Load traces on page load
-document.addEventListener('DOMContentLoaded', loadTraces);

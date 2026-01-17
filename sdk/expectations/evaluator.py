@@ -10,32 +10,17 @@ Design rules:
 - Severity is the maximum of all violations
 """
 
-from typing import Literal, Optional
-from pydantic import BaseModel
+from typing import Optional
 
+from sdk.schema import Verdict, SeverityLevel
 from sdk.expectations.rules import (
     Rule,
     RuleResult,
-    SeverityLevel,
     MustIncludeRule,
     MustNotIncludeRule,
     MaxLatencyRule,
     MinTokensRule,
 )
-
-
-class Verdict(BaseModel):
-    """
-    Immutable verdict for an LLM call.
-    
-    Once written to a trace, this MUST never be recalculated or modified.
-    """
-    status: Literal["pass", "fail"]
-    severity: Optional[SeverityLevel] = None  # None when passing
-    violations: list[str] = []
-    
-    class Config:
-        frozen = True  # Enforce immutability
 
 
 class Evaluator:

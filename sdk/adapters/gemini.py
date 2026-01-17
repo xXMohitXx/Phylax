@@ -17,7 +17,7 @@ class GeminiAdapter:
     Usage:
         adapter = GeminiAdapter(api_key="your-key")
         response = adapter.chat_completion(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             messages=[{"role": "user", "content": "Hello!"}]
         )
     """
@@ -55,7 +55,7 @@ class GeminiAdapter:
     
     def chat_completion(
         self,
-        model: str = "gemini-2.0-flash",
+        model: str = "gemini-2.5-flash",
         messages: list[dict[str, str]] = None,
         temperature: float = 0.7,
         max_tokens: int = 256,
@@ -65,7 +65,7 @@ class GeminiAdapter:
         Create a chat completion with automatic tracing.
         
         Args:
-            model: The model to use (e.g., "gemini-2.0-flash")
+            model: The model to use (e.g., "gemini-2.5-flash")
             messages: List of messages with role and content
             temperature: Sampling temperature
             max_tokens: Maximum tokens to generate
@@ -127,7 +127,7 @@ class GeminiAdapter:
     def generate(
         self,
         prompt: str,
-        model: str = "gemini-2.0-flash",
+        model: str = "gemini-2.5-flash",
         temperature: float = 0.7,
         max_tokens: int = 256,
         **kwargs,

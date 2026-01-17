@@ -79,7 +79,7 @@ class Trace(BaseModel):
     This is the canonical schema for all LLM call traces.
     """
     trace_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
     request: TraceRequest
     response: TraceResponse
     runtime: TraceRuntime

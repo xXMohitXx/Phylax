@@ -24,10 +24,10 @@ from sdk.expectations.rules import (
     MinTokensRule,
 )
 from sdk.expectations.evaluator import (
-    Verdict,
     Evaluator,
     evaluate,
 )
+from sdk.schema import Verdict
 
 __all__ = [
     # Rules
