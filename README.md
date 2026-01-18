@@ -1,3 +1,8 @@
+<p align="center">
+  ![sentinel_logo]assest/logo/sentinelfavicon.png)
+</p>
+
+
 # Sentinel prevents LLM regressions from reaching production.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
