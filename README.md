@@ -1,7 +1,6 @@
 <p align="center">
-  ![sentinel_logo]assest/logo/sentinelfavicon.png)
+  <img src="assets/logo/sentinellogo.png" alt="Sentinel Logo" width="200">
 </p>
-
 
 # Sentinel prevents LLM regressions from reaching production.
 
