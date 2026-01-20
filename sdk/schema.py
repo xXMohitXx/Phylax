@@ -80,6 +80,21 @@ class Trace(BaseModel):
     """
     trace_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    
+    # Phase 13: Execution context and causality
+    execution_id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()),
+        description="Groups traces from one program run"
+    )
+    node_id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()),
+        description="Unique ID for this trace as a node in execution graph"
+    )
+    parent_node_id: Optional[str] = Field(
+        default=None,
+        description="Parent node that triggered this call (for DAG construction)"
+    )
+    
     request: TraceRequest
     response: TraceResponse
     runtime: TraceRuntime

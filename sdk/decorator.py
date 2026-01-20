@@ -13,6 +13,7 @@ import functools
 from typing import Any, Callable, Optional, TypeVar, ParamSpec
 
 from sdk.capture import get_capture_layer, CaptureLayer
+from sdk.context import get_execution_id, get_parent_node_id, push_node, pop_node
 
 P = ParamSpec("P")
 T = TypeVar("T")
@@ -88,6 +89,10 @@ def trace(
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
             layer = capture_layer or get_capture_layer()
             
+            # Phase 13: Get execution context
+            execution_id = get_execution_id()
+            parent_node_id = get_parent_node_id()
+            
             # Try to extract messages from args/kwargs
             messages = _extract_messages(args, kwargs)
             parameters = _extract_parameters(kwargs)
@@ -105,7 +110,7 @@ def trace(
             expectations = _function_expectations.get(func)
             
             # Create and store the trace (with verdict if expectations exist)
-            _create_trace(
+            node_id = _create_trace(
                 layer=layer,
                 provider=provider,
                 model=actual_model,
@@ -114,7 +119,13 @@ def trace(
                 result=result,
                 latency_ms=latency_ms,
                 expectations=expectations,
+                execution_id=execution_id,
+                parent_node_id=parent_node_id,
             )
+            
+            # Phase 13: Push this node for child tracking, then pop after
+            push_node(node_id)
+            pop_node()
             
             return result
         
@@ -170,8 +181,10 @@ def _create_trace(
     result: Any,
     latency_ms: int,
     expectations: Optional[dict[str, Any]] = None,
-) -> None:
-    """Create and store a trace from the captured data."""
+    execution_id: Optional[str] = None,
+    parent_node_id: Optional[str] = None,
+) -> str:
+    """Create and store a trace from the captured data. Returns node_id."""
     from sdk.schema import (
         Trace,
         TraceRequest,
@@ -220,13 +233,20 @@ def _create_trace(
             min_tokens=expectations.get("min_tokens"),
         )
     
-    # Create and store trace
+    # Create and store trace with execution context
+    from uuid import uuid4
+    node_id = str(uuid4())
+    
     trace = Trace(
         request=request,
         response=response,
         runtime=runtime,
         verdict=verdict,
+        execution_id=execution_id or str(uuid4()),
+        node_id=node_id,
+        parent_node_id=parent_node_id,
     )
     
     layer._store_trace(trace)
+    return node_id
 
