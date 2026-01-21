@@ -615,6 +615,16 @@ function renderGraph(graph) {
     const nodeMap = {};
     graph.nodes.forEach(n => nodeMap[n.node_id] = n);
 
+    // Role icons for Phase 19
+    const roleIcons = {
+        'input': '📥',
+        'transform': '🔄',
+        'llm': '🤖',
+        'tool': '🔧',
+        'validation': '✓',
+        'output': '📤'
+    };
+
     graph.nodes.forEach((node, index) => {
         let statusClass = 'pending';
         let statusIcon = '⏳';
@@ -631,15 +641,22 @@ function renderGraph(graph) {
         const isTainted = taintedNodeIds.has(node.node_id);
         const taintedClass = isTainted ? 'tainted' : '';
 
+        // Phase 19: Use semantic labels
+        const role = node.role || 'llm';
+        const roleIcon = roleIcons[role] || '🤖';
+        const displayLabel = node.human_label || node.label || node.model || 'LLM Call';
+        const description = node.description || `${role.toUpperCase()} node`;
+
         nodesHtml += `
             <div class="graph-node ${statusClass} ${taintedClass}" data-node="${node.node_id}">
                 <div class="node-header">
                     <span class="node-status">${statusIcon}</span>
-                    <span class="node-label">${escapeHtml(node.label || node.model)}</span>
+                    <span class="node-role-icon" title="${role.toUpperCase()}">${roleIcon}</span>
+                    <span class="node-label">${escapeHtml(displayLabel)}</span>
                     ${isTainted ? '<span class="taint-badge">⚠️ TAINTED</span>' : ''}
                 </div>
                 <div class="node-meta">
-                    <span class="node-model">${node.model || 'unknown'}</span>
+                    <span class="node-description">${escapeHtml(description)}</span>
                     <span class="node-latency">${node.latency_ms}ms</span>
                 </div>
             </div>

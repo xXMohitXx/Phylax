@@ -1,5 +1,5 @@
 """
-Execution Graph Model (Phase 14)
+Execution Graph Model (Phase 14+)
 
 Represents execution as a Directed Acyclic Graph (DAG).
 
@@ -9,21 +9,51 @@ Design principles:
 - Edges written at runtime, not inferred later
 """
 
-from typing import Optional
+from typing import Optional, Literal
 from pydantic import BaseModel, Field
 from datetime import datetime
+from enum import Enum
+
+
+# =============================================================================
+# Phase 19: Semantic Node Roles
+# =============================================================================
+
+class NodeRole(str, Enum):
+    """
+    Semantic role of a node in the execution graph.
+    
+    These roles make graphs self-describing and human-readable.
+    """
+    INPUT = "input"           # User input, API request
+    TRANSFORM = "transform"   # Data transformation, parsing
+    LLM = "llm"              # LLM call (default for traces)
+    TOOL = "tool"            # Tool/function call
+    VALIDATION = "validation" # Expectation check, validation
+    OUTPUT = "output"         # Final output, response
 
 
 class GraphNode(BaseModel):
-    """A node in the execution graph (corresponds to one trace)."""
+    """
+    A node in the execution graph (corresponds to one trace).
+    
+    Phase 19: Now includes semantic role and human-readable labels.
+    """
     node_id: str
     trace_id: str
+    
+    # Phase 19: Semantic identification
+    role: NodeRole = Field(default=NodeRole.LLM, description="Semantic role of this node")
+    human_label: str = Field(default="", description="Human-readable label like 'Answer question'")
+    description: str = Field(default="", description="Short description of what this node does")
+    
+    # Technical metadata
     node_type: str = Field(default="llm", description="llm | function | tool")
     model: Optional[str] = None
     provider: Optional[str] = None
     latency_ms: int = 0
     verdict_status: Optional[str] = None  # pass | fail | None
-    label: str = ""  # Short label for display
+    label: str = ""  # Legacy short label
     
     class Config:
         frozen = True  # Immutable
@@ -104,11 +134,17 @@ class ExecutionGraph(BaseModel):
         root_node_id = None
         total_latency = 0
         
-        for trace in traces:
-            # Create node
+        for i, trace in enumerate(traces):
+            # Phase 19: Infer semantic role and labels
+            role, human_label, description = _infer_semantics(trace, i, len(traces))
+            
+            # Create node with semantic metadata
             node = GraphNode(
                 node_id=trace.node_id,
                 trace_id=trace.trace_id,
+                role=role,
+                human_label=human_label,
+                description=description,
                 node_type="llm",
                 model=trace.request.model,
                 provider=trace.request.provider,
@@ -336,3 +372,57 @@ def _get_label(trace) -> str:
         content = messages[0].content or ""
         return content[:30] + "..." if len(content) > 30 else content
     return trace.request.model or "unknown"
+
+
+def _infer_semantics(trace, index: int, total: int) -> tuple:
+    """
+    Phase 19: Infer semantic role and generate human-readable labels.
+    
+    Returns:
+        (role: NodeRole, human_label: str, description: str)
+    """
+    messages = trace.request.messages or []
+    first_content = messages[0].content.lower() if messages and messages[0].content else ""
+    model = trace.request.model or ""
+    provider = trace.request.provider or ""
+    has_verdict = trace.verdict is not None
+    
+    # Infer role based on context
+    role = NodeRole.LLM  # Default
+    
+    # Check if this is a validation step
+    if has_verdict or "check" in first_content or "validate" in first_content or "verify" in first_content:
+        role = NodeRole.VALIDATION
+    # Check for input/parsing patterns
+    elif "parse" in first_content or "extract" in first_content:
+        role = NodeRole.TRANSFORM
+    # First node is often input handler
+    elif index == 0 and trace.parent_node_id is None:
+        role = NodeRole.INPUT
+    # Last node might be output
+    elif index == total - 1:
+        role = NodeRole.OUTPUT
+    
+    # Generate human-readable label
+    if first_content:
+        # Capitalize first letter, truncate to readable length
+        label_text = first_content[:40].strip()
+        if len(first_content) > 40:
+            label_text += "..."
+        # Capitalize first letter
+        human_label = label_text[0].upper() + label_text[1:] if label_text else ""
+    else:
+        human_label = f"{role.value.title()} ({model})"
+    
+    # Generate description
+    role_desc = {
+        NodeRole.INPUT: "Handles incoming request",
+        NodeRole.TRANSFORM: "Transforms or parses data",
+        NodeRole.LLM: f"LLM call to {model}",
+        NodeRole.TOOL: "Executes tool or function",
+        NodeRole.VALIDATION: "Validates expectations",
+        NodeRole.OUTPUT: "Produces final output",
+    }
+    description = role_desc.get(role, f"LLM call via {provider}")
+    
+    return role, human_label, description
