@@ -160,3 +160,30 @@ async def analyze_execution(execution_id: str) -> dict:
         "bottlenecks": graph.find_bottlenecks(top_n=3),
         "verdict": graph.compute_verdict().model_dump(),
     }
+
+
+# =============================================================================
+# Phase 23: Graph Diff Endpoints
+# =============================================================================
+
+@router.get("/executions/{exec_a}/diff/{exec_b}")
+async def diff_executions(exec_a: str, exec_b: str) -> dict:
+    """
+    Phase 23: Compare two execution graphs.
+    
+    Returns differences in:
+    - Added/removed nodes
+    - Latency changes
+    - Verdict changes
+    """
+    graph_a = storage.get_execution_graph(exec_a)
+    if graph_a is None:
+        raise HTTPException(status_code=404, detail=f"Execution {exec_a} not found")
+    
+    graph_b = storage.get_execution_graph(exec_b)
+    if graph_b is None:
+        raise HTTPException(status_code=404, detail=f"Execution {exec_b} not found")
+    
+    diff = graph_a.diff_with(graph_b)
+    
+    return diff.model_dump()

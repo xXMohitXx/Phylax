@@ -119,6 +119,45 @@ class GraphVerdict(BaseModel):
         frozen = True
 
 
+# =============================================================================
+# Phase 23: Graph-Level Diffs
+# =============================================================================
+
+class NodeDiff(BaseModel):
+    """Difference in a single node between two graphs."""
+    node_label: str
+    change_type: str = Field(description="added | removed | changed")
+    latency_delta_ms: Optional[int] = None  # For changed nodes
+    verdict_changed: bool = False
+    old_verdict: Optional[str] = None
+    new_verdict: Optional[str] = None
+
+
+class GraphDiff(BaseModel):
+    """
+    Phase 23: Diff between two execution graphs.
+    
+    Enables comparison of:
+    - Added/removed nodes
+    - Latency changes
+    - Verdict changes
+    """
+    execution_a: str
+    execution_b: str
+    
+    added_nodes: list[NodeDiff] = Field(default_factory=list)
+    removed_nodes: list[NodeDiff] = Field(default_factory=list)
+    changed_nodes: list[NodeDiff] = Field(default_factory=list)
+    
+    # Summary
+    total_changes: int = 0
+    latency_delta_ms: int = 0  # B minus A
+    verdict_changed: bool = False
+    
+    class Config:
+        frozen = True
+
+
 class ExecutionGraph(BaseModel):
     """
     Complete execution graph.
@@ -400,6 +439,85 @@ class ExecutionGraph(BaseModel):
             }
             for n in sorted_nodes[:top_n]
         ]
+    
+    def diff_with(self, other: "ExecutionGraph") -> "GraphDiff":
+        """
+        Phase 23: Compare this graph with another graph.
+        
+        Args:
+            other: Another ExecutionGraph to compare against
+            
+        Returns:
+            GraphDiff object showing differences
+        """
+        # Build label-indexed maps for comparison
+        # We compare by label (semantic content) not node_id (random UUID)
+        self_nodes = {n.human_label or n.label: n for n in self.nodes}
+        other_nodes = {n.human_label or n.label: n for n in other.nodes}
+        
+        self_labels = set(self_nodes.keys())
+        other_labels = set(other_nodes.keys())
+        
+        added = []
+        removed = []
+        changed = []
+        
+        # Nodes only in 'other' (added)
+        for label in other_labels - self_labels:
+            node = other_nodes[label]
+            added.append(NodeDiff(
+                node_label=label,
+                change_type="added",
+                latency_delta_ms=node.latency_ms,
+                new_verdict=node.verdict_status,
+            ))
+        
+        # Nodes only in 'self' (removed)
+        for label in self_labels - other_labels:
+            node = self_nodes[label]
+            removed.append(NodeDiff(
+                node_label=label,
+                change_type="removed",
+                latency_delta_ms=-node.latency_ms,
+                old_verdict=node.verdict_status,
+            ))
+        
+        # Nodes in both (check for changes)
+        for label in self_labels & other_labels:
+            self_node = self_nodes[label]
+            other_node = other_nodes[label]
+            
+            latency_delta = other_node.latency_ms - self_node.latency_ms
+            verdict_changed = self_node.verdict_status != other_node.verdict_status
+            
+            if abs(latency_delta) > 50 or verdict_changed:  # 50ms threshold
+                changed.append(NodeDiff(
+                    node_label=label,
+                    change_type="changed",
+                    latency_delta_ms=latency_delta,
+                    verdict_changed=verdict_changed,
+                    old_verdict=self_node.verdict_status,
+                    new_verdict=other_node.verdict_status,
+                ))
+        
+        # Summary stats
+        total_changes = len(added) + len(removed) + len(changed)
+        latency_delta = other.total_latency_ms - self.total_latency_ms
+        
+        self_verdict = self.compute_verdict().status
+        other_verdict = other.compute_verdict().status
+        verdict_changed = self_verdict != other_verdict
+        
+        return GraphDiff(
+            execution_a=self.execution_id,
+            execution_b=other.execution_id,
+            added_nodes=added,
+            removed_nodes=removed,
+            changed_nodes=changed,
+            total_changes=total_changes,
+            latency_delta_ms=latency_delta,
+            verdict_changed=verdict_changed,
+        )
 
 
 def _get_label(trace) -> str:
