@@ -503,12 +503,15 @@ function switchView(view) {
     document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
     document.querySelector(`[data-view="${view}"]`)?.classList.add('active');
 
+    const tracesView = document.getElementById('tracesView');
+    const graphView = document.getElementById('graphView');
+
     if (view === 'traces') {
-        document.getElementById('tracesView').style.display = 'flex';
-        document.getElementById('graphView').style.display = 'none';
+        tracesView.style.display = 'grid';
+        graphView.style.display = 'none';
     } else {
-        document.getElementById('tracesView').style.display = 'none';
-        document.getElementById('graphView').style.display = 'flex';
+        tracesView.style.display = 'none';
+        graphView.style.display = 'grid';
         loadExecutions();
     }
 }
@@ -558,6 +561,20 @@ async function loadGraph(executionId) {
 
     try {
         const response = await fetch(`${API_BASE}/executions/${executionId}/graph`);
+
+        if (!response.ok) {
+            const error = await response.json();
+            graphContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <h3>Single-node execution</h3>
+                    <p>This trace was captured without execution context.</p>
+                    <p class="hint">Use <code>with sentinel.execution():</code> to create graphs.</p>
+                </div>
+            `;
+            return;
+        }
+
         const graph = await response.json();
         currentGraph = graph;
 

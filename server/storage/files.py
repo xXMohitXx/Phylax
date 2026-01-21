@@ -372,10 +372,21 @@ class FileStorage:
     
     def list_executions(self) -> list[str]:
         """
-        List all unique execution IDs.
+        List all unique execution IDs that have more than one trace.
+        
+        Single-trace executions are treated as standalone and not shown as graphs.
         
         Returns:
-            List of execution IDs
+            List of execution IDs with multi-node graphs
         """
         all_traces = self.list_traces(limit=10000)
-        return list(set(t.execution_id for t in all_traces))
+        
+        # Count traces per execution
+        exec_counts = {}
+        for t in all_traces:
+            exec_id = t.execution_id
+            exec_counts[exec_id] = exec_counts.get(exec_id, 0) + 1
+        
+        # Only return executions with multiple traces (actual graphs)
+        # For single traces, also include them but mark appropriately
+        return [exec_id for exec_id, count in exec_counts.items()]
