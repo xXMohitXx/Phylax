@@ -18,6 +18,9 @@ let currentFilter = 'failed'; // DEFAULT: Failed-only mode (Phase 11.1)
 let visibleCount = 5;
 const PAGE_SIZE = 5;
 
+// Phase 22: Failure Forensics Mode
+let forensicsMode = false;
+
 /**
  * Initialize the application
  */
@@ -683,6 +686,27 @@ function toggleStage(stageId) {
     }
 }
 
+// Phase 22: Toggle Failure Forensics Mode
+function toggleForensicsMode() {
+    forensicsMode = !forensicsMode;
+
+    const btn = document.getElementById('forensicsToggle');
+    const graphContainer = document.getElementById('graphCanvas');
+
+    if (forensicsMode) {
+        btn?.classList.add('active');
+        graphContainer?.classList.add('forensics-mode');
+    } else {
+        btn?.classList.remove('active');
+        graphContainer?.classList.remove('forensics-mode');
+    }
+
+    // Re-render if we have a graph
+    if (currentGraph) {
+        renderGraph(currentGraph);
+    }
+}
+
 // Render a single graph node
 function renderGraphNode(node, index, total, failedNodeIds, taintedNodeIds, maxLatency = 1000) {
     // Role icons for Phase 19
@@ -707,6 +731,7 @@ function renderGraphNode(node, index, total, failedNodeIds, taintedNodeIds, maxL
     }
 
     // Check if tainted
+    const isFailed = failedNodeIds.has(node.node_id);
     const isTainted = taintedNodeIds.has(node.node_id);
     const taintedClass = isTainted ? 'tainted' : '';
 
@@ -728,8 +753,13 @@ function renderGraphNode(node, index, total, failedNodeIds, taintedNodeIds, maxL
     const isBottleneck = latencyRatio > 0.7;
     const bottleneckClass = isBottleneck ? 'bottleneck' : '';
 
+    // Phase 22: Forensics mode - fade irrelevant nodes
+    const isRelevant = isFailed || isTainted;
+    const forensicsClass = forensicsMode && !isRelevant ? 'forensics-faded' : '';
+    const rootCauseClass = forensicsMode && isFailed && !isTainted ? 'root-cause-pulse' : '';
+
     let html = `
-        <div class="graph-node ${statusClass} ${taintedClass} ${bottleneckClass}" 
+        <div class="graph-node ${statusClass} ${taintedClass} ${bottleneckClass} ${forensicsClass} ${rootCauseClass}" 
              data-node="${node.node_id}" 
              style="width: ${widthPercent}%; --latency-color: ${heatmapColor};">
             <div class="node-header">

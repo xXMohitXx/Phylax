@@ -388,6 +388,26 @@
             cursor: not-allowed;
         }
 
+        /* Phase 22: Forensics Button */
+        .forensics-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .forensics-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .forensics-btn.active {
+            background: var(--error);
+            border-color: var(--error);
+            color: white;
+        }
+
         .detail-content {
             flex: 1;
             overflow-y: auto;
@@ -935,6 +955,33 @@
             transition: width 0.3s ease;
         }
 
+        /* Phase 22: Failure Forensics Mode */
+        .forensics-faded {
+            opacity: 0.3;
+            filter: grayscale(0.5);
+            pointer-events: none;
+        }
+
+        .root-cause-pulse {
+            animation: pulse-root-cause 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-root-cause {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+        }
+
+        .forensics-mode .graph-stage:not(.has-failure) {
+            opacity: 0.4;
+        }
+
         .node-header {
             display: flex;
             align-items: center;
@@ -1145,6 +1192,10 @@
             <section class="detail-panel">
                 <div class="detail-header">
                     <span class="detail-title">Execution Graph</span>
+                    <!-- Phase 22: Forensics Mode Toggle -->
+                    <button class="btn forensics-btn" id="forensicsToggle" onclick="toggleForensicsMode()">
+                        🔬 Forensics Mode
+                    </button>
                 </div>
                 <div class="detail-content graph-container" id="graphCanvas">
                     <div class="empty-state">
