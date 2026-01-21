@@ -187,3 +187,33 @@ async def diff_executions(exec_a: str, exec_b: str) -> dict:
     diff = graph_a.diff_with(graph_b)
     
     return diff.model_dump()
+
+
+# =============================================================================
+# Phase 24: Investigation Path Endpoints
+# =============================================================================
+
+@router.get("/executions/{execution_id}/investigate")
+async def get_investigation_path(execution_id: str) -> dict:
+    """
+    Phase 24: Get suggested investigation path for debugging.
+    
+    Returns deterministic reasoning (not AI) about how to debug a failure:
+    1. Root cause identification
+    2. Input review
+    3. Validation check
+    4. Blast radius analysis
+    """
+    graph = storage.get_execution_graph(execution_id)
+    
+    if graph is None:
+        raise HTTPException(status_code=404, detail=f"Execution {execution_id} not found")
+    
+    steps = graph.investigation_path()
+    verdict = graph.compute_verdict()
+    
+    return {
+        "execution_id": execution_id,
+        "verdict": verdict.status,
+        "steps": steps,
+    }

@@ -518,6 +518,87 @@ class ExecutionGraph(BaseModel):
             latency_delta_ms=latency_delta,
             verdict_changed=verdict_changed,
         )
+    
+    def investigation_path(self) -> list[dict]:
+        """
+        Phase 24: Generate a suggested investigation path for debugging.
+        
+        This is deterministic graph reasoning, not AI.
+        It encodes how senior engineers debug:
+        1. Start at failing node (root cause)
+        2. Check its inputs (parent nodes)
+        3. Review validation rules if any
+        4. Check tainted downstream nodes
+        
+        Returns:
+            List of investigation steps with node info and reasoning
+        """
+        steps = []
+        verdict = self.compute_verdict()
+        
+        if verdict.status == "pass":
+            return [{
+                "step": 1,
+                "action": "No failures detected",
+                "node_id": None,
+                "reasoning": "All nodes passed. No investigation needed.",
+            }]
+        
+        # Step 1: Identify root cause node
+        root_cause_id = verdict.root_cause_node
+        root_cause = self.get_node(root_cause_id) if root_cause_id else None
+        
+        if root_cause:
+            steps.append({
+                "step": 1,
+                "action": "Examine root cause",
+                "node_id": root_cause.node_id,
+                "label": root_cause.human_label or root_cause.label,
+                "role": root_cause.role.value if hasattr(root_cause.role, 'value') else str(root_cause.role),
+                "reasoning": "This is the first node that failed in the execution chain.",
+            })
+        
+        # Step 2: Check input/parent node
+        if root_cause_id:
+            parent_id = self.get_parent(root_cause_id)
+            if parent_id:
+                parent = self.get_node(parent_id)
+                if parent:
+                    steps.append({
+                        "step": 2,
+                        "action": "Review input",
+                        "node_id": parent.node_id,
+                        "label": parent.human_label or parent.label,
+                        "role": parent.role.value if hasattr(parent.role, 'value') else str(parent.role),
+                        "reasoning": "Check what data was passed to the failing node.",
+                    })
+        
+        # Step 3: Find any validation nodes
+        validation_nodes = [n for n in self.nodes if n.role.value == "validation" if hasattr(n.role, 'value') else str(n.role) == "validation"]
+        if validation_nodes:
+            vn = validation_nodes[0]
+            steps.append({
+                "step": len(steps) + 1,
+                "action": "Review validation rules",
+                "node_id": vn.node_id,
+                "label": vn.human_label or vn.label,
+                "role": "validation",
+                "reasoning": "Check why validation failed and what rules were violated.",
+            })
+        
+        # Step 4: Show tainted downstream nodes
+        if root_cause_id:
+            tainted = self.get_tainted_nodes(root_cause_id)
+            if tainted:
+                steps.append({
+                    "step": len(steps) + 1,
+                    "action": "Review blast radius",
+                    "node_ids": tainted,
+                    "count": len(tainted),
+                    "reasoning": f"{len(tainted)} downstream node(s) may have been affected by this failure.",
+                })
+        
+        return steps
 
 
 def _get_label(trace) -> str:
