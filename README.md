@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo/phylaxlogo.png" alt="Phylax Logo" width="200">
+  <img src="assets/logo/phylax_logo.png" alt="Phylax Logo" width="200">
 </p>
 
 # Phylax prevents LLM regressions from reaching production.
