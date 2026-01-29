@@ -7,6 +7,9 @@ env/
 pypi_test/
 test_phylax/
 
+# content
+content/
+
 # Python cache
 __pycache__/
 *.py[cod]
