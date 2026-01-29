@@ -18,7 +18,7 @@ import sys
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sdk.adapters.gemini import GeminiAdapter
+from phylax._internal.adapters.gemini import GeminiAdapter
 
 
 def main():

@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "phylax"
 version = "1.0.0"
-description = "Developer-first local LLM tracing, replay & debugging system"
+description = "Deterministic regression enforcement for LLM systems."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
     {name = "Phylax Team"}
 ]
-keywords = ["llm", "tracing", "debugging", "replay", "observability"]
+keywords = ["llm", "testing", "regression", "ci", "deterministic", "tracing"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -21,31 +21,42 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance",
 ]
 dependencies = [
-    "fastapi>=0.109.0",
-    "uvicorn[standard]>=0.27.0",
     "pydantic>=2.5.0",
-    "openai>=1.0.0",
     "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]
+server = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+]
+openai = [
+    "openai>=1.0.0",
+]
+google = [
+    "google-generativeai>=0.8.0",
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
     "httpx>=0.26.0",
+    "requests>=2.31.0",
 ]
-llama = [
-    "llama-cpp-python>=0.2.0",
+all = [
+    "phylax[server,openai,google]",
 ]
 
 [project.scripts]
-phylax = "cli.main:main"
+phylax = "phylax.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/xXMohitXx/Phylax"
 Documentation = "https://github.com/xXMohitXx/Phylax#readme"
+Repository = "https://github.com/xXMohitXx/Phylax"
 
 [tool.setuptools.packages.find]
-include = ["sdk*", "server*", "cli*"]
+include = ["phylax*"]

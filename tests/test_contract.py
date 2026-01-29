@@ -14,8 +14,8 @@ import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sdk.schema import Trace, TraceRequest, TraceResponse, TraceMessage, Verdict, TraceRuntime
-from sdk.graph import ExecutionGraph
+from phylax._internal.schema import Trace, TraceRequest, TraceResponse, TraceMessage, Verdict, TraceRuntime
+from phylax._internal.graph import ExecutionGraph
 
 
 # =============================================================================
@@ -102,7 +102,7 @@ def test_graph_determinism():
 
 def test_deterministic_expectations():
     """INVARIANT: All verdicts are deterministic rules."""
-    from sdk.expectations import evaluate
+    from phylax._internal.expectations import evaluate
     
     # Same inputs MUST produce same outputs
     v1 = evaluate(

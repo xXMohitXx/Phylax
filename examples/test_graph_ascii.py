@@ -9,8 +9,8 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sdk.schema import Trace, TraceRequest, TraceResponse, TraceMessage, Verdict, TraceRuntime
-from sdk.graph import ExecutionGraph
+from phylax._internal.schema import Trace, TraceRequest, TraceResponse, TraceMessage, Verdict, TraceRuntime
+from phylax._internal.graph import ExecutionGraph
 
 
 def create_mock_trace(

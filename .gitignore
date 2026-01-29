@@ -4,6 +4,7 @@ sentinel/
 venv/
 .venv/
 env/
+pypi_test/
 
 # Python cache
 __pycache__/

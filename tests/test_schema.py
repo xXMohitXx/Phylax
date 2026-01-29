@@ -5,7 +5,7 @@ Tests for SDK Schema
 import pytest
 from datetime import datetime
 
-from sdk.schema import (
+from phylax._internal.schema import (
     Trace,
     TraceRequest,
     TraceResponse,

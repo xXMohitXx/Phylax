@@ -11,8 +11,8 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sdk.schema import Trace, TraceRequest, TraceResponse, TraceMessage, Verdict
-from sdk.graph import ExecutionGraph, GraphNode, GraphEdge, GraphVerdict
+from phylax._internal.schema import Trace, TraceRequest, TraceResponse, TraceMessage, Verdict
+from phylax._internal.graph import ExecutionGraph, GraphNode, GraphEdge, GraphVerdict
 
 
 def create_mock_trace(
@@ -23,7 +23,7 @@ def create_mock_trace(
     verdict_status: str = "pass"
 ):
     """Create a mock trace for testing."""
-    from sdk.schema import TraceRuntime
+    from phylax._internal.schema import TraceRuntime
     
     return Trace(
         trace_id=str(uuid.uuid4()),

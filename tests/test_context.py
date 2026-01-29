@@ -13,7 +13,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sdk.context import (
+from phylax._internal.context import (
     execution,
     get_execution_id,
     get_parent_node_id,
@@ -91,7 +91,7 @@ class TestTraceSchema:
     
     def test_trace_has_execution_fields(self):
         """Trace should have execution_id, node_id, parent_node_id."""
-        from sdk.schema import Trace, TraceRequest, TraceResponse, TraceRuntime
+        from phylax._internal.schema import Trace, TraceRequest, TraceResponse, TraceRuntime
         
         trace = Trace(
             request=TraceRequest(

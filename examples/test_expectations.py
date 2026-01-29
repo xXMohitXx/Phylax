@@ -10,8 +10,8 @@ import sys
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sdk.decorator import trace, expect
-from sdk.adapters.gemini import GeminiAdapter
+from phylax._internal.decorator import trace, expect
+from phylax._internal.adapters.gemini import GeminiAdapter
 
 
 # Example 1: Passing expectation

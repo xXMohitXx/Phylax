@@ -12,9 +12,9 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import sdk
-from sdk.decorator import trace
-from sdk.adapters.gemini import GeminiAdapter
+import phylax
+from phylax._internal.decorator import trace
+from phylax._internal.adapters.gemini import GeminiAdapter
 
 
 @trace(provider="gemini")

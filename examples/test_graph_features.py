@@ -17,9 +17,9 @@ import requests
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import sdk
-from sdk.decorator import trace, expect
-from sdk.adapters.gemini import GeminiAdapter
+import phylax
+from phylax._internal.decorator import trace, expect
+from phylax._internal.adapters.gemini import GeminiAdapter
 
 API_BASE = "http://127.0.0.1:8000/v1"
 

@@ -6,7 +6,7 @@ Tests the four rules and the evaluator.
 
 import pytest
 
-from sdk.expectations import (
+from phylax._internal.expectations import (
     evaluate,
     Verdict,
     Evaluator,

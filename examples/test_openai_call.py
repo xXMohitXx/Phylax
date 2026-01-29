@@ -18,7 +18,7 @@ import sys
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sdk.adapters.openai import OpenAIAdapter
+from phylax._internal.adapters.openai import OpenAIAdapter
 
 
 def main():

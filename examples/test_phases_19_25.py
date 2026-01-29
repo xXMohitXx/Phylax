@@ -9,8 +9,8 @@ import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sdk.schema import Trace, TraceRequest, TraceResponse, TraceMessage, Verdict, TraceRuntime
-from sdk.graph import ExecutionGraph, NodeRole, GraphStage, GraphDiff, NodeDiff
+from phylax._internal.schema import Trace, TraceRequest, TraceResponse, TraceMessage, Verdict, TraceRuntime
+from phylax._internal.graph import ExecutionGraph, NodeRole, GraphStage, GraphDiff, NodeDiff
 
 
 def create_trace(exec_id, node_id, parent_id=None, latency=100, status='pass', content='test'):
