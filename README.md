@@ -41,6 +41,7 @@ from phylax._internal.decorator import trace
 from phylax._internal.context import execution
 from phylax._internal.adapters.gemini import GeminiAdapter
 
+# add google api key
 @trace(provider="gemini")
 def ask_gemini(prompt: str):
     """Traced Gemini call."""
