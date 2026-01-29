@@ -5,6 +5,7 @@ venv/
 .venv/
 env/
 pypi_test/
+test_phylax/
 
 # Python cache
 __pycache__/

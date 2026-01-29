@@ -36,19 +36,36 @@ pip install phylax[all]
 ## Quick Start
 
 ```python
-from phylax import trace, expect, execution
+import phylax
+from phylax._internal.decorator import trace
+from phylax._internal.context import execution
+from phylax._internal.adapters.gemini import GeminiAdapter
 
 @trace(provider="gemini")
-@expect(must_include=["refund"], max_latency_ms=1500)
-def customer_reply(query):
-    return llm.generate(query)
+def ask_gemini(prompt: str):
+    """Traced Gemini call."""
+    adapter = GeminiAdapter()
+    response, _ = adapter.generate(
+        prompt=prompt,
+        model="gemini-2.5-flash",
+    )
+    return response
+
+# Single call
+result = ask_gemini("Hello!")
+print(result.text)
 
 # Track multi-step agent flows
-with execution("customer-support-flow"):
-    result = customer_reply("I want a refund")
+with execution() as exec_id:
+    step1 = ask_gemini("What is 2+2?")
+    step2 = ask_gemini("Is that correct?")
 ```
 
 ```bash
+# Start the UI server
+phylax server
+# Open http://127.0.0.1:8000/ui
+
 # Mark a known-good response as baseline
 phylax bless <trace_id>
 
@@ -72,6 +89,21 @@ Phylax is a **test framework**. It tells you when LLM behavior changes.
 
 ---
 
+## Using the Web UI
+
+```bash
+pip install phylax[server]
+phylax server
+# Open http://127.0.0.1:8000/ui
+```
+
+The UI shows:
+- Trace list with pass/fail status
+- Execution graphs for multi-step flows
+- Forensics mode for debugging
+
+---
+
 ## CI Integration
 
 ```yaml
@@ -87,27 +119,12 @@ Phylax is a **test framework**. It tells you when LLM behavior changes.
 
 ---
 
-## Expectations (Deterministic Rules)
-
-```python
-@expect(
-    must_include=["word"],       # Required content
-    must_not_include=["sorry"],  # Forbidden content
-    max_latency_ms=2000,         # Performance gate
-    min_tokens=10                # Minimum length
-)
-```
-
-All rules are deterministic. No AI judgment. No ambiguity.
-
----
-
 ## Commands
 
 | Command | What it does |
 |---------|--------------|
 | `phylax init` | Initialize config |
-| `phylax server` | Start API server |
+| `phylax server` | Start API server + UI |
 | `phylax list` | List traces |
 | `phylax list --failed` | Show only failed traces |
 | `phylax show <id>` | Show trace details |
@@ -122,20 +139,20 @@ All rules are deterministic. No AI judgment. No ambiguity.
 | Feature | Description |
 |---------|-------------|
 | **Trace Capture** | Record every LLM call automatically |
-| **Expectations** | Define PASS/FAIL rules (4 deterministic rules) |
+| **Execution Context** | Group traces by `execution()` context |
 | **Golden Traces** | Baseline comparisons with hash verification |
 | **CI Integration** | `phylax check` exits 1 on regression |
-| **Execution Graphs** | Visualize multi-step agent workflows |
+| **Web UI** | View traces at http://127.0.0.1:8000/ui |
 | **Forensics Mode** | Debug failures with guided investigation |
 
 ---
 
 ## Stability Guarantee
 
-Phylax v1.0.0 is **API-frozen**:
+Phylax v1.x is **API-frozen**:
 
 - No breaking changes in v1.x
-- `trace`, `expect`, `execution` are stable
+- `trace`, `execution` are stable
 - Exit codes are stable
 - Schema is stable
 

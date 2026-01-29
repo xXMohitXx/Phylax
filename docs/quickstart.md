@@ -7,9 +7,7 @@
 ## 1. Install (2 min)
 
 ```bash
-git clone https://github.com/xXMohitXx/Phylax.git
-cd Phylax
-pip install -r requirements.txt
+pip install phylax[all]
 ```
 
 Set your API key:
@@ -26,7 +24,7 @@ export GOOGLE_API_KEY="your-key"
 ## 2. Start Server (1 min)
 
 ```bash
-python -m cli.main server
+phylax server
 ```
 
 Open: http://127.0.0.1:8000/ui
@@ -38,19 +36,26 @@ Open: http://127.0.0.1:8000/ui
 Create `myapp.py`:
 
 ```python
-from sdk.decorator import trace, expect
-from sdk.adapters.gemini import GeminiAdapter
+import os
+import phylax
+from phylax._internal.decorator import trace
+from phylax._internal.context import execution
+from phylax._internal.adapters.gemini import GeminiAdapter
 
 @trace(provider="gemini")
-@expect(must_include=["hello"], max_latency_ms=2000)
 def greet(name):
+    """Traced Gemini call."""
     adapter = GeminiAdapter()
-    response, _ = adapter.generate(f"Say hello to {name}")
+    response, _ = adapter.generate(
+        prompt=f"Say hello to {name} in a friendly way.",
+        model="gemini-2.5-flash",
+    )
     return response
 
 # Run it
-result = greet("World")
-print(result)
+if __name__ == "__main__":
+    result = greet("World")
+    print(f"Response: {result.text}")
 ```
 
 Run:
@@ -58,24 +63,40 @@ Run:
 python myapp.py
 ```
 
-Check UI — you should see your trace!
+Check UI at http://127.0.0.1:8000/ui — you should see your trace!
 
 ---
 
-## 4. Bless a Golden (1 min)
+## 4. Use Execution Context (2 min)
 
-Find your trace ID in the UI and mark it as the baseline:
+Group related calls together:
 
-```bash
-python -m cli.main bless <trace_id> --yes
+```python
+from phylax._internal.context import execution
+
+with execution() as exec_id:
+    print(f"Execution ID: {exec_id}")
+    step1 = greet("Alice")
+    step2 = greet("Bob")
+    # Both traces share the same execution_id
 ```
 
 ---
 
-## 5. Run CI Check (1 min)
+## 5. Bless a Golden (1 min)
+
+Find your trace ID in the UI and mark it as the baseline:
 
 ```bash
-python -m cli.main check
+phylax bless <trace_id> --yes
+```
+
+---
+
+## 6. Run CI Check (1 min)
+
+```bash
+phylax check
 ```
 
 - **Exit 0**: All goldens pass ✅
@@ -83,10 +104,10 @@ python -m cli.main check
 
 ---
 
-## 6. Add to CI (2 min)
+## 7. Add to CI (2 min)
 
 ```yaml
-# .github/workflows/Phylax.yml
+# .github/workflows/phylax.yml
 name: Phylax Check
 on: [push]
 jobs:
@@ -97,8 +118,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - run: pip install -r requirements.txt
-      - run: python -m cli.main check
+      - run: pip install phylax[all]
+      - run: phylax check
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
 ```
@@ -108,9 +129,10 @@ jobs:
 ## Done! You now have:
 
 ✅ LLM call tracing  
-✅ Expectation evaluation (PASS/FAIL)  
+✅ Execution context grouping  
 ✅ Golden baseline comparison  
 ✅ CI regression gate  
+✅ Web UI for debugging  
 
 ---
 

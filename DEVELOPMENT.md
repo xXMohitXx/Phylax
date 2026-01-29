@@ -1,10 +1,10 @@
 # Development Guide
 
-Complete guide for local development, testing, and contributing to Phylax v1.0.
+Complete guide for local development, testing, and contributing to Phylax.
 
 ---
 
-## Quick Setup
+## Quick Setup (For Contributors)
 
 ```bash
 # Clone
@@ -12,12 +12,18 @@ git clone https://github.com/xXMohitXx/Phylax.git
 cd Phylax
 
 # Virtual environment
-python -m venv Phylax
-.\Phylax\Scripts\activate  # Windows
-# source Phylax/bin/activate  # Linux/Mac
+python -m venv .venv
+.\.venv\Scripts\activate  # Windows
+# source .venv/bin/activate  # Linux/Mac
 
-# Install
-pip install -r requirements.txt
+# Install in dev mode
+pip install -e ".[all,dev]"
+```
+
+## For Users
+
+```bash
+pip install phylax[all]
 ```
 
 ## Environment Variables
@@ -33,20 +39,20 @@ $env:OPENAI_API_KEY = "your-openai-key"  # optional
 
 ### Start Server
 ```bash
-python -m cli.main server
+phylax server
 # UI: http://127.0.0.1:8000/ui
 # API: http://127.0.0.1:8000/docs
 ```
 
 ### CLI Commands
 ```bash
-python -m cli.main init           # Initialize
-python -m cli.main list           # List traces
-python -m cli.main list --failed  # Failed only
-python -m cli.main show <id>      # Show trace
-python -m cli.main replay <id>    # Replay
-python -m cli.main bless <id>     # Mark golden
-python -m cli.main check          # CI check
+phylax init           # Initialize
+phylax list           # List traces
+phylax list --failed  # Failed only
+phylax show <id>      # Show trace
+phylax replay <id>    # Replay
+phylax bless <id>     # Mark golden
+phylax check          # CI check
 ```
 
 ---
@@ -54,14 +60,13 @@ python -m cli.main check          # CI check
 ## Testing
 
 ```bash
-# Contract and invariant tests
-python tests/test_contract.py
+# Run all tests
+pytest tests/
 
-# Phase 19-25 tests
-python examples/test_phases_19_25.py
-
-# All examples
+# Run specific tests
+python examples/test_graph_unit.py
 python examples/test_graph_features.py
+python examples/test_phases_19_25.py
 ```
 
 ---
@@ -70,158 +75,79 @@ python examples/test_graph_features.py
 
 ```
 Phylax/
-├── sdk/
-│   ├── __init__.py            # Version (1.0.0)
-│   ├── schema.py              # Trace schema
-│   ├── decorator.py           # @trace, @expect
-│   ├── capture.py             # Core capture
-│   ├── context.py             # Execution context
-│   ├── graph.py               # Graph models
-│   ├── expectations/
-│   │   ├── rules.py           # 4 rules
-│   │   └── evaluator.py       # Verdict logic
-│   └── adapters/
-│       ├── openai.py
-│       └── gemini.py
-├── server/
-│   ├── main.py                # FastAPI app
-│   ├── routes/
-│   │   ├── traces.py          # CRUD + Graph endpoints
-│   │   ├── replay.py          # Replay engine
-│   │   └── chat.py            # OpenAI compat
-│   └── storage/
-│       ├── files.py           # JSON storage
-│       └── sqlite.py          # Index
-├── cli/
-│   └── main.py                # All commands
-├── ui/
-│   ├── index.html             # Failure-first UI
-│   └── app.js                 # Frontend logic
-├── docs/                      # v1.0 Documentation
-│   ├── contract.md            # API guarantees
-│   ├── invariants.md          # Semantic invariants
-│   ├── failure-modes.md       # Error behavior
-│   ├── quickstart.md          # Getting started
-│   ├── mental-model.md        # Conceptual guide
-│   ├── graph-model.md         # Graph visualization
-│   ├── failure-playbook.md    # Debug procedures
-│   ├── versioning.md          # Release policy
-│   └── performance.md         # Scale limits
-├── tests/
-│   └── test_contract.py       # Contract enforcement
-└── examples/
-    └── test_phases_19_25.py   # Comprehensive tests
+├── phylax/                    # Main package (PyPI)
+│   ├── __init__.py            # Public API
+│   ├── _internal/             # Internal modules
+│   │   ├── schema.py          # Trace schema
+│   │   ├── decorator.py       # @trace, @expect
+│   │   ├── capture.py         # Core capture
+│   │   ├── context.py         # Execution context
+│   │   ├── graph.py           # Graph models
+│   │   ├── expectations/      # 4 rules + evaluator
+│   │   └── adapters/          # OpenAI, Gemini
+│   ├── cli/                   # CLI commands
+│   ├── server/                # FastAPI backend
+│   ├── ui/                    # Web UI (HTML/JS)
+│   └── assets/                # Logo, favicon
+├── tests/                     # Unit tests
+├── examples/                  # Demo scripts
+├── docs/                      # Documentation
+└── pyproject.toml             # Package config
 ```
 
 ---
 
-## Key Design Decisions
+## Creating a Demo Script
 
-### API Contract (v1.0)
-- Guaranteed APIs in [docs/contract.md](docs/contract.md)
-- 10 semantic invariants in [docs/invariants.md](docs/invariants.md)
-- Breaking changes require major version bump
+```python
+import phylax
+from phylax._internal.decorator import trace
+from phylax._internal.context import execution
+from phylax._internal.adapters.gemini import GeminiAdapter
 
-### Verdict Immutability
-- Verdicts computed at trace creation
-- Never recalculated after storage
-- Traces are audit artifacts
 
-### Storage
-- JSON files as source of truth (`~/.Phylax/traces/`)
-- SQLite index for queries
-- Date-organized directories
+@trace(provider="gemini")
+def ask_gemini(prompt: str):
+    adapter = GeminiAdapter()
+    response, _ = adapter.generate(
+        prompt=prompt,
+        model="gemini-2.5-flash",
+    )
+    return response
 
-### Expectations
-All deterministic (no AI):
-- `must_include` — substring present
-- `must_not_include` — substring absent
-- `max_latency_ms` — performance
-- `min_tokens` — minimum length
+
+# Single call
+result = ask_gemini("Hello!")
+print(result.text)
+
+# Grouped calls
+with execution() as exec_id:
+    step1 = ask_gemini("Step 1")
+    step2 = ask_gemini("Step 2")
+```
+
+---
+
+## Building for PyPI
+
+```bash
+pip install build twine
+python -m build
+twine upload dist/*
+```
 
 ---
 
 ## Contributing
 
-### Workflow
-1. Fork the repo
-2. Create branch: `git checkout -b feature/my-feature`
-3. Make changes + add tests
-4. Run tests: `python tests/test_contract.py`
-5. Commit: `git commit -m "feat: add feature"`
-6. Push and create PR
-
-### Commit Format
-```
-feat: new feature
-fix: bug fix
-docs: documentation
-refactor: code improvement
-test: add tests
-```
-
-### Areas for Contribution
-| Area | Difficulty |
-|------|------------|
-| Bug fixes | Easy |
-| Documentation | Easy |
-| Tests | Medium |
-| UI improvements | Medium |
-| New adapters | Medium |
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `pytest tests/`
+5. Submit a pull request
 
 ---
 
-## Debugging
+## License
 
-### Trace Files
-```
-~/.Phylax/traces/YYYY-MM-DD/<trace_id>.json
-```
-
-### Common Issues
-| Issue | Solution |
-|-------|----------|
-| API key not found | Set environment variable |
-| Traces not showing | Restart server, refresh UI |
-| ⏳ verdict | No `@expect` decorator |
-| Graph empty | Use `execution()` context |
-| UI cached | Hard refresh (Ctrl+Shift+R) |
-
----
-
-## API Testing
-
-```bash
-# Health check
-curl http://127.0.0.1:8000/health
-
-# List traces
-curl http://127.0.0.1:8000/v1/traces
-
-# Get execution graph
-curl http://127.0.0.1:8000/v1/executions/{id}/graph
-
-# Get investigation path
-curl http://127.0.0.1:8000/v1/executions/{id}/investigate
-
-# Create snapshot
-curl http://127.0.0.1:8000/v1/executions/{id}/snapshot
-```
-
----
-
-## Release Process
-
-1. Update `sdk/__init__.py` version
-2. Update CHANGELOG.md
-3. Run all tests
-4. Commit and tag: `git tag -a v1.0.x -m "Release"`
-5. Push: `git push --tags`
-
-See [docs/versioning.md](docs/versioning.md) for full policy.
-
----
-
-## Status: ✅ v1.0.0 STABLE
-
-All 35 phases complete. Ready for production.
+MIT License

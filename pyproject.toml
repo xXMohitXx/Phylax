@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "phylax"
-version = "1.0.0"
+version = "1.0.1"
 description = "Deterministic regression enforcement for LLM systems."
 readme = "README.md"
 license = {text = "MIT"}
@@ -60,3 +60,12 @@ Repository = "https://github.com/xXMohitXx/Phylax"
 
 [tool.setuptools.packages.find]
 include = ["phylax*"]
+
+[tool.setuptools.package-data]
+phylax = [
+    "ui/*.html",
+    "ui/*.js",
+    "ui/*.css",
+    "assets/**/*",
+]
+
