@@ -9,7 +9,8 @@ Demonstrates:
 
 import os
 import sys
-
+from dotenv import load_dotenv
+load_dotenv()   
 # Add project root to path for local testing
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

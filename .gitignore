@@ -3,7 +3,7 @@ phylax/
 sentinel/
 venv/
 .venv/
-env/
+.env
 pypi_test/
 test_phylax/
 
