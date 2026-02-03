@@ -3,7 +3,6 @@ phylax/
 sentinel/
 venv/
 .venv/
-.env
 pypi_test/
 test_phylax/
 
@@ -45,3 +44,6 @@ Thumbs.db
 # Local data
 .phylax/
 .sentinel/
+
+# Environment variables
+.env
