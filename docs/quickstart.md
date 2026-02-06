@@ -36,15 +36,12 @@ Open: http://127.0.0.1:8000/ui
 Create `myapp.py`:
 
 ```python
-import os
-import phylax
-from phylax._internal.decorator import trace
-from phylax._internal.context import execution
-from phylax._internal.adapters.gemini import GeminiAdapter
+from phylax import trace, expect, GeminiAdapter
 
 @trace(provider="gemini")
+@expect(must_include=["hello", "hi"], max_latency_ms=5000)
 def greet(name):
-    """Traced Gemini call."""
+    """Traced Gemini call with expectations."""
     adapter = GeminiAdapter()
     response, _ = adapter.generate(
         prompt=f"Say hello to {name} in a friendly way.",
@@ -72,7 +69,7 @@ Check UI at http://127.0.0.1:8000/ui — you should see your trace!
 Group related calls together:
 
 ```python
-from phylax._internal.context import execution
+from phylax import trace, expect, execution, GeminiAdapter
 
 with execution() as exec_id:
     print(f"Execution ID: {exec_id}")
@@ -129,6 +126,7 @@ jobs:
 ## Done! You now have:
 
 ✅ LLM call tracing  
+✅ Expectation validation  
 ✅ Execution context grouping  
 ✅ Golden baseline comparison  
 ✅ CI regression gate  
@@ -136,8 +134,29 @@ jobs:
 
 ---
 
+## Using Other Providers
+
+```python
+from phylax import (
+    OpenAIAdapter,     # pip install phylax[openai]
+    GeminiAdapter,     # pip install phylax[google]
+    GroqAdapter,       # pip install phylax[groq]
+    MistralAdapter,    # pip install phylax[mistral]
+    HuggingFaceAdapter, # pip install phylax[huggingface]
+    OllamaAdapter,     # pip install phylax[ollama]
+)
+
+# All adapters share the same interface
+adapter = GroqAdapter()
+response, trace = adapter.generate(prompt="Hello!", model="llama3-70b-8192")
+```
+
+---
+
 ## Next Steps
 
+- [Providers](providers.md) — All supported providers
+- [Error Codes](errors.md) — PHYLAX_Exxx error reference
+- [Correct Usage](correct-usage.md) — Valid configurations
 - [Mental Model](mental-model.md) — What Phylax is
-- [Graph Model](graph-model.md) — Multi-step agents
 - [Failure Playbook](failure-playbook.md) — Debug failures

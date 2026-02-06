@@ -2,6 +2,14 @@
 
 All notable changes to Phylax.
 
+## [1.1.2] - 2026-02-07
+
+### Added
+- **Adapters exported from main package**: Now `from phylax import GeminiAdapter` works
+- All 7 demos updated to use clean imports
+
+---
+
 ## [1.1.1] - 2026-02-07
 
 ### Changed

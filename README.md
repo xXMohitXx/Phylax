@@ -23,43 +23,45 @@ Without Phylax, you discover this **in production**.
 pip install phylax
 ```
 
-For server/UI support:
-```bash
-pip install phylax[server]
-```
-
-For all LLM providers:
+For all LLM providers (OpenAI, Gemini, Groq, Mistral, HuggingFace, Ollama):
 ```bash
 pip install phylax[all]
+```
+
+Individual providers:
+```bash
+pip install phylax[openai]       # OpenAI
+pip install phylax[google]       # Gemini (google-genai SDK)
+pip install phylax[groq]         # Groq LPU
+pip install phylax[mistral]      # Mistral AI
+pip install phylax[huggingface]  # HuggingFace Inference API
+pip install phylax[ollama]       # Ollama (local models)
 ```
 
 ## Quick Start
 
 ```python
-import phylax
-from phylax._internal.decorator import trace
-from phylax._internal.context import execution
-from phylax._internal.adapters.gemini import GeminiAdapter
+from phylax import trace, expect, execution, GeminiAdapter
 
-# add google api key
 @trace(provider="gemini")
-def ask_gemini(prompt: str):
-    """Traced Gemini call."""
+@expect(must_include=["hello"], max_latency_ms=5000)
+def greet(name: str):
+    """Traced Gemini call with expectations."""
     adapter = GeminiAdapter()
     response, _ = adapter.generate(
-        prompt=prompt,
+        prompt=f"Say hello to {name}",
         model="gemini-2.5-flash",
     )
     return response
 
 # Single call
-result = ask_gemini("Hello!")
+result = greet("World")
 print(result.text)
 
 # Track multi-step agent flows
 with execution() as exec_id:
-    step1 = ask_gemini("What is 2+2?")
-    step2 = ask_gemini("Is that correct?")
+    step1 = greet("Alice")
+    step2 = greet("Bob")
 ```
 
 ```bash
@@ -78,6 +80,27 @@ That's it. Your CI now blocks LLM regressions.
 
 ---
 
+## Supported Providers
+
+| Provider | Adapter | Env Variable |
+|----------|---------|--------------|
+| OpenAI | `OpenAIAdapter` | `OPENAI_API_KEY` |
+| Gemini | `GeminiAdapter` | `GOOGLE_API_KEY` |
+| Groq | `GroqAdapter` | `GROQ_API_KEY` |
+| Mistral | `MistralAdapter` | `MISTRAL_API_KEY` |
+| HuggingFace | `HuggingFaceAdapter` | `HF_TOKEN` |
+| Ollama | `OllamaAdapter` | `OLLAMA_HOST` |
+
+```python
+from phylax import OpenAIAdapter, GroqAdapter, MistralAdapter
+
+# All adapters share the same interface
+adapter = GroqAdapter()
+response, trace = adapter.generate(prompt="Hello!", model="llama3-70b-8192")
+```
+
+---
+
 ## What Phylax is NOT
 
 - ❌ **Not monitoring** — no metrics, no dashboards
@@ -87,21 +110,6 @@ That's it. Your CI now blocks LLM regressions.
 - ❌ **Not prompt engineering** — tests outputs, not prompts
 
 Phylax is a **test framework**. It tells you when LLM behavior changes.
-
----
-
-## Using the Web UI
-
-```bash
-pip install phylax[server]
-phylax server
-# Open http://127.0.0.1:8000/ui
-```
-
-The UI shows:
-- Trace list with pass/fail status
-- Execution graphs for multi-step flows
-- Forensics mode for debugging
 
 ---
 
@@ -140,31 +148,37 @@ The UI shows:
 | Feature | Description |
 |---------|-------------|
 | **Trace Capture** | Record every LLM call automatically |
+| **Expectations** | Validate with `@expect` rules |
 | **Execution Context** | Group traces by `execution()` context |
 | **Golden Traces** | Baseline comparisons with hash verification |
 | **CI Integration** | `phylax check` exits 1 on regression |
 | **Web UI** | View traces at http://127.0.0.1:8000/ui |
-| **Forensics Mode** | Debug failures with guided investigation |
+| **Multi-Provider** | OpenAI, Gemini, Groq, Mistral, HuggingFace, Ollama |
 
 ---
 
-## Stability Guarantee
+## Demos
 
-Phylax v1.x is **API-frozen**:
+See the `demos/` directory for runnable examples:
 
-- No breaking changes in v1.x
-- `trace`, `execution` are stable
-- Exit codes are stable
-- Schema is stable
-
-See [docs/contract.md](https://github.com/xXMohitXx/Phylax/blob/main/docs/contract.md) for full guarantees.
+```bash
+python demos/01_basic_trace.py      # Basic tracing
+python demos/02_expectations.py     # All @expect rules
+python demos/03_execution_context.py # Trace grouping
+python demos/04_graph_nodes.py      # Graph API
+python demos/05_golden_workflow.py  # CI workflow
+python demos/06_raw_evidence.py     # Evidence API
+python demos/07_error_contracts.py  # Error codes
+```
 
 ---
 
 ## Documentation
 
 - [Quickstart](https://github.com/xXMohitXx/Phylax/blob/main/docs/quickstart.md)
-- [Mental Model](https://github.com/xXMohitXx/Phylax/blob/main/docs/mental-model.md)
+- [Providers](https://github.com/xXMohitXx/Phylax/blob/main/docs/providers.md)
+- [Error Codes](https://github.com/xXMohitXx/Phylax/blob/main/docs/errors.md)
+- [Correct Usage](https://github.com/xXMohitXx/Phylax/blob/main/docs/correct-usage.md)
 - [API Contract](https://github.com/xXMohitXx/Phylax/blob/main/docs/contract.md)
 
 ---

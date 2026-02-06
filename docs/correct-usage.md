@@ -8,14 +8,15 @@ Phylax is a verdict engine. It answers one question:
 ## Valid Setup
 
 ```python
-from phylax._internal.decorator import trace, expect
-from phylax._internal.context import execution
+from phylax import trace, expect, execution, GeminiAdapter
 
 @trace(provider="gemini")
 @expect(must_include=["hello"], max_latency_ms=2000)
 def greet():
-    # LLM call
-    ...
+    """Traced LLM call with expectations."""
+    adapter = GeminiAdapter()
+    response, _ = adapter.generate(prompt="Say hello", model="gemini-2.5-flash")
+    return response
 
 with execution() as exec_id:
     greet()  # Creates trace with verdict
@@ -28,7 +29,7 @@ with execution() as exec_id:
 
 ---
 
-## Invalid Setups
+## Invalid Setups (Hard Failures)
 
 | Setup | Error |
 |-------|-------|
@@ -36,6 +37,21 @@ with execution() as exec_id:
 | Empty `execution()` | PHYLAX_E102 |
 | Bless trace without verdict | PHYLAX_E201 |
 | `phylax check` without goldens | PHYLAX_E202 |
+
+---
+
+## Supported Providers
+
+```python
+from phylax import (
+    OpenAIAdapter,      # OPENAI_API_KEY
+    GeminiAdapter,      # GOOGLE_API_KEY
+    GroqAdapter,        # GROQ_API_KEY
+    MistralAdapter,     # MISTRAL_API_KEY
+    HuggingFaceAdapter, # HF_TOKEN
+    OllamaAdapter,      # OLLAMA_HOST
+)
+```
 
 ---
 
