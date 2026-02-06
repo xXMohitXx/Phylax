@@ -12,13 +12,13 @@ Requirements:
 
 import sys
 
-from phylax._internal.graph import (
+from phylax import (
     ExecutionGraph,
     NodeRole,
     GraphStage,
+    Verdict,
+    __version__,
 )
-from phylax._internal.schema import Verdict
-import phylax
 
 
 def create_sample_graph():
@@ -59,7 +59,7 @@ def main():
     print("=" * 60)
     print("🧪 DEMO 04: Graph Nodes")
     print("=" * 60)
-    print(f"📦 Phylax version: {phylax.__version__}")
+    print(f"📦 Phylax version: {__version__}")
     print()
     
     # Create graph

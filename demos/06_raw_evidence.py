@@ -13,19 +13,19 @@ Requirements:
 
 import sys
 
+from phylax import __version__
 from phylax._internal.evidence import (
     compare_outputs,
     compare_latency,
     compare_paths,
 )
-import phylax
 
 
 def main():
     print("=" * 60)
     print("🧪 DEMO 06: Raw Evidence")
     print("=" * 60)
-    print(f"📦 Phylax version: {phylax.__version__}")
+    print(f"📦 Phylax version: {__version__}")
     print()
     
     # Hash Evidence

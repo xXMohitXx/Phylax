@@ -13,13 +13,13 @@ Requirements:
 
 import sys
 
+from phylax import __version__
 from phylax._internal.errors import (
     MissingExpectationsError,
     EmptyExecutionGraphError,
     NonDeterministicGoldenError,
     ReplayWithoutGoldenError,
 )
-import phylax
 
 
 def demo_e101_missing_expectations():
@@ -90,7 +90,7 @@ def main():
     print("=" * 60)
     print("🧪 DEMO 07: Error Contracts")
     print("=" * 60)
-    print(f"📦 Phylax version: {phylax.__version__}")
+    print(f"📦 Phylax version: {__version__}")
     print()
     
     demo_e101_missing_expectations()

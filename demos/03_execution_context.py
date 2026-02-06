@@ -14,10 +14,7 @@ Requirements:
 import os
 import sys
 
-from phylax._internal.decorator import trace, expect
-from phylax._internal.context import execution
-from phylax._internal.adapters.gemini import GeminiAdapter
-import phylax
+from phylax import trace, expect, execution, GeminiAdapter, __version__
 
 
 @trace(provider="gemini")
@@ -64,7 +61,7 @@ def main():
     print("=" * 60)
     print("🧪 DEMO 03: Execution Context")
     print("=" * 60)
-    print(f"📦 Phylax version: {phylax.__version__}")
+    print(f"📦 Phylax version: {__version__}")
     print()
     
     # Group traces in an execution context
