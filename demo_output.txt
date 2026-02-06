@@ -1,0 +1,43 @@
+﻿============================================================
+python : Traceback (most recent 
+call last):
+At line:1 char:66
++ ... _Rlo04pNs2w6q_6llyvEJY"; 
+python demos/02_expectations.py 
+2>&1 | Out-F ...
++                              ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo          : N 
+   otSpecified: (Traceback (mo  
+  st recent call last)::Strin   
+ g) [], RemoteException
+    + FullyQualifiedErrorId : N 
+   ativeCommandError
+ 
+  File "C:\Users\Mohit Manglani\
+OneDrive\Desktop\sentinel_v0\dem
+os\02_expectations.py", line 
+112, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Users\Mohit Manglani\
+OneDrive\Desktop\sentinel_v0\dem
+os\02_expectations.py", line 
+83, in main
+    print("\U0001f9ea DEMO 02: 
+Expectation Rules")
+  File "C:\Users\Mohit Manglani\
+AppData\Local\Programs\Python\Py
+thon312\Lib\encodings\cp1252.py"
+, line 19, in encode
+    return codecs.charmap_encode
+(input,self.errors,encoding_tabl
+e)[0]
+           ^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^
+UnicodeEncodeError: 'charmap' 
+codec can't encode character 
+'\U0001f9ea' in position 0: 
+character maps to <undefined>
