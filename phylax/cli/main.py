@@ -308,9 +308,10 @@ def cmd_check(args):
     blessed_traces = storage.list_blessed_traces()
     
     if not blessed_traces:
-        print("⚠️  No blessed traces found.")
+        print("[PHYLAX_E202] No golden traces found.")
+        print("   Cannot check regressions without golden references.")
         print("   Use 'phylax bless <trace_id>' to mark a trace as golden.")
-        return 0
+        return 1
     
     print("═" * 60)
     print("🔍 PHYLAX CHECK - Replaying Golden Traces")
