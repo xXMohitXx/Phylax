@@ -1,127 +1,97 @@
 # Changelog
 
-All notable changes to Phylax are documented here.
+All notable changes to Phylax.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-
----
-
-## [1.0.0] - 2026-01-28
-
-### 🎉 First Stable Release
-
-Phylax v1.0.0 marks the first production-ready release with frozen API contracts.
-
-### Added
-
-#### Phase 26 — Contract Freeze
-- `docs/contract.md` — Guaranteed stable APIs
-- `docs/invariants.md` — 10 semantic invariants
-- `tests/test_contract.py` — Contract enforcement tests
-
-#### Phase 27 — Failure Modes
-- `docs/failure-modes.md` — Explicit failure taxonomy
-- Determinism guarantees documented
-- Error codes standardized
-
-#### Phase 28 — Documentation
-- `docs/quickstart.md` — 10 min to CI failure
-- `docs/mental-model.md` — What Phylax is/isn't
-- `docs/graph-model.md` — Execution graph guide
-- `docs/failure-playbook.md` — Debug procedures
-
-#### Phase 29-33 — V1 Preparation
-- `docs/versioning.md` — Semantic versioning policy
-- `docs/performance.md` — Scale bounds and limits
-- CHANGELOG.md created
+## [1.1.1] - 2026-02-07
 
 ### Changed
-- SDK version bumped to 1.0.0
-- README updated for v1.0
-- **Renamed from Sentinel to Phylax**
+- **GeminiAdapter**: Migrated from deprecated `google-generativeai` to new `google-genai` SDK
+  - Uses centralized `Client` architecture
+  - Supports gemini-2.5-flash, gemini-2.5-pro models
 
 ### Fixed
-- Fixed investigation_path list comprehension syntax
+- Updated google dependency: `google-genai>=0.5.0`
 
 ---
 
-## [0.5.0] - 2026-01-22
+## [1.1.0] - 2026-02-07
 
 ### Added
+- **Multi-Provider Support**:
+  - `GroqAdapter` - Groq LPU inference (llama3-70b, mixtral-8x7b)
+  - `MistralAdapter` - Mistral AI (mistral-large, codestral)
+  - `HuggingFaceAdapter` - HuggingFace Inference API
+  - `OllamaAdapter` - Local models via Ollama
 
-#### Phase 19 — Semantic Nodes
-- `NodeRole` enum (INPUT, TRANSFORM, LLM, TOOL, VALIDATION, OUTPUT)
-- `human_label` and `description` on GraphNode
-- Auto-inference of node roles
+- **Error Contracts Demo**: `demos/07_error_contracts.py`
 
-#### Phase 20 — Hierarchical Graphs
-- `GraphStage` model for grouping nodes
-- Collapsible stages in UI
-
-#### Phase 21 — Time Visualization
-- Latency heatmap colors
-- Bottleneck badges
-- Time bars on nodes
-
-#### Phase 22 — Forensics Mode
-- Toggle for debug focus
-- Faded non-relevant nodes
-- Pulsing root cause
-
-#### Phase 23 — Graph Diffs
-- `GraphDiff` and `NodeDiff` models
-- `diff_with()` method on ExecutionGraph
-- `/executions/{a}/diff/{b}` endpoint
-
-#### Phase 24 — Investigation Paths
-- `investigation_path()` method
-- Deterministic debug guidance
-- `/executions/{id}/investigate` endpoint
-
-#### Phase 25 — Enterprise Hardening
-- `compute_hash()` for integrity
-- `to_snapshot()` for immutable snapshots
-- `verify_integrity()` for tamper detection
-- `/executions/{id}/snapshot`, `/export`, `/verify` endpoints
+- **Optional Dependencies**:
+  - `pip install phylax[groq]`
+  - `pip install phylax[mistral]`
+  - `pip install phylax[huggingface]`
+  - `pip install phylax[ollama]`
 
 ---
 
-## [0.4.0] - 2026-01-20
+## [1.0.5] - 2026-02-07
 
 ### Added
-- Phase 14-18 execution graph features
-- Graph construction from traces
-- Graph verdict computation
-- Performance analysis (critical path, bottlenecks)
+- **Phase 1: Misuse Elimination**
+  - PHYLAX_E101: `@trace` without `@expect` → hard fail
+  - PHYLAX_E102: Empty `execution()` → hard fail
+  - PHYLAX_E201: Bless trace without verdict → hard fail
+  - PHYLAX_E202: `phylax check` without goldens → hard fail
+
+- **Phase 2: Error Contracts**
+  - `docs/errors.md` - Error taxonomy table
+
+- **Phase 3: Raw Evidence**
+  - `phylax/_internal/evidence.py` - HashEvidence, LatencyEvidence, PathEvidence
+
+- **Phase 4: Opinionated Docs**
+  - `docs/correct-usage.md`
+  - `docs/when-not-to-use.md`
+
+- **Demos Directory**: 6 comprehensive examples
 
 ---
 
-## [0.3.0] - 2026-01-15
+## [1.0.4] - 2026-01-29
 
-### Added
-- Phase 13 execution context
-- Multi-step agent support
-- Parent-child trace linking
-
----
-
-## [0.2.0] - 2026-01-10
-
-### Added
-- Phase 7-12 core features
-- Expectation engine (4 rules)
-- Golden traces and blessing
-- CI integration (`phylax check`)
-- Failure-first UI
+### Fixed
+- Fixed `ModuleNotFoundError: No module named 'server'` in capture.py
+- Corrected import to `phylax.server.storage.files`
 
 ---
 
-## [0.1.0] - 2026-01-05
+## [1.0.3] - 2026-01-29
+
+### Fixed
+- Fixed `phylax server` command module path
+
+---
+
+## [1.0.2] - 2026-01-28
+
+### Changed
+- Updated PyPI description with latest README
+
+---
+
+## [1.0.1] - 2026-01-28
+
+### Fixed
+- Included UI and assets in PyPI package
+- Added `[tool.setuptools.package-data]` to pyproject.toml
+
+---
+
+## [1.0.0] - 2026-01-20
 
 ### Added
-- Initial SDK release
-- `@trace` and `@expect` decorators
-- Gemini and OpenAI adapters
-- FastAPI server
-- CLI commands
-- File-based storage
+- Initial stable release
+- Core decorators: `@trace`, `@expect`
+- Execution context: `execution()`
+- CLI commands: `init`, `server`, `list`, `show`, `bless`, `check`
+- Web UI for trace visualization
+- Adapters: OpenAIAdapter, GeminiAdapter
