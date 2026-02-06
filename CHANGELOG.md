@@ -2,6 +2,14 @@
 
 All notable changes to Phylax.
 
+## [1.1.3] - 2026-02-07
+
+### Fixed
+- **Critical**: Fixed `expectations/__init__.py` to export `evaluate` function
+- `@trace` + `@expect` decorators now work correctly together
+
+---
+
 ## [1.1.2] - 2026-02-07
 
 ### Added
