@@ -37,8 +37,28 @@ python demos/05_golden_workflow.py
 | 04_graph_nodes.py | Graph API | Building and traversing graphs |
 | 05_golden_workflow.py | `bless`, `check` | CI workflow demo |
 | 06_raw_evidence.py | Evidence API | Raw evidence comparison |
+| 07_error_contracts.py | Error codes | PHYLAX_E1xx/E2xx errors |
 
 ## Requirements
+
+- Python 3.10+
+- API key for your provider (see below)
+- Install: `pip install phylax[all]`
+
+## Provider Installation
+
+```bash
+# All providers
+pip install phylax[all]
+
+# Individual providers
+pip install phylax[openai]     # OpenAI
+pip install phylax[google]     # Gemini
+pip install phylax[groq]       # Groq
+pip install phylax[mistral]    # Mistral
+pip install phylax[huggingface] # HuggingFace
+pip install phylax[ollama]     # Ollama (local)
+```
 
 - Python 3.10+
 - `GOOGLE_API_KEY` environment variable

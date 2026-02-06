@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "phylax"
-version = "1.0.5"
+version = "1.1.0"
 description = "Deterministic regression enforcement for LLM systems."
 readme = "README.md"
 license = {text = "MIT"}
@@ -40,6 +40,18 @@ openai = [
 google = [
     "google-generativeai>=0.8.0",
 ]
+groq = [
+    "groq>=0.4.0",
+]
+mistral = [
+    "mistralai>=0.1.0",
+]
+huggingface = [
+    "huggingface_hub>=0.20.0",
+]
+ollama = [
+    "ollama>=0.1.0",
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
@@ -47,7 +59,7 @@ dev = [
     "requests>=2.31.0",
 ]
 all = [
-    "phylax[server,openai,google]",
+    "phylax[server,openai,google,groq,mistral,huggingface,ollama]",
 ]
 
 [project.scripts]
@@ -68,4 +80,3 @@ phylax = [
     "ui/*.css",
     "assets/**/*",
 ]
-
