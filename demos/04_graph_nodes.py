@@ -16,40 +16,59 @@ from phylax import (
     ExecutionGraph,
     NodeRole,
     GraphStage,
-    Verdict,
     __version__,
 )
+from phylax._internal.graph import GraphNode, GraphEdge, GraphVerdict
 
 
 def create_sample_graph():
     """Create a sample execution graph for demonstration."""
-    graph = ExecutionGraph(execution_id="demo-execution-001")
+    # Create nodes manually (normally done via from_traces)
+    nodes = [
+        GraphNode(
+            node_id="node-1",
+            trace_id="trace-1",
+            role=NodeRole.INPUT,
+            human_label="Root node",
+            verdict_status="pass",
+        ),
+        GraphNode(
+            node_id="node-2",
+            trace_id="trace-2",
+            role=NodeRole.LLM,
+            human_label="Child 1",
+            verdict_status="pass",
+        ),
+        GraphNode(
+            node_id="node-3",
+            trace_id="trace-3",
+            role=NodeRole.LLM,
+            human_label="Child 2 (failed)",
+            verdict_status="fail",
+        ),
+        GraphNode(
+            node_id="node-4",
+            trace_id="trace-4",
+            role=NodeRole.OUTPUT,
+            human_label="Leaf node",
+            verdict_status="pass",
+        ),
+    ]
     
-    # Add root node (first call in execution)
-    graph.add_node(
-        node_id="node-1",
-        parent_id=None,
-        verdict=Verdict(status="pass", violations=[], severity="none"),
-    )
+    # Create edges (parent -> child)
+    edges = [
+        GraphEdge(from_node="node-1", to_node="node-2"),
+        GraphEdge(from_node="node-1", to_node="node-3"),
+        GraphEdge(from_node="node-2", to_node="node-4"),
+    ]
     
-    # Add child nodes
-    graph.add_node(
-        node_id="node-2",
-        parent_id="node-1",
-        verdict=Verdict(status="pass", violations=[], severity="none"),
-    )
-    
-    graph.add_node(
-        node_id="node-3",
-        parent_id="node-1",
-        verdict=Verdict(status="fail", violations=["latency exceeded 1000ms"], severity="high"),
-    )
-    
-    # Add leaf node
-    graph.add_node(
-        node_id="node-4",
-        parent_id="node-2",
-        verdict=Verdict(status="pass", violations=[], severity="none"),
+    # Construct immutable graph
+    graph = ExecutionGraph(
+        execution_id="demo-execution-001",
+        nodes=nodes,
+        edges=edges,
+        root_node_id="node-1",
+        node_count=4,
     )
     
     return graph
@@ -82,11 +101,11 @@ def main():
     for node_id in ["node-1", "node-2", "node-3", "node-4"]:
         node = graph.get_node(node_id)
         if node:
-            role = "ROOT" if node.parent_id is None else "CHILD"
+            role = node.role.value.upper()
             children = graph.get_children(node_id)
             if not children:
                 role = "LEAF"
-            status = "✅" if node.verdict.status == "pass" else "❌"
+            status = "✅" if node.verdict_status == "pass" else "❌"
             print(f"   {node_id}: {role} {status}")
     print()
     
