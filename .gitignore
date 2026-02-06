@@ -49,4 +49,5 @@ Thumbs.db
 .env
 
 #videos
-my-video/
+my-video
+my-video/src

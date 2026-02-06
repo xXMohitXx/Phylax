@@ -15,8 +15,7 @@ load_dotenv()
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import phylax
-from phylax._internal.decorator import trace
-from phylax._internal.context import execution
+from phylax import trace, execution
 from phylax._internal.adapters.gemini import GeminiAdapter
 
 
