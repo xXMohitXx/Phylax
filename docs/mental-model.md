@@ -6,10 +6,10 @@
 
 ## The One-Liner
 
-**Phylax is a regression gate for LLM outputs.**
+**Phylax is a CI-native regression enforcement gate for LLM outputs.**
 
 It answers one question:  
-*"Did my LLM behavior change from what I expected?"*
+*"Did my LLM behavior violate a declared contract?"*
 
 ---
 
@@ -44,16 +44,19 @@ When failures happen, Phylax shows:
 ## What Phylax is NOT
 
 ### ❌ Not an LLM Evaluator
-Phylax doesn't judge if your output is "good". It judges if it matches expectations.
+Phylax doesn't judge if your output is "good". It judges if it violates declared contracts.
 
 ### ❌ Not a Prompt Engineering Tool
-Phylax doesn't help you write prompts. It tells you when prompts break.
+Phylax doesn't help you write prompts. It tells you when outputs violate expectations.
 
 ### ❌ Not a Monitoring Dashboard
-Phylax is for CI, not production monitoring. Use observability tools for that.
+Phylax is for CI enforcement, not production monitoring. Use observability tools for that.
 
 ### ❌ Not AI-Powered
 Phylax uses zero AI to evaluate. Rules are code, not inference.
+
+### ❌ Not Adaptive or Heuristic
+Phylax uses exact matching and explicit rules. No fuzzy logic.
 
 ---
 
@@ -113,7 +116,7 @@ Phylax makes these promises (see [contract.md](contract.md)):
 3. **CI exit codes are reliable** — 0 = pass, 1 = fail
 4. **No AI judgment** — Only explicit rules
 
-If you can't trust your testing tool, it's worthless.
+If you can't trust your enforcement tool, it's worthless.
 
 ---
 

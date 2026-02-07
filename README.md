@@ -4,7 +4,7 @@
 
 # Phylax
 
-**Deterministic regression enforcement for LLM systems.**
+**CI-native regression enforcement for LLM outputs.**
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyPI version](https://img.shields.io/pypi/v/phylax.svg)](https://pypi.org/project/phylax/)
@@ -14,8 +14,8 @@
 
 ## The Problem
 
-LLM outputs change unexpectedly. Same prompt, different model version → different behavior.
-Without Phylax, you discover this **in production**.
+LLM systems change across model versions, prompts, and environments.
+Phylax enforces contracts so these changes are caught before production.
 
 ## Installation
 
@@ -65,18 +65,17 @@ with execution() as exec_id:
 ```
 
 ```bash
-# Start the UI server
+# Start the server
 phylax server
-# Open http://127.0.0.1:8000/ui
 
 # Mark a known-good response as baseline
 phylax bless <trace_id>
 
-# In CI: fail if output regresses
-phylax check  # exits 1 on failure
+# In CI: fail if output violates declared expectations
+phylax check  # exits 1 on contract violation
 ```
 
-That's it. Your CI now blocks LLM regressions.
+**That's it. Your CI now blocks LLM contract violations.**
 
 ---
 
@@ -103,17 +102,19 @@ response, trace = adapter.generate(prompt="Hello!", model="llama3-70b-8192")
 
 ## What Phylax is NOT
 
-- ❌ **Not monitoring** — no metrics, no dashboards
-- ❌ **Not observability** — no traces-to-cloud, no analytics
-- ❌ **Not AI judgment** — rules are deterministic, not LLM-based
-- ❌ **Not cloud-dependent** — runs entirely local
-- ❌ **Not prompt engineering** — tests outputs, not prompts
+- ❌ **Not monitoring or observability** — no metrics, no dashboards, no analytics
+- ❌ **Not production runtime tooling** — CI enforcement only
+- ❌ **Not AI-based judgment or scoring** — rules are deterministic, never LLM-based
+- ❌ **Not exploratory prompt evaluation** — tests outputs against declared contracts
+- ❌ **Not adaptive or heuristic-driven** — exact match, explicit expectations
 
-Phylax is a **test framework**. It tells you when LLM behavior changes.
+**If you need subjective evaluation or live insights, Phylax is the wrong tool.**
 
 ---
 
-## CI Integration
+## CI Integration (Primary Interface)
+
+Phylax's primary interface is CI verdict enforcement.
 
 ```yaml
 # .github/workflows/phylax.yml
@@ -123,8 +124,8 @@ Phylax is a **test framework**. It tells you when LLM behavior changes.
 ```
 
 **Exit codes:**
-- `0` — All golden traces pass
-- `1` — Regression detected
+- `0` — All golden traces pass declared expectations
+- `1` — Contract violation detected
 
 ---
 
@@ -139,23 +140,51 @@ Phylax is a **test framework**. It tells you when LLM behavior changes.
 | `phylax show <id>` | Show trace details |
 | `phylax replay <id>` | Re-run a trace |
 | `phylax bless <id>` | Mark as golden baseline |
-| `phylax check` | CI regression check |
+| `phylax check` | **CI regression enforcement** |
+| `phylax --version` | Show version |
 
 ---
 
-## Features
+## Capabilities
 
-| Feature | Description |
-|---------|-------------|
+| Capability | Description |
+|------------|-------------|
 | **Trace Capture** | Record every LLM call automatically |
 | **Expectations** | Validate with `@expect` rules |
 | **Execution Context** | Group traces by `execution()` context |
 | **Golden Traces** | Baseline comparisons with hash verification |
-| **Golden Reference UI** | ⭐ Bless/unbless traces from web interface |
-| **Trace ID Search** | 🔍 Search traces by ID in sidebar |
-| **CI Integration** | `phylax check` exits 1 on regression |
-| **Web UI** | View traces at http://127.0.0.1:8000/ui |
+| **CI Enforcement** | `phylax check` exits 1 on contract violation |
 | **Multi-Provider** | OpenAI, Gemini, Groq, Mistral, HuggingFace, Ollama |
+
+### Auxiliary Control Surfaces
+
+The UI and API are auxiliary control surfaces.
+Phylax's primary interface is CI verdict enforcement.
+
+| Surface | Purpose |
+|---------|---------|
+| **Web UI** | Inspect traces at http://127.0.0.1:8000/ui |
+| **Golden Reference UI** | Bless/unbless traces from interface |
+| **Trace ID Search** | Find traces by ID |
+| **REST API** | Programmatic trace access |
+
+---
+
+## Architecture
+
+```
+phylax/
+├── _internal/           # Core enforcement logic
+│   ├── adapters/        # LLM provider adapters
+│   ├── expectations/    # Deterministic rule engine
+│   └── graph.py         # Execution graphs
+├── cli/                 # CLI commands
+├── server/              # API server
+└── ui/                  # Web interface
+```
+
+The API server exists to support Phylax operations (trace storage, golden management, CI verdicts).
+It is not an extensibility platform.
 
 ---
 
@@ -164,14 +193,23 @@ Phylax is a **test framework**. It tells you when LLM behavior changes.
 See the `demos/` directory for runnable examples:
 
 ```bash
-python demos/01_basic_trace.py      # Basic tracing
-python demos/02_expectations.py     # All @expect rules
+python demos/01_basic_trace.py       # Basic tracing
+python demos/02_expectations.py      # All @expect rules
 python demos/03_execution_context.py # Trace grouping
-python demos/04_graph_nodes.py      # Graph API
-python demos/05_golden_workflow.py  # CI workflow
-python demos/06_raw_evidence.py     # Evidence API
-python demos/07_error_contracts.py  # Error codes
+python demos/04_graph_nodes.py       # Graph API
+python demos/05_golden_workflow.py   # CI workflow
+python demos/06_raw_evidence.py      # Evidence API
+python demos/07_error_contracts.py   # Error codes
 ```
+
+---
+
+## Version
+
+**v1.1.6 STABLE**
+
+Stable means execution semantics and verdict behavior are frozen.
+Minor versions focus on correctness and misuse prevention.
 
 ---
 
@@ -182,6 +220,14 @@ python demos/07_error_contracts.py  # Error codes
 - [Error Codes](https://github.com/xXMohitXx/Phylax/blob/main/docs/errors.md)
 - [Correct Usage](https://github.com/xXMohitXx/Phylax/blob/main/docs/correct-usage.md)
 - [API Contract](https://github.com/xXMohitXx/Phylax/blob/main/docs/contract.md)
+
+---
+
+## TL;DR
+
+Phylax is a CI-native, deterministic regression enforcement system for LLM outputs.
+It records LLM behavior, evaluates explicit expectations, and fails builds when declared contracts regress.
+Phylax does not explain, score, or optimize outputs — it enforces consistency.
 
 ---
 

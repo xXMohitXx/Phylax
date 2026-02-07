@@ -1,6 +1,6 @@
 # Phylax Quickstart
 
-> **Goal: From zero to CI failure in 10 minutes.**
+> **Goal: From zero to CI enforcement in 10 minutes.**
 
 ---
 

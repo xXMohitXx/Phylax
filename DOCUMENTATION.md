@@ -1,21 +1,33 @@
 # Phylax Documentation
 
-Complete technical reference for Phylax v1.1.5 — the LLM regression prevention tool.
+Complete technical reference for Phylax v1.1.6 — CI-native regression enforcement for LLM outputs.
 
 ---
 
 ## Overview
 
-Phylax prevents LLM regressions from reaching production by:
+Phylax enforces contracts so LLM behavior changes are caught before production:
 1. **Recording** every LLM call
-2. **Evaluating** expectations (PASS/FAIL)
+2. **Evaluating** explicit expectations (PASS/FAIL)
 3. **Comparing** against golden baselines
-4. **Visualizing** execution graphs
-5. **Failing CI** when outputs regress
+4. **Failing CI** when declared contracts regress
 
-### Status: ✅ v1.1.5 STABLE
+### Status: ✅ v1.1.6 STABLE
 
-All features implemented. API contract frozen. Ready for production.
+Stable means execution semantics and verdict behavior are frozen.
+Minor versions focus on correctness and misuse prevention.
+
+---
+
+## What Phylax is NOT
+
+- ❌ **Not monitoring or observability** — no metrics, no dashboards, no analytics
+- ❌ **Not production runtime tooling** — CI enforcement only
+- ❌ **Not AI-based judgment or scoring** — rules are deterministic, never LLM-based
+- ❌ **Not exploratory prompt evaluation** — tests outputs against declared contracts
+- ❌ **Not adaptive or heuristic-driven** — exact match, explicit expectations
+
+**If you need subjective evaluation or live insights, Phylax is the wrong tool.**
 
 ---
 
@@ -23,7 +35,7 @@ All features implemented. API contract frozen. Ready for production.
 
 | Document | Purpose |
 |----------|---------|
-| [docs/quickstart.md](docs/quickstart.md) | 10 min to CI failure |
+| [docs/quickstart.md](docs/quickstart.md) | 10 min to CI enforcement |
 | [docs/mental-model.md](docs/mental-model.md) | What Phylax is/isn't |
 | [docs/graph-model.md](docs/graph-model.md) | How to read graphs |
 | [docs/failure-playbook.md](docs/failure-playbook.md) | Debug procedures |
@@ -39,10 +51,8 @@ All features implemented. API contract frozen. Ready for production.
 
 ### Installation
 ```python
-from sdk.decorator import trace, expect
-from sdk.context import execution
-from sdk.adapters.gemini import GeminiAdapter
-from sdk.adapters.openai import OpenAIAdapter
+from phylax import trace, expect, execution
+from phylax import GeminiAdapter, OpenAIAdapter
 ```
 
 ### @trace Decorator
@@ -68,7 +78,7 @@ def customer_support(query):
 
 ### Execution Context
 ```python
-from sdk.context import execution
+from phylax import execution
 
 # Track multi-step workflows
 with execution("my-agent-flow"):
@@ -121,10 +131,10 @@ class Verdict:
 
 ## Execution Graphs
 
-### Graph Features
+### Graph Capabilities
 
-| Feature | Description |
-|---------|-------------|
+| Capability | Description |
+|------------|-------------|
 | DAG Visualization | Nodes and edges with hierarchical stages |
 | Semantic Nodes | Role labels (INPUT, LLM, VALIDATION...) |
 | Time Visualization | Latency heatmap, bottleneck badges |
@@ -135,7 +145,7 @@ class Verdict:
 
 ### Building Graphs
 ```python
-from sdk.graph import ExecutionGraph
+from phylax._internal.graph import ExecutionGraph
 
 graph = ExecutionGraph.from_traces(traces)
 verdict = graph.compute_verdict()
@@ -149,35 +159,41 @@ snapshot = graph.to_snapshot()
 
 ### Bless a Trace
 ```bash
-Phylax bless <trace_id>
-Phylax bless <trace_id> --yes    # Skip confirmation
-Phylax bless <trace_id> --force  # Override existing
+phylax bless <trace_id>
+phylax bless <trace_id> --yes    # Skip confirmation
+phylax bless <trace_id> --force  # Override existing
 ```
 
 ### How It Works
 1. Output is hashed and stored
 2. One golden per model/provider
-3. `Phylax check` compares against golden
-4. Hash mismatch → FAIL
+3. `phylax check` compares against golden
+4. Hash mismatch → Contract violation → CI fails
 
 ---
 
-## CLI Reference
+## CLI Reference (Primary Interface)
+
+Phylax's primary interface is CI verdict enforcement.
 
 | Command | Description |
 |---------|-------------|
-| `Phylax init` | Initialize config |
-| `Phylax server` | Start API server |
-| `Phylax list` | List traces |
-| `Phylax list --failed` | Failed only |
-| `Phylax show <id>` | Show trace |
-| `Phylax replay <id>` | Re-run trace |
-| `Phylax bless <id>` | Mark golden |
-| `Phylax check` | CI check (exits 1 on fail) |
+| `phylax check` | **CI enforcement** (exits 1 on violation) |
+| `phylax bless <id>` | Mark golden baseline |
+| `phylax init` | Initialize config |
+| `phylax server` | Start auxiliary server |
+| `phylax list` | List traces |
+| `phylax list --failed` | Show only failed traces |
+| `phylax show <id>` | Show trace |
+| `phylax replay <id>` | Re-run trace |
+| `phylax --version` | Show version |
 
 ---
 
-## API Reference
+## API Reference (Auxiliary)
+
+The API server exists to support Phylax operations (trace storage, golden management, CI verdicts).
+It is not an extensibility platform.
 
 Base: `http://127.0.0.1:8000`
 
@@ -226,24 +242,28 @@ Base: `http://127.0.0.1:8000`
 ## Storage
 
 ```
-~/.Phylax/
+~/.phylax/
 ├── config.yaml
 ├── traces/
 │   └── YYYY-MM-DD/
 │       └── <trace_id>.json
-└── Phylax.db  # SQLite index
+└── phylax.db  # SQLite index
 ```
 
 ---
 
-## CI Integration
+## CI Integration (Primary Use Case)
 
 ### GitHub Actions
 ```yaml
-- run: python -m cli.main check
+- run: phylax check
   env:
     GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
 ```
+
+**Exit codes:**
+- `0` — All golden traces pass declared expectations
+- `1` — Contract violation detected
 
 ---
 
@@ -253,7 +273,11 @@ Base: `http://127.0.0.1:8000`
 |----------|-------------|
 | `GOOGLE_API_KEY` | Gemini API key |
 | `OPENAI_API_KEY` | OpenAI API key |
-| `Phylax_HOME` | Config directory (optional) |
+| `GROQ_API_KEY` | Groq API key |
+| `MISTRAL_API_KEY` | Mistral API key |
+| `HF_TOKEN` | HuggingFace token |
+| `OLLAMA_HOST` | Ollama host |
+| `PHYLAX_HOME` | Config directory (optional) |
 
 ---
 
