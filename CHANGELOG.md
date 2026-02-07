@@ -2,6 +2,15 @@
 
 All notable changes to Phylax.
 
+## [1.1.5] - 2026-02-07
+
+### Added
+- **Trace ID Search**: Search box in sidebar to find traces by ID
+  - Type partial or full trace ID to filter
+  - Auto-selects on exact match
+
+---
+
 ## [1.1.4] - 2026-02-07
 
 ### Added
