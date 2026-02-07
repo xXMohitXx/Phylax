@@ -82,11 +82,17 @@ with execution() as exec_id:
 
 ## 5. Bless a Golden (1 min)
 
-Find your trace ID in the UI and mark it as the baseline:
+**Option A: From the UI (recommended)**
+1. Find your trace in the sidebar
+2. Click **⭐ Bless as Golden** button
+3. Trace shows gold border and "GOLDEN" badge
 
+**Option B: From CLI**
 ```bash
 phylax bless <trace_id> --yes
 ```
+
+**Tip:** Use the 🔍 search box to find traces by ID!
 
 ---
 

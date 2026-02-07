@@ -151,6 +151,8 @@ Phylax is a **test framework**. It tells you when LLM behavior changes.
 | **Expectations** | Validate with `@expect` rules |
 | **Execution Context** | Group traces by `execution()` context |
 | **Golden Traces** | Baseline comparisons with hash verification |
+| **Golden Reference UI** | ⭐ Bless/unbless traces from web interface |
+| **Trace ID Search** | 🔍 Search traces by ID in sidebar |
 | **CI Integration** | `phylax check` exits 1 on regression |
 | **Web UI** | View traces at http://127.0.0.1:8000/ui |
 | **Multi-Provider** | OpenAI, Gemini, Groq, Mistral, HuggingFace, Ollama |

@@ -1,6 +1,6 @@
 # Phylax Documentation
 
-Complete technical reference for Phylax v1.0 — the LLM regression prevention tool.
+Complete technical reference for Phylax v1.1.5 — the LLM regression prevention tool.
 
 ---
 
@@ -13,7 +13,7 @@ Phylax prevents LLM regressions from reaching production by:
 4. **Visualizing** execution graphs
 5. **Failing CI** when outputs regress
 
-### Status: ✅ v1.0.0 STABLE
+### Status: ✅ v1.1.5 STABLE
 
 All features implemented. API contract frozen. Ready for production.
 
@@ -201,6 +201,13 @@ Base: `http://127.0.0.1:8000`
 | GET | `/v1/executions/{id}/snapshot` | Immutable copy |
 | GET | `/v1/executions/{id}/export` | Export artifact |
 | GET | `/v1/executions/{id}/verify` | Verify integrity |
+
+### Golden References
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/v1/traces/{id}/bless` | Mark as golden |
+| DELETE | `/v1/traces/{id}/bless` | Remove golden status |
+| GET | `/v1/goldens` | List all golden traces |
 
 ### Replay
 | Method | Endpoint | Description |
