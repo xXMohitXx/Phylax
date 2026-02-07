@@ -460,10 +460,13 @@ def cmd_graph_check(args):
 
 def main():
     """Main entry point."""
+    from phylax import __version__
+    
     parser = argparse.ArgumentParser(
         prog="phylax",
         description="Developer-first local LLM tracing, replay & debugging system",
     )
+    parser.add_argument("--version", "-v", action="version", version=f"phylax {__version__}")
     
     subparsers = parser.add_subparsers(dest="command", help="Commands")
     
