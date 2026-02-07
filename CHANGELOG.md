@@ -2,6 +2,13 @@
 
 All notable changes to Phylax.
 
+## [1.1.6] - 2026-02-07
+
+### Added
+- **CLI Version Flag**: `phylax --version` or `phylax -v` shows current version
+
+---
+
 ## [1.1.5] - 2026-02-07
 
 ### Added
