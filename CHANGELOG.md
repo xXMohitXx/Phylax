@@ -2,6 +2,21 @@
 
 All notable changes to Phylax.
 
+## [1.1.4] - 2026-02-07
+
+### Added
+- **Golden Reference UI**: Bless/unbless traces directly from the UI
+  - ⭐ "Bless as Golden" button next to Replay
+  - Golden badge on blessed traces in sidebar
+  - Gold border styling for blessed traces
+  
+- **Bless API Endpoints**:
+  - `POST /v1/traces/{id}/bless` - Mark trace as golden
+  - `DELETE /v1/traces/{id}/bless` - Remove golden status
+  - `GET /v1/goldens` - List all golden traces
+
+---
+
 ## [1.1.3] - 2026-02-07
 
 ### Fixed
