@@ -12,13 +12,15 @@ Requirements:
 
 import sys
 
-from phylax import (
+from phylax import __version__
+from phylax.graph import (
     ExecutionGraph,
     NodeRole,
     GraphStage,
-    __version__,
+    GraphNode,
+    GraphEdge,
+    GraphVerdict,
 )
-from phylax._internal.graph import GraphNode, GraphEdge, GraphVerdict
 
 
 def create_sample_graph():

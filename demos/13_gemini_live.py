@@ -14,7 +14,7 @@ load_dotenv()
 
 import google.generativeai as genai
 
-from phylax._internal.expectations import (
+from phylax.expectations import (
     Evaluator,
     MustIncludeRule,
     MustNotIncludeRule,
@@ -37,7 +37,7 @@ if not api_key:
     exit(1)
 
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-2.0-flash")
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 print("=" * 70)
 print("DEMO 13: Live Gemini Integration - All Axis 1 Features")

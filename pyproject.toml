@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "phylax"
-version = "1.2.2"
+version = "1.2.3"
 description = "CI-native regression enforcement for LLM outputs."
 readme = "README.md"
 

@@ -14,7 +14,7 @@ Requirements:
 import sys
 
 from phylax import __version__
-from phylax._internal.errors import (
+from phylax.errors import (
     MissingExpectationsError,
     EmptyExecutionGraphError,
     NonDeterministicGoldenError,

@@ -14,7 +14,7 @@ Requirements:
 import sys
 
 from phylax import __version__
-from phylax._internal.evidence import (
+from phylax.evidence import (
     compare_outputs,
     compare_latency,
     compare_paths,

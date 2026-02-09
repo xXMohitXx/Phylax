@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # Load environment
 load_dotenv()
 
-from phylax._internal.expectations import (
+from phylax.expectations import (
     Evaluator,
     MustIncludeRule,
     MaxLatencyRule,

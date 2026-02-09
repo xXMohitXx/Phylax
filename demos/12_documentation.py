@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # Load environment
 load_dotenv()
 
-from phylax._internal.expectations import (
+from phylax.expectations import (
     Evaluator,
     MustIncludeRule,
     MustNotIncludeRule,
@@ -111,7 +111,7 @@ print(json.dumps(documenter.to_json(), indent=2))
 print("\n--- Example 6: Template Documentation ---")
 print("Describe what a template includes.")
 
-from phylax._internal.expectations import describe_template
+from phylax.expectations import describe_template
 
 template = get_template("safe-response")
 print(describe_template(template))
