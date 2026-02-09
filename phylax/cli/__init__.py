@@ -1,0 +1,1 @@
+"""Phylax CLI module."""
