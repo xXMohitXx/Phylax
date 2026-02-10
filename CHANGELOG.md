@@ -2,7 +2,7 @@
 
 All notable changes to Phylax.
 
-## [1.2.0] - 2026-02-10
+## [1.2.4] - 2026-02-10
 
 ### Added
 - **Axis 2 Readiness Audit**: Full pass across all 6 audit phases
