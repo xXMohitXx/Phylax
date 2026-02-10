@@ -87,7 +87,7 @@ Phylax uses exact matching and explicit rules. No fuzzy logic.
 - Future runs compare against golden
 
 ### "Graphs are for visualization"
-**Shift**: Graphs are for debugging.
+**Shift**: Graphs are for failure localization.
 - Multi-step agents create causality chains
 - Failures propagate through the graph
 - Root cause analysis is automatic

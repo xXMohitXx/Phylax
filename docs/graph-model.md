@@ -1,6 +1,6 @@
 # Phylax Graph Model
 
-> **How to read and debug execution graphs.**
+> **How to read and investigate execution graphs.**
 
 ---
 
@@ -94,7 +94,7 @@ verdict = graph.compute_verdict()
 ### Rules
 
 1. **If ANY node fails → graph fails**
-2. **Root cause = topologically first failing node**
+2. **First failure = topologically first failing node**
 3. **Tainted = all descendants of failed nodes**
 
 ---
@@ -105,7 +105,7 @@ Toggle "🔬 Forensics Mode" to:
 
 1. **Fade** non-relevant nodes
 2. **Highlight** failure chain
-3. **Pulse** root cause node
+3. **Pulse** first failing node
 4. **Show** tainted downstream nodes
 
 This helps you focus on what matters.
@@ -114,23 +114,23 @@ This helps you focus on what matters.
 
 ## Investigation Path
 
-Phylax suggests a debug path:
+Phylax suggests an investigation path:
 
 ```python
 steps = graph.investigation_path()
 # [
-#   {step: 1, action: "Examine root cause", node_id: "..."},
+#   {step: 1, action: "Examine first failure", node_id: "..."},
 #   {step: 2, action: "Review input", node_id: "..."},
 #   {step: 3, action: "Review blast radius", count: 2}
 # ]
 ```
 
-This encodes how senior engineers debug:
+This encodes structured failure localization:
 
-1. **Start at root cause** — What failed first?
+1. **Start at first failure** — What failed first?
 2. **Check parent input** — What data triggered the failure?
 3. **Review validation** — Which rule was violated?
-4. **Assess blast radius** — What else was affected?
+4. **Assess blast radius** — What is downstream?
 
 ---
 
@@ -178,7 +178,7 @@ curl http://127.0.0.1:8000/v1/executions/{id}/graph
 curl http://127.0.0.1:8000/v1/executions/{id}/analysis
 ```
 
-### Get Debug Path
+### Get Investigation Path
 ```bash
 curl http://127.0.0.1:8000/v1/executions/{id}/investigate
 ```
@@ -201,13 +201,13 @@ Input Stage
 
 Processing Stage
   ├─ 🤖 Classify Intent (200ms) ✅
-  └─ 🔧 Fetch Knowledge (500ms) ❌ ← Root cause
+  └─ 🔧 Fetch Knowledge (500ms) ❌ ← First failure
 
 Output Stage
   └─ 🤖 Generate Reply (400ms) ⚠️ TAINTED
 ```
 
-Debug path:
-1. Check "Fetch Knowledge" — why did tool fail?
+Investigation path:
+1. Check "Fetch Knowledge" — what contract was violated?
 2. Check "Classify Intent" — was intent parsed correctly?
-3. Note "Generate Reply" is tainted (may have bad data)
+3. Note "Generate Reply" is tainted (downstream of failure)

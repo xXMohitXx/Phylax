@@ -113,7 +113,7 @@ INVARIANT: Traces in an execution form a DAG.
 - Execution graphs are acyclic
 - Topological ordering is always valid
 
-**Why**: Causality enables root cause analysis.
+**Why**: Causality enables failure localization.
 
 **Test**: `test_graph_acyclicity()`
 

@@ -63,6 +63,9 @@ phylax check          # CI check
 # Run all tests
 pytest tests/
 
+# Run Axis 2 invariant tests (must pass before Axis 2 work)
+pytest tests/test_axis2_invariants.py -v
+
 # Run specific tests
 python examples/test_graph_unit.py
 python examples/test_graph_features.py

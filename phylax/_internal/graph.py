@@ -105,7 +105,7 @@ class GraphVerdict(BaseModel):
     Phase 16: Graph-level verdict.
     
     Determines if the entire execution passed or failed,
-    and identifies the root cause node.
+    and identifies the first failing node.
     """
     status: str = Field(description="pass | fail")
     root_cause_node: Optional[str] = Field(
@@ -342,7 +342,7 @@ class ExecutionGraph(BaseModel):
                 message="All nodes passed"
             )
         
-        # Find root cause: first failure in topological order
+        # Find first failure: first failing node in topological order
         topo_order = self.topological_order()
         failed_ids = {n.node_id for n in failed_nodes}
         
@@ -368,7 +368,7 @@ class ExecutionGraph(BaseModel):
             root_cause_node=root_cause,
             failed_count=len(failed_nodes),
             tainted_count=len(tainted_only),
-            message=f"Root cause: {root_label}"
+            message=f"First failing node: {root_label}"
         )
     
     # =========================================================================
@@ -533,17 +533,17 @@ class ExecutionGraph(BaseModel):
     
     def investigation_path(self) -> list[dict]:
         """
-        Phase 24: Generate a suggested investigation path for debugging.
+        Phase 24: Generate a suggested investigation path for failure localization.
         
-        This is deterministic graph reasoning, not AI.
-        It encodes how senior engineers debug:
-        1. Start at failing node (root cause)
+        This is deterministic graph traversal, not AI.
+        It encodes structured failure localization:
+        1. Start at first failing node
         2. Check its inputs (parent nodes)
         3. Review validation rules if any
-        4. Check tainted downstream nodes
+        4. Check downstream nodes
         
         Returns:
-            List of investigation steps with node info and reasoning
+            List of investigation steps with node info and observations
         """
         steps = []
         verdict = self.compute_verdict()
@@ -553,7 +553,7 @@ class ExecutionGraph(BaseModel):
                 "step": 1,
                 "action": "No failures detected",
                 "node_id": None,
-                "reasoning": "All nodes passed. No investigation needed.",
+                "observation": "All nodes passed. No investigation needed.",
             }]
         
         # Step 1: Identify root cause node
@@ -563,11 +563,11 @@ class ExecutionGraph(BaseModel):
         if root_cause:
             steps.append({
                 "step": 1,
-                "action": "Examine root cause",
+                "action": "Examine first failure",
                 "node_id": root_cause.node_id,
                 "label": root_cause.human_label or root_cause.label,
                 "role": root_cause.role.value if hasattr(root_cause.role, 'value') else str(root_cause.role),
-                "reasoning": "This is the first node that failed in the execution chain.",
+                "observation": "This is the first node that failed in the execution chain.",
             })
         
         # Step 2: Check input/parent node
@@ -582,7 +582,7 @@ class ExecutionGraph(BaseModel):
                         "node_id": parent.node_id,
                         "label": parent.human_label or parent.label,
                         "role": parent.role.value if hasattr(parent.role, 'value') else str(parent.role),
-                        "reasoning": "Check what data was passed to the failing node.",
+                        "observation": "Check what data was passed to the failing node.",
                     })
         
         # Step 3: Find any validation nodes
@@ -595,7 +595,7 @@ class ExecutionGraph(BaseModel):
                 "node_id": vn.node_id,
                 "label": vn.human_label or vn.label,
                 "role": "validation",
-                "reasoning": "Check why validation failed and what rules were violated.",
+                "observation": "Check which validation rules were violated.",
             })
         
         # Step 4: Show tainted downstream nodes
@@ -607,7 +607,7 @@ class ExecutionGraph(BaseModel):
                     "action": "Review blast radius",
                     "node_ids": tainted,
                     "count": len(tainted),
-                    "reasoning": f"{len(tainted)} downstream node(s) may have been affected by this failure.",
+                    "observation": f"{len(tainted)} downstream node(s) are below this failing node.",
                 })
         
         return steps

@@ -6,7 +6,7 @@ Public API:
     expect      - Decorator to add expectations
     execution   - Context manager for grouping traces
     Trace       - Trace data model
-    Verdict     - Verdict enum (PASS, FAIL, TAINTED)
+    Verdict     - Verdict model (PASS, FAIL)
     
 Adapters:
     OpenAIAdapter       - OpenAI integration

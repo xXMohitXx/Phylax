@@ -2,6 +2,43 @@
 
 All notable changes to Phylax.
 
+## [1.2.0] - 2026-02-10
+
+### Added
+- **Axis 2 Readiness Audit**: Full pass across all 6 audit phases
+- **`docs/non-goals.md`**: Formal non-goals document listing 5 permanent constraints
+- **`tests/test_axis2_invariants.py`**: 15 invariant guard tests that fail the build if:
+  - Verdict space expands beyond PASS/FAIL
+  - Expectations become adaptive or inferred
+  - Evidence introduces interpretive language
+  - Non-goals documentation is missing
+  - Error messages contain advice instead of codes
+
+### Changed
+- **Doctrine Freeze**: All descriptions now say "CI-native regression enforcement for LLM outputs"
+  - Fixed `phylax/__init__.py`, `phylax/cli/main.py`, `phylax/server/main.py`
+  - Fixed legacy `cli/main.py`, `server/main.py`
+- **Evidence Purity**: Removed all causal language from codebase
+  - `"root cause"` → `"first failing node"` in all user-facing strings
+  - `"reasoning"` → `"observation"` in investigation steps
+  - `"debugging"` → `"failure localization"` in all docs and descriptions
+  - Fixed `phylax/_internal/graph.py`, `phylax/server/routes/traces.py`
+  - Fixed `docs/graph-model.md`, `docs/failure-playbook.md`, `docs/mental-model.md`,
+    `docs/quickstart.md`, `docs/invariants.md`, `DOCUMENTATION.md`
+- **Verdict Cleanup**: Removed residual `TAINTED` from `__init__.py` docstring
+
+### Audit Results
+| Phase | Status |
+|-------|--------|
+| 0 — Doctrine Freeze | ✅ PASS |
+| 1 — Verdict Integrity | ✅ PASS |
+| 2 — Expectation Model | ✅ PASS |
+| 3 — Evidence Purity | ✅ PASS |
+| 4 — UI & API Subordination | ✅ PASS |
+| 5 — Test & Failure Signal | ✅ PASS |
+
+---
+
 ## [1.1.6] - 2026-02-07
 
 ### Added

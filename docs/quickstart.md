@@ -136,7 +136,7 @@ jobs:
 ✅ Execution context grouping  
 ✅ Golden baseline comparison  
 ✅ CI regression gate  
-✅ Web UI for debugging  
+✅ Web UI for failure visualization  
 
 ---
 

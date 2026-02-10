@@ -138,9 +138,9 @@ class Verdict:
 | DAG Visualization | Nodes and edges with hierarchical stages |
 | Semantic Nodes | Role labels (INPUT, LLM, VALIDATION...) |
 | Time Visualization | Latency heatmap, bottleneck badges |
-| Forensics Mode | Debug focus, root cause highlighting |
+| Failure Focus | First-failure highlighting |
 | Graph Diffs | Compare two executions |
-| Investigation Paths | Guided debugging steps |
+| Investigation Paths | Failure localization steps |
 | Enterprise | Integrity hashing, snapshots, exports |
 
 ### Building Graphs
@@ -213,7 +213,7 @@ Base: `http://127.0.0.1:8000`
 | GET | `/v1/executions/{id}/graph` | Get DAG |
 | GET | `/v1/executions/{id}/analysis` | Performance |
 | GET | `/v1/executions/{a}/diff/{b}` | Compare |
-| GET | `/v1/executions/{id}/investigate` | Debug path |
+| GET | `/v1/executions/{id}/investigate` | Failure path |
 | GET | `/v1/executions/{id}/snapshot` | Immutable copy |
 | GET | `/v1/executions/{id}/export` | Export artifact |
 | GET | `/v1/executions/{id}/verify` | Verify integrity |

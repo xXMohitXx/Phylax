@@ -1,6 +1,6 @@
 # Phylax Failure Playbook
 
-> **How to debug failures — fast.**
+> **How to investigate failures — fast.**
 
 ---
 
@@ -76,9 +76,9 @@ Execution graph shows ❌ overall verdict.
 
 1. **Enable Forensics Mode** — Click 🔬 button
 
-2. **Find root cause** — Look for pulsing red node
+2. **Find first failure** — Look for pulsing red node
    - This is the first node that failed
-   - Start debugging here
+   - Start investigating here
 
 3. **Check parent** — What input did it receive?
    - Click parent node
@@ -96,7 +96,7 @@ Execution graph shows ❌ overall verdict.
 ### Investigation Order
 
 ```
-1. Root cause node     → What failed?
+1. First failing node   → What failed?
 2. Parent input        → What triggered it?
 3. Validation rules    → Which rule violated?
 4. Tainted downstream  → What did it affect?

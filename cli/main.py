@@ -394,7 +394,7 @@ def cmd_graph_check(args):
     Phase 16: Check graph-level verdicts.
     
     Evaluates execution graphs and fails CI if any graph fails.
-    Provides root cause analysis.
+    Identifies first failing node in topological order.
     """
     from server.storage.files import FileStorage
     
@@ -427,7 +427,7 @@ def cmd_graph_check(args):
         else:
             failures += 1
             print(f"\n❌ FAILED: {exec_id[:20]}...")
-            print(f"   Root cause: {verdict.root_cause_node[:20] if verdict.root_cause_node else 'unknown'}...")
+            print(f"   First failing node: {verdict.root_cause_node[:20] if verdict.root_cause_node else 'unknown'}...")
             print(f"   Failed nodes: {verdict.failed_count}")
             print(f"   Tainted nodes: {verdict.tainted_count}")
             print(f"   Message: {verdict.message}")
@@ -445,7 +445,7 @@ def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
         prog="phylax",
-        description="Developer-first local LLM tracing, replay & debugging system",
+        description="CI-native regression enforcement for LLM outputs",
     )
     
     subparsers = parser.add_subparsers(dest="command", help="Commands")

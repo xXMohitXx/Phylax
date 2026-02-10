@@ -274,10 +274,10 @@ async def diff_executions(exec_a: str, exec_b: str) -> dict:
 @router.get("/executions/{execution_id}/investigate")
 async def get_investigation_path(execution_id: str) -> dict:
     """
-    Phase 24: Get suggested investigation path for debugging.
+    Phase 24: Get suggested investigation path for failure localization.
     
-    Returns deterministic reasoning (not AI) about how to debug a failure:
-    1. Root cause identification
+    Returns deterministic graph traversal (not AI) for localizing failures:
+    1. First failure identification
     2. Input review
     3. Validation check
     4. Blast radius analysis
