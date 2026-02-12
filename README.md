@@ -206,7 +206,7 @@ python demos/07_error_contracts.py   # Error codes
 
 ## Version
 
-**v1.1.6 STABLE**
+**v1.2.5 STABLE**
 
 Stable means execution semantics and verdict behavior are frozen.
 Minor versions focus on correctness and misuse prevention.

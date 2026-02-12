@@ -37,3 +37,13 @@ adapters:
     enabled: false
     # Path to llama model file
     model_path: null
+  google:
+    enabled: true
+  groq:
+    enabled: true
+  mistral:
+    enabled: true
+  huggingface:
+    enabled: true
+  ollama:
+    enabled: true

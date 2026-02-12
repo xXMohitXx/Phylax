@@ -168,6 +168,18 @@ class TestEvidencePurity:
             "PHYLAX_INVARIANT_VIOLATION: compare_outputs does not use exact comparison"
         )
 
+    def test_no_root_cause_field(self):
+        """GraphVerdict must use 'first_failing_node', never 'root_cause'."""
+        from phylax._internal.graph import GraphVerdict
+        fields = GraphVerdict.model_fields.keys()
+        
+        assert "first_failing_node" in fields, (
+            "PHYLAX_INVARIANT_VIOLATION: GraphVerdict missing 'first_failing_node'"
+        )
+        assert "root_cause_node" not in fields, (
+            "PHYLAX_INVARIANT_VIOLATION: 'root_cause_node' found in GraphVerdict (must use first_failing_node)"
+        )
+
 
 # =============================================================================
 # I4: NON-GOALS DOCUMENTED

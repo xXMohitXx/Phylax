@@ -108,7 +108,7 @@ class GraphVerdict(BaseModel):
     and identifies the first failing node.
     """
     status: str = Field(description="pass | fail")
-    root_cause_node: Optional[str] = Field(
+    first_failing_node: Optional[str] = Field(
         default=None, 
         description="First failing node in topological order"
     )
@@ -346,10 +346,10 @@ class ExecutionGraph(BaseModel):
         topo_order = self.topological_order()
         failed_ids = {n.node_id for n in failed_nodes}
         
-        root_cause = None
+        first_failure = None
         for node_id in topo_order:
             if node_id in failed_ids:
-                root_cause = node_id
+                first_failure = node_id
                 break
         
         # Calculate blast radius (tainted nodes)
@@ -360,12 +360,12 @@ class ExecutionGraph(BaseModel):
         # Don't count failed nodes as tainted
         tainted_only = all_tainted - failed_ids
         
-        root_node = self.get_node(root_cause) if root_cause else None
+        root_node = self.get_node(first_failure) if first_failure else None
         root_label = root_node.label if root_node else "unknown"
         
         return GraphVerdict(
             status="fail",
-            root_cause_node=root_cause,
+            first_failing_node=first_failure,
             failed_count=len(failed_nodes),
             tainted_count=len(tainted_only),
             message=f"First failing node: {root_label}"
@@ -557,22 +557,22 @@ class ExecutionGraph(BaseModel):
             }]
         
         # Step 1: Identify root cause node
-        root_cause_id = verdict.root_cause_node
-        root_cause = self.get_node(root_cause_id) if root_cause_id else None
+        first_failure_id = verdict.first_failing_node
+        first_failure = self.get_node(first_failure_id) if first_failure_id else None
         
-        if root_cause:
+        if first_failure:
             steps.append({
                 "step": 1,
                 "action": "Examine first failure",
-                "node_id": root_cause.node_id,
-                "label": root_cause.human_label or root_cause.label,
-                "role": root_cause.role.value if hasattr(root_cause.role, 'value') else str(root_cause.role),
+                "node_id": first_failure.node_id,
+                "label": first_failure.human_label or first_failure.label,
+                "role": first_failure.role.value if hasattr(first_failure.role, 'value') else str(first_failure.role),
                 "observation": "This is the first node that failed in the execution chain.",
             })
         
         # Step 2: Check input/parent node
-        if root_cause_id:
-            parent_id = self.get_parent(root_cause_id)
+        if first_failure_id:
+            parent_id = self.get_parent(first_failure_id)
             if parent_id:
                 parent = self.get_node(parent_id)
                 if parent:
@@ -599,8 +599,8 @@ class ExecutionGraph(BaseModel):
             })
         
         # Step 4: Show tainted downstream nodes
-        if root_cause_id:
-            tainted = self.get_tainted_nodes(root_cause_id)
+        if first_failure_id:
+            tainted = self.get_tainted_nodes(first_failure_id)
             if tainted:
                 steps.append({
                     "step": len(steps) + 1,

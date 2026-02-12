@@ -2,6 +2,13 @@
 
 All notable changes to Phylax.
 
+## [1.2.5] - 2026-02-12
+
+### Changed
+- **Evidence Purity**: Renamed `root_cause_node` to `first_failing_node` in `GraphVerdict`
+- **Dependencies**: Updated to `google-genai>=0.5.0`
+- **Configuration**: Added missing adapters to `config.yaml`
+
 ## [1.2.4] - 2026-02-10
 
 ### Added

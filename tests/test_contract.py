@@ -161,7 +161,7 @@ def test_graph_verdict_derivation():
     
     # Graph fails if any node fails
     assert verdict.status == "fail"
-    assert verdict.root_cause_node == n2
+    assert verdict.first_failing_node == n2
     assert verdict.failed_count == 1
     return True, "Graph verdict follows node verdicts"
 

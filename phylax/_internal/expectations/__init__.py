@@ -1,6 +1,7 @@
 """Phylax internal expectations module."""
 
 from phylax._internal.expectations.evaluator import evaluate, Evaluator
+from phylax._internal.schema import Verdict
 from phylax._internal.expectations.rules import (
     Rule,
     MustIncludeRule,
