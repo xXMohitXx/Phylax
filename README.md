@@ -206,7 +206,7 @@ python demos/07_error_contracts.py   # Error codes
 
 ## Version
 
-**v1.2.5 STABLE**
+**v1.2.6 STABLE**
 
 Stable means execution semantics and verdict behavior are frozen.
 Minor versions focus on correctness and misuse prevention.
@@ -220,6 +220,14 @@ Minor versions focus on correctness and misuse prevention.
 - [Error Codes](https://github.com/xXMohitXx/Phylax/blob/main/docs/errors.md)
 - [Correct Usage](https://github.com/xXMohitXx/Phylax/blob/main/docs/correct-usage.md)
 - [API Contract](https://github.com/xXMohitXx/Phylax/blob/main/docs/contract.md)
+- [Graph Model](https://github.com/xXMohitXx/Phylax/blob/main/docs/graph-model.md)
+- [Invariants](https://github.com/xXMohitXx/Phylax/blob/main/docs/invariants.md)
+- [Failure Modes](https://github.com/xXMohitXx/Phylax/blob/main/docs/failure-modes.md)
+- [Failure Playbook](https://github.com/xXMohitXx/Phylax/blob/main/docs/failure-playbook.md)
+- [Mental Model](https://github.com/xXMohitXx/Phylax/blob/main/docs/mental-model.md)
+- [Versioning](https://github.com/xXMohitXx/Phylax/blob/main/docs/versioning.md)
+- [Performance](https://github.com/xXMohitXx/Phylax/blob/main/docs/performance.md)
+- [Execution Context](https://github.com/xXMohitXx/Phylax/blob/main/docs/execution-context.md)
 
 ---
 

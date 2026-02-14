@@ -9,7 +9,7 @@
 When you use `with execution("name"):`, all LLM calls inside become nodes in a **directed acyclic graph (DAG)**.
 
 ```python
-from sdk.context import execution
+from phylax import execution
 
 with execution("my-agent"):
     step1 = call_llm("Parse input")      # Node 1

@@ -48,7 +48,7 @@ UI shows ❌ for a trace, verdict is "fail".
 
 1. **Find the golden** — Which trace was blessed?
    ```bash
-   python -m cli.main list --blessed
+   phylax list --blessed
    ```
 
 2. **Compare outputs** — Look at diff in UI
@@ -62,7 +62,7 @@ UI shows ❌ for a trace, verdict is "fail".
 ### Re-bless if Acceptable
 
 ```bash
-python -m cli.main bless <new-trace-id> --force
+phylax bless <new-trace-id> --force
 ```
 
 ---
@@ -115,17 +115,17 @@ Execution graph shows ❌ overall verdict.
 
 2. **Run locally**
    ```bash
-   python -m cli.main check
+   phylax check
    ```
 
 3. **List failures**
    ```bash
-   python -m cli.main list --failed
+   phylax list --failed
    ```
 
 4. **Inspect specific trace**
    ```bash
-   python -m cli.main show <trace-id>
+   phylax show <trace-id>
    ```
 
 ### Common CI Issues
@@ -223,14 +223,14 @@ Made calls but UI is empty.
 
 ```bash
 # See all failures
-python -m cli.main list --failed
+phylax list --failed
 
 # Show specific trace
-python -m cli.main show <id>
+phylax show <id>
 
 # Re-bless after fixing
-python -m cli.main bless <id> --force
+phylax bless <id> --force
 
 # Run CI check locally
-python -m cli.main check
+phylax check
 ```

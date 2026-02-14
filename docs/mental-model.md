@@ -90,7 +90,7 @@ Phylax uses exact matching and explicit rules. No fuzzy logic.
 **Shift**: Graphs are for failure localization.
 - Multi-step agents create causality chains
 - Failures propagate through the graph
-- Root cause analysis is automatic
+- First-failure localization is automatic
 
 ---
 

@@ -224,5 +224,5 @@ def test_invalid_expectation_fails_fast():
 
 ---
 
-*Last updated: 2026-01-26*  
+*Last updated: 2026-02-14*  
 *Applies to: Phylax v1.0.0+*

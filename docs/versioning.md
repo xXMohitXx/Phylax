@@ -120,12 +120,12 @@ Example:
 ## How to Check Version
 
 ```python
-import sdk
-print(sdk.__version__)  # "1.0.0"
+import phylax
+print(phylax.__version__)  # "1.2.6"
 ```
 
 ```bash
-python -m cli.main --version
+phylax --version
 ```
 
 ---

@@ -22,7 +22,7 @@ pip install phylax[ollama]
 ## OpenAI
 
 ```python
-from phylax._internal.adapters import OpenAIAdapter
+from phylax import OpenAIAdapter
 
 adapter = OpenAIAdapter()  # Uses OPENAI_API_KEY
 response, trace = adapter.chat_completion(
@@ -40,7 +40,7 @@ response, trace = adapter.chat_completion(
 ## Google Gemini
 
 ```python
-from phylax._internal.adapters import GeminiAdapter
+from phylax import GeminiAdapter
 
 adapter = GeminiAdapter()  # Uses GOOGLE_API_KEY
 response, trace = adapter.generate(
@@ -53,14 +53,14 @@ response, trace = adapter.generate(
 |--------------|--------|
 | `GOOGLE_API_KEY` | gemini-2.5-flash, gemini-2.5-pro |
 
-> **Note**: Uses new `google-genai` SDK (v1.1.1+)
+> **Note**: Uses `google-genai` SDK (v0.5.0+)
 
 ---
 
 ## Groq
 
 ```python
-from phylax._internal.adapters import GroqAdapter
+from phylax import GroqAdapter
 
 adapter = GroqAdapter()  # Uses GROQ_API_KEY
 response, trace = adapter.chat_completion(
@@ -78,7 +78,7 @@ response, trace = adapter.chat_completion(
 ## Mistral
 
 ```python
-from phylax._internal.adapters import MistralAdapter
+from phylax import MistralAdapter
 
 adapter = MistralAdapter()  # Uses MISTRAL_API_KEY
 response, trace = adapter.generate(
@@ -96,7 +96,7 @@ response, trace = adapter.generate(
 ## HuggingFace
 
 ```python
-from phylax._internal.adapters import HuggingFaceAdapter
+from phylax import HuggingFaceAdapter
 
 adapter = HuggingFaceAdapter()  # Uses HF_TOKEN
 response, trace = adapter.generate(
@@ -114,7 +114,7 @@ response, trace = adapter.generate(
 ## Ollama (Local)
 
 ```python
-from phylax._internal.adapters import OllamaAdapter
+from phylax import OllamaAdapter
 
 adapter = OllamaAdapter()  # Uses OLLAMA_HOST (default: localhost:11434)
 response, trace = adapter.generate(

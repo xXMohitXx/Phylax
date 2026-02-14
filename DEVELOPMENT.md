@@ -30,7 +30,11 @@ pip install phylax[all]
 
 ```powershell
 $env:GOOGLE_API_KEY = "your-gemini-key"
-$env:OPENAI_API_KEY = "your-openai-key"  # optional
+$env:OPENAI_API_KEY = "your-openai-key"    # optional
+$env:GROQ_API_KEY = "your-groq-key"        # optional
+$env:MISTRAL_API_KEY = "your-mistral-key"  # optional
+$env:HF_TOKEN = "your-hf-token"            # optional
+$env:OLLAMA_HOST = "http://localhost:11434" # optional
 ```
 
 ---
@@ -53,6 +57,7 @@ phylax show <id>      # Show trace
 phylax replay <id>    # Replay
 phylax bless <id>     # Mark golden
 phylax check          # CI check
+phylax --version      # Show version
 ```
 
 ---
@@ -60,13 +65,16 @@ phylax check          # CI check
 ## Testing
 
 ```bash
-# Run all tests
+# Run all tests (208 tests)
 pytest tests/
 
 # Run Axis 2 invariant tests (must pass before Axis 2 work)
 pytest tests/test_axis2_invariants.py -v
 
-# Run specific tests
+# Run context tests
+pytest tests/test_context.py -v
+
+# Run specific examples
 python examples/test_graph_unit.py
 python examples/test_graph_features.py
 python examples/test_phases_19_25.py
@@ -86,15 +94,24 @@ Phylax/
 │   │   ├── capture.py         # Core capture
 │   │   ├── context.py         # Execution context
 │   │   ├── graph.py           # Graph models
+│   │   ├── errors.py          # Error codes (PHYLAX_Exxx)
 │   │   ├── expectations/      # 4 rules + evaluator
-│   │   └── adapters/          # OpenAI, Gemini
+│   │   └── adapters/          # All LLM provider adapters
+│   │       ├── openai.py      # OpenAI
+│   │       ├── gemini.py      # Gemini (google-genai SDK)
+│   │       ├── groq.py        # Groq LPU
+│   │       ├── mistral.py     # Mistral AI
+│   │       ├── huggingface.py # HuggingFace Inference API
+│   │       └── ollama.py      # Ollama (local models)
 │   ├── cli/                   # CLI commands
 │   ├── server/                # FastAPI backend
 │   ├── ui/                    # Web UI (HTML/JS)
 │   └── assets/                # Logo, favicon
-├── tests/                     # Unit tests
+├── tests/                     # Unit tests (208 tests)
 ├── examples/                  # Demo scripts
+├── demos/                     # Usage demonstrations
 ├── docs/                      # Documentation
+├── config.yaml                # Default configuration
 └── pyproject.toml             # Package config
 ```
 
@@ -103,13 +120,11 @@ Phylax/
 ## Creating a Demo Script
 
 ```python
-import phylax
-from phylax._internal.decorator import trace
-from phylax._internal.context import execution
-from phylax._internal.adapters.gemini import GeminiAdapter
+from phylax import trace, expect, execution, GeminiAdapter
 
 
 @trace(provider="gemini")
+@expect(must_include=["hello"], max_latency_ms=5000)
 def ask_gemini(prompt: str):
     adapter = GeminiAdapter()
     response, _ = adapter.generate(
@@ -136,7 +151,20 @@ with execution() as exec_id:
 ```bash
 pip install build twine
 python -m build
-twine upload dist/*
+twine upload dist/* -u __token__ -p <PYPI_TOKEN>
+```
+
+---
+
+## Version Checking
+
+```python
+import phylax
+print(phylax.__version__)  # "1.2.6"
+```
+
+```bash
+phylax --version
 ```
 
 ---
@@ -147,7 +175,8 @@ twine upload dist/*
 2. Create a feature branch
 3. Make your changes
 4. Run tests: `pytest tests/`
-5. Submit a pull request
+5. Ensure all 208 tests pass
+6. Submit a pull request
 
 ---
 

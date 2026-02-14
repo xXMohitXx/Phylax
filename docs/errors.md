@@ -9,8 +9,11 @@ Machine-readable error codes for CI integration.
 | Code | Invariant Violated | User Action |
 |------|-------------------|-------------|
 | PHYLAX_E101 | Function has no expectations | Add `@expect` decorator |
-| PHYLAX_E102 | Execution graph is empty | Add traced calls inside `execution()` |
+| PHYLAX_E102 | Execution graph is empty | Ensure graph evaluation has nodes |
 | PHYLAX_E103 | Execution has no verdict path | Ensure traced functions have expectations |
+
+> **Note (v1.2.6)**: Empty `execution()` contexts no longer raise `PHYLAX_E102` at context exit.
+> Graph emptiness is validated at graph evaluation time instead.
 
 ---
 

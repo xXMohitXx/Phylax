@@ -1,4 +1,4 @@
-# Phylax Invariants (v1.0)
+# Phylax Invariants (v1.2)
 
 > **This is Phylax's constitution.**  
 > These invariants are non-negotiable and enforced by tests.
@@ -162,7 +162,7 @@ INVARIANT: Graph verdict is a pure function of node verdicts.
 ```
 
 - If ANY node fails → graph fails
-- Root cause = topologically first failing node
+- First failing node = topologically first failing node
 - Tainted nodes = descendants of failed nodes
 - Graph status is never "pending" if all nodes are resolved
 
@@ -193,9 +193,10 @@ INVARIANT: compute_hash() is a pure function.
 
 These invariants are enforced by:
 
-1. **Contract Tests** — `tests/test_invariants.py`
-2. **CI Pipeline** — Invariant tests run on every commit
-3. **Code Review** — Changes that violate invariants are rejected
+1. **Contract Tests** — `tests/test_contract.py`
+2. **Axis 2 Invariant Tests** — `tests/test_axis2_invariants.py`
+3. **CI Pipeline** — Invariant tests run on every commit
+4. **Code Review** — Changes that violate invariants are rejected
 
 ### Test Pattern
 
@@ -228,5 +229,5 @@ If an invariant is violated:
 
 ---
 
-*Last updated: 2026-01-26*  
+*Last updated: 2026-02-14*  
 *Applies to: Phylax v1.0.0+*

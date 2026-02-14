@@ -1,6 +1,6 @@
 # Phylax Documentation
 
-Complete technical reference for Phylax v1.1.6 — CI-native regression enforcement for LLM outputs.
+Complete technical reference for Phylax v1.2.6 — CI-native regression enforcement for LLM outputs.
 
 ---
 
@@ -12,7 +12,7 @@ Phylax enforces contracts so LLM behavior changes are caught before production:
 3. **Comparing** against golden baselines
 4. **Failing CI** when declared contracts regress
 
-### Status: ✅ v1.1.6 STABLE
+### Status: ✅ v1.2.6 STABLE
 
 Stable means execution semantics and verdict behavior are frozen.
 Minor versions focus on correctness and misuse prevention.
@@ -38,12 +38,15 @@ Minor versions focus on correctness and misuse prevention.
 | [docs/quickstart.md](docs/quickstart.md) | 10 min to CI enforcement |
 | [docs/mental-model.md](docs/mental-model.md) | What Phylax is/isn't |
 | [docs/graph-model.md](docs/graph-model.md) | How to read graphs |
+| [docs/execution-context.md](docs/execution-context.md) | Execution context usage |
 | [docs/failure-playbook.md](docs/failure-playbook.md) | Debug procedures |
 | [docs/contract.md](docs/contract.md) | API stability guarantees |
 | [docs/invariants.md](docs/invariants.md) | Semantic invariants |
 | [docs/failure-modes.md](docs/failure-modes.md) | Error behavior |
 | [docs/versioning.md](docs/versioning.md) | Release policy |
 | [docs/performance.md](docs/performance.md) | Scale limits |
+| [docs/providers.md](docs/providers.md) | LLM provider reference |
+| [docs/errors.md](docs/errors.md) | Error code reference |
 
 ---
 
@@ -52,7 +55,8 @@ Minor versions focus on correctness and misuse prevention.
 ### Installation
 ```python
 from phylax import trace, expect, execution
-from phylax import GeminiAdapter, OpenAIAdapter
+from phylax import GeminiAdapter, OpenAIAdapter, GroqAdapter
+from phylax import MistralAdapter, HuggingFaceAdapter, OllamaAdapter
 ```
 
 ### @trace Decorator
@@ -81,14 +85,18 @@ def customer_support(query):
 from phylax import execution
 
 # Track multi-step workflows
-with execution("my-agent-flow"):
+with execution() as exec_id:
     step1 = call_llm("First step")
     step2 = call_llm("Second step")  # Automatically linked
 ```
 
+The `execution()` context manager groups traces into a single execution graph.
+It does not validate whether traced calls were made inside it — validation
+happens at graph evaluation time.
+
 ### Adapters
 
-**GeminiAdapter**
+**GeminiAdapter** (uses `google-genai` SDK)
 ```python
 adapter = GeminiAdapter()  # uses GOOGLE_API_KEY env
 response, trace = adapter.generate(
@@ -103,6 +111,42 @@ adapter = OpenAIAdapter()  # uses OPENAI_API_KEY env
 response, trace = adapter.chat_completion(
     model="gpt-4",
     messages=[{"role": "user", "content": "Hello!"}]
+)
+```
+
+**GroqAdapter**
+```python
+adapter = GroqAdapter()  # uses GROQ_API_KEY env
+response, trace = adapter.chat_completion(
+    model="llama3-70b-8192",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+```
+
+**MistralAdapter**
+```python
+adapter = MistralAdapter()  # uses MISTRAL_API_KEY env
+response, trace = adapter.generate(
+    prompt="Hello!",
+    model="mistral-large-latest"
+)
+```
+
+**HuggingFaceAdapter**
+```python
+adapter = HuggingFaceAdapter()  # uses HF_TOKEN env
+response, trace = adapter.generate(
+    prompt="Hello!",
+    model="meta-llama/Llama-3.1-8B-Instruct"
+)
+```
+
+**OllamaAdapter**
+```python
+adapter = OllamaAdapter()  # uses OLLAMA_HOST env (default: localhost:11434)
+response, trace = adapter.generate(
+    prompt="Hello!",
+    model="llama3"
 )
 ```
 
@@ -142,6 +186,15 @@ class Verdict:
 | Graph Diffs | Compare two executions |
 | Investigation Paths | Failure localization steps |
 | Enterprise | Integrity hashing, snapshots, exports |
+
+### Graph Verdict
+```python
+class GraphVerdict:
+    status: "pass" | "fail"
+    first_failing_node: str | None  # First failing node in topological order
+    failed_count: int
+    tainted_count: int
+```
 
 ### Building Graphs
 ```python

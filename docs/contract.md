@@ -40,9 +40,9 @@ The following are **frozen** and will not change in any v1.x release:
 ### Execution Context
 
 ```python
-from sdk.context import execution
+from phylax import execution
 
-with execution(name: str):
+with execution() as exec_id:
     # All traces inside are linked by execution_id
     pass
 ```
@@ -191,5 +191,5 @@ This contract is enforced by:
 
 ---
 
-*Last updated: 2026-01-26*  
+*Last updated: 2026-02-14*  
 *Applies to: Phylax v1.0.0+*

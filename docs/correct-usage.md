@@ -24,7 +24,6 @@ with execution() as exec_id:
 
 **Requirements:**
 - Every `@trace` must have `@expect`
-- Every `execution()` must contain traced calls
 - Golden traces must have passing verdicts
 
 ---
@@ -34,7 +33,6 @@ with execution() as exec_id:
 | Setup | Error |
 |-------|-------|
 | `@trace` without `@expect` | PHYLAX_E101 |
-| Empty `execution()` | PHYLAX_E102 |
 | Bless trace without verdict | PHYLAX_E201 |
 | `phylax check` without goldens | PHYLAX_E202 |
 
@@ -59,7 +57,6 @@ from phylax import (
 
 Phylax refuses meaningless configurations because:
 - A trace without expectations cannot produce a verdict
-- An empty execution cannot be evaluated
 - A failing trace cannot be a golden reference
 - A check without goldens cannot detect regressions
 

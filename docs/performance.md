@@ -177,5 +177,5 @@ Measured on: Intel i7, 16GB RAM, SSD
 
 ---
 
-*Last updated: 2026-01-26*
-*Measured on: Phylax v1.0.0*
+*Last updated: 2026-02-14*
+*Measured on: Phylax v1.2.6*
