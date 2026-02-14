@@ -331,7 +331,7 @@ class ExecutionGraph(BaseModel):
         
         Rules:
         - Graph fails if any node fails
-        - Root cause = first failing node in topological order
+        - First failure = first failing node in topological order
         - Tainted = all nodes downstream of failures
         """
         failed_nodes = self.get_failed_nodes()
@@ -556,7 +556,7 @@ class ExecutionGraph(BaseModel):
                 "observation": "All nodes passed. No investigation needed.",
             }]
         
-        # Step 1: Identify root cause node
+        # Step 1: Identify first failing node
         first_failure_id = verdict.first_failing_node
         first_failure = self.get_node(first_failure_id) if first_failure_id else None
         

@@ -126,10 +126,10 @@ def main():
     fail_verdict = fail_graph.compute_verdict()
     
     print(f"[OK] Graph verdict: {fail_verdict.status.upper()}")
-    print(f"   - Root cause: {fail_verdict.root_cause_node[:20]}...")
+    print(f"   - First failing node: {fail_verdict.first_failing_node[:20]}...")
     print(f"   - Failed count: {fail_verdict.failed_count}")
     print(f"   - Tainted count: {fail_verdict.tainted_count}")
-    print("[PASS] Verdict correctly identifies root cause!")
+    print("[PASS] Verdict correctly identifies first failing node!")
     
     tainted = fail_graph.get_tainted_nodes(n2)
     print(f"[OK] Blast radius from node2: {len(tainted)} nodes affected")

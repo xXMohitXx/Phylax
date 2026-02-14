@@ -117,8 +117,8 @@ def main():
     print(f"   Status: {verdict.status.upper()}")
     print(f"   Failed nodes: {verdict.failed_count}")
     print(f"   Tainted nodes: {verdict.tainted_count}")
-    if verdict.root_cause_node:
-        print(f"   Root cause: {verdict.root_cause_node}")
+    if verdict.first_failing_node:
+        print(f"   First failing node: {verdict.first_failing_node}")
     
     return 0
 

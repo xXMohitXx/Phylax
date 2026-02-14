@@ -18,7 +18,7 @@ from phylax.server.routes import traces, replay, chat
 app = FastAPI(
     title="Phylax",
     description="CI-native regression enforcement for LLM outputs",
-    version="1.2.4",
+    version="1.2.6",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -58,7 +58,7 @@ async def root():
     """Root endpoint with API info."""
     return {
         "name": "Phylax",
-        "version": "1.2.4",
+        "version": "1.2.6",
         "description": "CI-native regression enforcement for LLM outputs",
         "docs": "/docs",
         "ui": "/ui",

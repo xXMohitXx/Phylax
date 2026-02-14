@@ -85,7 +85,7 @@ The graph has an overall verdict:
 verdict = graph.compute_verdict()
 # GraphVerdict(
 #   status="fail",
-#   root_cause_node="node-123",
+#   first_failing_node="node-123",
 #   failed_count=1,
 #   tainted_count=2
 # )

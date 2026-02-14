@@ -1,0 +1,235 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\Mohit Manglani\AppData\Local\Programs\Python\Python312\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Mohit Manglani\OneDrive\Desktop\sentinel_v0
+configfile: pyproject.toml
+plugins: anyio-4.10.0, langsmith-0.6.6
+collecting ... collected 6 items
+
+tests/test_context.py::TestExecutionContext::test_execution_creates_context FAILED [ 16%]
+tests/test_context.py::TestExecutionContext::test_get_execution_id_in_context FAILED [ 33%]
+tests/test_context.py::TestExecutionContext::test_get_execution_id_outside_context PASSED [ 50%]
+tests/test_context.py::TestExecutionContext::test_parent_node_tracking PASSED [ 66%]
+tests/test_context.py::TestExecutionContext::test_nested_execution_contexts FAILED [ 83%]
+tests/test_context.py::TestTraceSchema::test_trace_has_execution_fields PASSED [100%]
+
+================================== FAILURES ===================================
+_____________ TestExecutionContext.test_execution_creates_context _____________
+
+self = <tests.test_context.TestExecutionContext object at 0x000001FEECD4E930>
+
+    def test_execution_creates_context(self):
+        """execution() should create a context with execution_id."""
+        assert not in_execution_context()
+    
+>       with execution() as exec_id:
+             ^^^^^^^^^^^
+
+tests\test_context.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <contextlib._GeneratorContextManager object at 0x000001FEEF437740>
+typ = None, value = None, traceback = None
+
+    def __exit__(self, typ, value, traceback):
+        if typ is None:
+            try:
+>               next(self.gen)
+
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\contextlib.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    @contextmanager
+    def execution() -> Generator[str, None, None]:
+        """
+        Create an execution context that groups traces.
+    
+        All traces created inside this context share the same execution_id.
+        Parent-child relationships are tracked automatically.
+    
+        Usage:
+            import phylax
+    
+            with phylax.execution() as exec_id:
+                step_a()  # parent_node_id = None (root)
+                step_b()  # parent_node_id = step_a.node_id
+    
+        Returns:
+            The execution_id for this context
+    
+        Raises:
+            EmptyExecutionGraphError: If no traced calls were made in this context
+        """
+        exec_id = str(uuid4())
+        token = _execution_id.set(exec_id)
+        stack_token = _node_stack.set([])
+        count_token = _node_count.set(0)
+    
+        try:
+            yield exec_id
+        finally:
+            node_count = _node_count.get()
+    
+            _execution_id.reset(token)
+            _node_stack.reset(stack_token)
+            _node_count.reset(count_token)
+    
+            # Only raise if no nodes AND no exception already propagating
+            if node_count == 0 and sys.exc_info()[0] is None:
+                from phylax._internal.errors import EmptyExecutionGraphError
+>               raise EmptyExecutionGraphError(exec_id)
+E               phylax._internal.errors.EmptyExecutionGraphError: [PHYLAX_E102] Execution '0d361139-88a7-4320-a1f3-dad52143eb49' has no traced calls. An empty graph cannot be evaluated.
+
+phylax\_internal\context.py:64: EmptyExecutionGraphError
+____________ TestExecutionContext.test_get_execution_id_in_context ____________
+
+self = <tests.test_context.TestExecutionContext object at 0x000001FEEF434DA0>
+
+    def test_get_execution_id_in_context(self):
+        """get_execution_id() should return same ID within context."""
+>       with execution() as exec_id:
+             ^^^^^^^^^^^
+
+tests\test_context.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <contextlib._GeneratorContextManager object at 0x000001FEEF3C7590>
+typ = None, value = None, traceback = None
+
+    def __exit__(self, typ, value, traceback):
+        if typ is None:
+            try:
+>               next(self.gen)
+
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\contextlib.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    @contextmanager
+    def execution() -> Generator[str, None, None]:
+        """
+        Create an execution context that groups traces.
+    
+        All traces created inside this context share the same execution_id.
+        Parent-child relationships are tracked automatically.
+    
+        Usage:
+            import phylax
+    
+            with phylax.execution() as exec_id:
+                step_a()  # parent_node_id = None (root)
+                step_b()  # parent_node_id = step_a.node_id
+    
+        Returns:
+            The execution_id for this context
+    
+        Raises:
+            EmptyExecutionGraphError: If no traced calls were made in this context
+        """
+        exec_id = str(uuid4())
+        token = _execution_id.set(exec_id)
+        stack_token = _node_stack.set([])
+        count_token = _node_count.set(0)
+    
+        try:
+            yield exec_id
+        finally:
+            node_count = _node_count.get()
+    
+            _execution_id.reset(token)
+            _node_stack.reset(stack_token)
+            _node_count.reset(count_token)
+    
+            # Only raise if no nodes AND no exception already propagating
+            if node_count == 0 and sys.exc_info()[0] is None:
+                from phylax._internal.errors import EmptyExecutionGraphError
+>               raise EmptyExecutionGraphError(exec_id)
+E               phylax._internal.errors.EmptyExecutionGraphError: [PHYLAX_E102] Execution '75bd59fb-763e-480f-9094-78b1692984a1' has no traced calls. An empty graph cannot be evaluated.
+
+phylax\_internal\context.py:64: EmptyExecutionGraphError
+_____________ TestExecutionContext.test_nested_execution_contexts _____________
+
+self = <tests.test_context.TestExecutionContext object at 0x000001FEEF437050>
+
+    def test_nested_execution_contexts(self):
+        """Nested execution() calls should be independent."""
+        with execution() as outer_id:
+            assert get_execution_id() == outer_id
+    
+            # Nested context has different ID
+>           with execution() as inner_id:
+                 ^^^^^^^^^^^
+
+tests\test_context.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <contextlib._GeneratorContextManager object at 0x000001FEEF436ED0>
+typ = None, value = None, traceback = None
+
+    def __exit__(self, typ, value, traceback):
+        if typ is None:
+            try:
+>               next(self.gen)
+
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\contextlib.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    @contextmanager
+    def execution() -> Generator[str, None, None]:
+        """
+        Create an execution context that groups traces.
+    
+        All traces created inside this context share the same execution_id.
+        Parent-child relationships are tracked automatically.
+    
+        Usage:
+            import phylax
+    
+            with phylax.execution() as exec_id:
+                step_a()  # parent_node_id = None (root)
+                step_b()  # parent_node_id = step_a.node_id
+    
+        Returns:
+            The execution_id for this context
+    
+        Raises:
+            EmptyExecutionGraphError: If no traced calls were made in this context
+        """
+        exec_id = str(uuid4())
+        token = _execution_id.set(exec_id)
+        stack_token = _node_stack.set([])
+        count_token = _node_count.set(0)
+    
+        try:
+            yield exec_id
+        finally:
+            node_count = _node_count.get()
+    
+            _execution_id.reset(token)
+            _node_stack.reset(stack_token)
+            _node_count.reset(count_token)
+    
+            # Only raise if no nodes AND no exception already propagating
+            if node_count == 0 and sys.exc_info()[0] is None:
+                from phylax._internal.errors import EmptyExecutionGraphError
+>               raise EmptyExecutionGraphError(exec_id)
+E               phylax._internal.errors.EmptyExecutionGraphError: [PHYLAX_E102] Execution '5c533206-0702-4fc8-aeff-59e926b8b468' has no traced calls. An empty graph cannot be evaluated.
+
+phylax\_internal\context.py:64: EmptyExecutionGraphError
+============================== warnings summary ===============================
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:323
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:323
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:323
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:323
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:323
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:323
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:323
+..\..\..\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:323
+  C:\Users\Mohit Manglani\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_context.py::TestExecutionContext::test_execution_creates_context
+FAILED tests/test_context.py::TestExecutionContext::test_get_execution_id_in_context
+FAILED tests/test_context.py::TestExecutionContext::test_nested_execution_contexts
+=================== 3 failed, 3 passed, 8 warnings in 0.22s ===================

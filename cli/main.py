@@ -427,7 +427,7 @@ def cmd_graph_check(args):
         else:
             failures += 1
             print(f"\n❌ FAILED: {exec_id[:20]}...")
-            print(f"   First failing node: {verdict.root_cause_node[:20] if verdict.root_cause_node else 'unknown'}...")
+            print(f"   First failing node: {verdict.first_failing_node[:20] if verdict.first_failing_node else 'unknown'}...")
             print(f"   Failed nodes: {verdict.failed_count}")
             print(f"   Tainted nodes: {verdict.tainted_count}")
             print(f"   Message: {verdict.message}")

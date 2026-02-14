@@ -2,6 +2,11 @@
 
 All notable changes to Phylax.
 
+## [1.2.6] - 2026-02-14
+
+### Fixed
+- **Context Manager**: `execution()` no longer raises `EmptyExecutionGraphError` when an exception is already propagating
+
 ## [1.2.5] - 2026-02-12
 
 ### Changed

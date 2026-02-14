@@ -198,8 +198,8 @@ async def get_investigation_path(execution_id: str) -> dict:
     """
     Phase 24: Get suggested investigation path for debugging.
     
-    Returns deterministic reasoning (not AI) about how to debug a failure:
-    1. Root cause identification
+    Returns deterministic steps (not AI) for failure localization:
+    1. First failing node identification
     2. Input review
     3. Validation check
     4. Blast radius analysis

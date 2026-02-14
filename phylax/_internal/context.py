@@ -39,9 +39,6 @@ def execution() -> Generator[str, None, None]:
             
     Returns:
         The execution_id for this context
-        
-    Raises:
-        EmptyExecutionGraphError: If no traced calls were made in this context
     """
     exec_id = str(uuid4())
     token = _execution_id.set(exec_id)
@@ -51,17 +48,9 @@ def execution() -> Generator[str, None, None]:
     try:
         yield exec_id
     finally:
-        # Phase 1: Validate execution has traces
-        from phylax._internal.errors import EmptyExecutionGraphError
-        node_count = _node_count.get()
-        
         _execution_id.reset(token)
         _node_stack.reset(stack_token)
         _node_count.reset(count_token)
-        
-        # If no nodes were created, fail
-        if node_count == 0:
-            raise EmptyExecutionGraphError(exec_id)
 
 
 def get_execution_id() -> str:

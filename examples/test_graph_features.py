@@ -138,8 +138,8 @@ def test_phase_16_graph_verdict(execution_id):
         analysis = resp.json()
         verdict = analysis.get('verdict', {})
         print(f"✓ Graph verdict: {verdict.get('status', 'unknown').upper()}")
-        if verdict.get('root_cause_node'):
-            print(f"   - Root cause: {verdict['root_cause_node'][:20]}...")
+        if verdict.get('first_failing_node'):
+            print(f"   - First failing node: {verdict['first_failing_node'][:20]}...")
         print(f"   - Failed nodes: {verdict.get('failed_count', 0)}")
         print(f"   - Tainted nodes: {verdict.get('tainted_count', 0)}")
     else:

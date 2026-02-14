@@ -139,13 +139,13 @@ def test_phase_16_verdict_fail():
     verdict = graph.compute_verdict()
     
     print(f"✓ Graph verdict: {verdict.status.upper()}")
-    print(f"   - Root cause: {verdict.root_cause_node[:20]}...")
+    print(f"   - First failing node: {verdict.first_failing_node[:20]}...")
     print(f"   - Failed count: {verdict.failed_count}")
     print(f"   - Tainted count: {verdict.tainted_count}")
     
     assert verdict.status == "fail", "Expected fail verdict"
-    assert verdict.root_cause_node == node2, "Root cause should be node2"
-    print(" Verdict correctly identifies root cause!")
+    assert verdict.first_failing_node == node2, "First failing node should be node2"
+    print(" Verdict correctly identifies first failing node!")
     
     # Test blast radius
     tainted = graph.get_tainted_nodes(node2)

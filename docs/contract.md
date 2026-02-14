@@ -103,14 +103,14 @@ graph.compute_verdict() → GraphVerdict
 
 class GraphVerdict:
     status: "pass" | "fail"
-    root_cause_node: str | None  # First failing node
+    first_failing_node: str | None  # First failing node
     failed_count: int
     tainted_count: int
 ```
 
 **Guarantee**:
 - If any node fails, graph fails
-- Root cause is topologically first failing node
+- First failure is topologically first failing node
 - Tainted nodes are downstream of failed nodes
 
 ---
