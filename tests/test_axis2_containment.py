@@ -29,7 +29,7 @@ import json
 
 import pytest
 
-from phylax._internal.surfaces.surface import (
+from phylax import (
     Surface,
     SurfaceRule,
     SurfaceRuleResult,
@@ -37,9 +37,7 @@ from phylax._internal.surfaces.surface import (
     SurfaceAdapter,
     SurfaceEvaluator,
     SurfaceRegistry,
-)
-from phylax._internal.surfaces.text import TextSurfaceAdapter
-from phylax._internal.surfaces.structured import (
+    TextSurfaceAdapter,
     FieldExistsRule,
     FieldNotExistsRule,
     TypeEnforcementRule,
@@ -47,26 +45,21 @@ from phylax._internal.surfaces.structured import (
     EnumEnforcementRule,
     ArrayBoundsRule,
     StructuredSurfaceAdapter,
-)
-from phylax._internal.surfaces.tools import (
     ToolPresenceRule,
     ToolCountRule,
     ToolArgumentRule,
     ToolOrderingRule,
     ToolSurfaceAdapter,
-)
-from phylax._internal.surfaces.execution_trace import (
     StepCountRule,
     ForbiddenTransitionRule,
     RequiredStageRule,
     ExecutionTraceSurfaceAdapter,
-)
-from phylax._internal.surfaces.stability import (
     ExactStabilityRule,
     AllowedDriftRule,
     StabilitySurfaceAdapter,
-    _deterministic_hash,
 )
+# Private helper — not part of public API, imported directly for testing only
+from phylax._internal.surfaces.stability import _deterministic_hash
 
 
 # ═════════════════════════════════════════════════════════════════════════════

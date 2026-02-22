@@ -15,7 +15,7 @@ import pytest
 import uuid
 from pydantic import ValidationError
 
-from phylax._internal.surfaces.surface import (
+from phylax import (
     Surface,
     SurfaceRuleResult,
     SurfaceVerdict,
@@ -24,8 +24,8 @@ from phylax._internal.surfaces.surface import (
     SurfaceEvaluator,
     SurfaceRegistry,
     get_registry,
+    TextSurfaceAdapter,
 )
-from phylax._internal.surfaces.text import TextSurfaceAdapter
 
 
 # =============================================================================

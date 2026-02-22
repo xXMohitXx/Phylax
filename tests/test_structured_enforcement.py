@@ -16,8 +16,9 @@ Also tests:
 
 import pytest
 
-from phylax._internal.surfaces.surface import Surface, SurfaceEvaluator
-from phylax._internal.surfaces.structured import (
+from phylax import (
+    Surface,
+    SurfaceEvaluator,
     FieldExistsRule,
     FieldNotExistsRule,
     TypeEnforcementRule,
@@ -349,7 +350,7 @@ class TestForbiddenBehaviors:
     def test_no_schema_auto_generation(self):
         """No auto-schema generation from data."""
         import inspect
-        from phylax._internal.surfaces import structured
+        from phylax._internal.surfaces import structured  # Source scan needs module ref
         source = inspect.getsource(structured)
         for forbidden in ["auto_schema", "infer_schema", "generate_schema"]:
             assert forbidden not in source.lower()
@@ -357,7 +358,7 @@ class TestForbiddenBehaviors:
     def test_no_soft_matching(self):
         """No approximate or soft matching functions."""
         import inspect
-        from phylax._internal.surfaces import structured
+        from phylax._internal.surfaces import structured  # Source scan needs module ref
         source = inspect.getsource(structured)
         for forbidden in ["similarity", "levenshtein", "approximate"]:
             assert forbidden not in source.lower()
@@ -365,7 +366,7 @@ class TestForbiddenBehaviors:
     def test_no_default_injection(self):
         """No default value injection."""
         import inspect
-        from phylax._internal.surfaces import structured
+        from phylax._internal.surfaces import structured  # Source scan needs module ref
         source = inspect.getsource(structured)
         assert "default_value" not in source.lower()
         assert "inject_default" not in source.lower()

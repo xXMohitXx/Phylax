@@ -11,13 +11,15 @@ Tests:
 
 import pytest
 
-from phylax._internal.surfaces.surface import Surface, SurfaceEvaluator
-from phylax._internal.surfaces.stability import (
+from phylax import (
+    Surface,
+    SurfaceEvaluator,
     ExactStabilityRule,
     AllowedDriftRule,
     StabilitySurfaceAdapter,
-    _deterministic_hash,
 )
+# Private helper — not part of public API, imported directly for testing only
+from phylax._internal.surfaces.stability import _deterministic_hash
 
 
 def _make_stability_surface(baseline, current):
@@ -266,21 +268,21 @@ class TestForbiddenStabilityBehaviors:
 
     def test_no_pattern_detection(self):
         import inspect
-        from phylax._internal.surfaces import stability
+        from phylax._internal.surfaces import stability  # Source scan needs module ref
         source = inspect.getsource(stability)
         for forbidden in ["regression_slope", "moving_average", "drift_analysis"]:
             assert forbidden not in source.lower()
 
     def test_no_auto_update(self):
         import inspect
-        from phylax._internal.surfaces import stability
+        from phylax._internal.surfaces import stability  # Source scan needs module ref
         source = inspect.getsource(stability)
         for forbidden in ["auto_update", "auto_baseline", "self_update"]:
             assert forbidden not in source.lower()
 
     def test_no_scoring(self):
         import inspect
-        from phylax._internal.surfaces import stability
+        from phylax._internal.surfaces import stability  # Source scan needs module ref
         source = inspect.getsource(stability)
         for forbidden in ["drift_score", "stability_score", "confidence"]:
             assert forbidden not in source.lower()

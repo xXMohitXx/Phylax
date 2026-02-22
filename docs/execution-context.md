@@ -50,14 +50,10 @@ with execution() as exec_id:
 The execution context uses Python's `contextvars` module — thread-safe and async-safe:
 
 ```python
-from phylax._internal.context import (
-    execution,           # Context manager
-    get_execution_id,    # Get current execution ID
-    get_parent_node_id,  # Get current parent node
-    push_node,           # Push node to stack (internal)
-    pop_node,            # Pop node from stack (internal)
-    in_execution_context, # Check if inside context
-)
+from phylax import execution  # Context manager (public API)
+
+# Advanced / internal helpers (not part of public API):
+# get_execution_id, get_parent_node_id, push_node, pop_node, in_execution_context
 ```
 
 ---

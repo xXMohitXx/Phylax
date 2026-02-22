@@ -7,7 +7,7 @@ Phylax v1.3.x introduces the **Surface Abstraction Layer** — a generic enforce
 A Surface is a typed, immutable wrapper around a raw LLM output payload. Surfaces enable enforcement rules to operate on structured data, tool calls, execution traces, and cross-run snapshots without modifying the core engine.
 
 ```python
-from phylax._internal.surfaces.surface import Surface
+from phylax import Surface
 
 s = Surface(type="structured_output", raw_payload={"status": "ok", "count": 42})
 ```
@@ -42,8 +42,7 @@ s = Surface(type="structured_output", raw_payload={"status": "ok", "count": 42})
 | `ArrayBoundsRule(path, op, n)` | Array length constraint (`==`, `<=`, `>=`) |
 
 ```python
-from phylax._internal.surfaces.structured import FieldExistsRule, ExactValueRule
-from phylax._internal.surfaces.surface import Surface, SurfaceEvaluator
+from phylax import FieldExistsRule, ExactValueRule, Surface, SurfaceEvaluator
 
 ev = SurfaceEvaluator()
 ev.add_rule(FieldExistsRule("response.status"))

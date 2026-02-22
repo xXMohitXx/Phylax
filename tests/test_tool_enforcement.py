@@ -12,8 +12,9 @@ Tests:
 
 import pytest
 
-from phylax._internal.surfaces.surface import Surface, SurfaceEvaluator
-from phylax._internal.surfaces.tools import (
+from phylax import (
+    Surface,
+    SurfaceEvaluator,
     ToolPresenceRule,
     ToolCountRule,
     ToolArgumentRule,

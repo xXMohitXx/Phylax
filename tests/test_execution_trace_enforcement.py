@@ -10,8 +10,9 @@ Tests:
 
 import pytest
 
-from phylax._internal.surfaces.surface import Surface, SurfaceEvaluator
-from phylax._internal.surfaces.execution_trace import (
+from phylax import (
+    Surface,
+    SurfaceEvaluator,
     StepCountRule,
     ForbiddenTransitionRule,
     RequiredStageRule,
