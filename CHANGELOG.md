@@ -23,6 +23,17 @@ All notable changes to Phylax.
 - **`StructuredSurfaceAdapter`** — JSON/dict → Surface conversion
 - **`tests/test_structured_enforcement.py`**: 50 tests including determinism and forbidden behavior checks
 
+## [1.3.1] - 2026-02-22
+
+### Added — Axis 2 Phase 2.2: Tool & Function Call Invariants
+- **`phylax/_internal/surfaces/tools.py`**: 4 tool enforcement rules
+  - `ToolPresenceRule` — tool must/must-not appear
+  - `ToolCountRule` — exact/min/max occurrence count
+  - `ToolArgumentRule` — path-based strict argument comparison
+  - `ToolOrderingRule` — index-based ordering (before / not_after)
+- **`ToolSurfaceAdapter`** — event list → Surface conversion (no dedup, no retry collapsing)
+- **`tests/test_tool_enforcement.py`**: 35+ tests
+
 ## [1.2.6] - 2026-02-14
 
 ### Fixed

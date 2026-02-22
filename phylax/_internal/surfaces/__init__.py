@@ -32,6 +32,13 @@ from phylax._internal.surfaces.structured import (
     ArrayBoundsRule,
     StructuredSurfaceAdapter,
 )
+from phylax._internal.surfaces.tools import (
+    ToolPresenceRule,
+    ToolCountRule,
+    ToolArgumentRule,
+    ToolOrderingRule,
+    ToolSurfaceAdapter,
+)
 
 __all__ = [
     # Core models
@@ -57,4 +64,10 @@ __all__ = [
     "EnumEnforcementRule",
     "ArrayBoundsRule",
     "StructuredSurfaceAdapter",
+    # Tool enforcement (Phase 2.2)
+    "ToolPresenceRule",
+    "ToolCountRule",
+    "ToolArgumentRule",
+    "ToolOrderingRule",
+    "ToolSurfaceAdapter",
 ]

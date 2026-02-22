@@ -58,9 +58,15 @@ from phylax._internal.surfaces import (
     EnumEnforcementRule,
     ArrayBoundsRule,
     StructuredSurfaceAdapter,
+    # Axis 2 Phase 2.2: Tool & Function Call Invariants
+    ToolPresenceRule,
+    ToolCountRule,
+    ToolArgumentRule,
+    ToolOrderingRule,
+    ToolSurfaceAdapter,
 )
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 __all__ = [
     # Core decorators
     "trace",
@@ -105,6 +111,12 @@ __all__ = [
     "EnumEnforcementRule",
     "ArrayBoundsRule",
     "StructuredSurfaceAdapter",
+    # Axis 2 Phase 2.2: Tool & Function Call Invariants
+    "ToolPresenceRule",
+    "ToolCountRule",
+    "ToolArgumentRule",
+    "ToolOrderingRule",
+    "ToolSurfaceAdapter",
     # Version
     "__version__",
 ]
