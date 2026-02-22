@@ -23,6 +23,15 @@ from phylax._internal.surfaces.surface import (
     get_registry,
 )
 from phylax._internal.surfaces.text import TextSurfaceAdapter
+from phylax._internal.surfaces.structured import (
+    FieldExistsRule,
+    FieldNotExistsRule,
+    TypeEnforcementRule,
+    ExactValueRule,
+    EnumEnforcementRule,
+    ArrayBoundsRule,
+    StructuredSurfaceAdapter,
+)
 
 __all__ = [
     # Core models
@@ -38,6 +47,14 @@ __all__ = [
     # Registry
     "SurfaceRegistry",
     "get_registry",
-    # Adapters
+    # Text adapter
     "TextSurfaceAdapter",
+    # Structured output enforcement (Phase 2.1)
+    "FieldExistsRule",
+    "FieldNotExistsRule",
+    "TypeEnforcementRule",
+    "ExactValueRule",
+    "EnumEnforcementRule",
+    "ArrayBoundsRule",
+    "StructuredSurfaceAdapter",
 ]

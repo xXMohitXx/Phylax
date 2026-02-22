@@ -50,9 +50,17 @@ from phylax._internal.surfaces import (
     SurfaceRegistry,
     get_registry,
     TextSurfaceAdapter,
+    # Axis 2 Phase 2.1: Structured Output Enforcement
+    FieldExistsRule,
+    FieldNotExistsRule,
+    TypeEnforcementRule,
+    ExactValueRule,
+    EnumEnforcementRule,
+    ArrayBoundsRule,
+    StructuredSurfaceAdapter,
 )
 
-__version__ = "1.3.0a0"
+__version__ = "1.3.0"
 __all__ = [
     # Core decorators
     "trace",
@@ -89,6 +97,14 @@ __all__ = [
     "SurfaceRegistry",
     "get_registry",
     "TextSurfaceAdapter",
+    # Axis 2 Phase 2.1: Structured Output Enforcement
+    "FieldExistsRule",
+    "FieldNotExistsRule",
+    "TypeEnforcementRule",
+    "ExactValueRule",
+    "EnumEnforcementRule",
+    "ArrayBoundsRule",
+    "StructuredSurfaceAdapter",
     # Version
     "__version__",
 ]

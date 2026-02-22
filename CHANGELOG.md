@@ -11,6 +11,18 @@ All notable changes to Phylax.
 - **Surface Registry**: Pre-registers 5 built-in types: `text_output`, `structured_output`, `tool_calls`, `execution_trace`, `cross_run_snapshot`
 - **Engine Integrity**: Core engine code (`rules.py`, `evaluator.py`, `schema.py`) remains completely unchanged
 
+## [1.3.0] - 2026-02-22
+
+### Added — Axis 2 Phase 2.1: Structured Output Enforcement
+- **`phylax/_internal/surfaces/structured.py`**: 6 deterministic structural validation rules
+  - `FieldExistsRule` / `FieldNotExistsRule` — dot-notation path existence
+  - `TypeEnforcementRule` — strict type check (no coercion: `"1"` ≠ `1`)
+  - `ExactValueRule` — strict equality (no case folding, no trimming)
+  - `EnumEnforcementRule` — set membership
+  - `ArrayBoundsRule` — length constraints (`==`, `<=`, `>=`)
+- **`StructuredSurfaceAdapter`** — JSON/dict → Surface conversion
+- **`tests/test_structured_enforcement.py`**: 50 tests including determinism and forbidden behavior checks
+
 ## [1.2.6] - 2026-02-14
 
 ### Fixed
