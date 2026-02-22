@@ -38,7 +38,21 @@ from phylax._internal.adapters import (
     OllamaAdapter,
 )
 
-__version__ = "1.2.6"
+# Axis 2: Surface Abstraction Layer
+from phylax._internal.surfaces import (
+    Surface,
+    SurfaceType,
+    SurfaceRuleResult,
+    SurfaceVerdict,
+    SurfaceRule,
+    SurfaceAdapter,
+    SurfaceEvaluator,
+    SurfaceRegistry,
+    get_registry,
+    TextSurfaceAdapter,
+)
+
+__version__ = "1.3.0a0"
 __all__ = [
     # Core decorators
     "trace",
@@ -64,6 +78,17 @@ __all__ = [
     "MistralAdapter",
     "HuggingFaceAdapter",
     "OllamaAdapter",
+    # Axis 2: Surface Abstraction Layer
+    "Surface",
+    "SurfaceType",
+    "SurfaceRuleResult",
+    "SurfaceVerdict",
+    "SurfaceRule",
+    "SurfaceAdapter",
+    "SurfaceEvaluator",
+    "SurfaceRegistry",
+    "get_registry",
+    "TextSurfaceAdapter",
     # Version
     "__version__",
 ]

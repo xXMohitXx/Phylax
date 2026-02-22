@@ -2,6 +2,15 @@
 
 All notable changes to Phylax.
 
+## [1.3.0a0] - 2026-02-22
+
+### Added — Axis 2 Phase 2.0: Surface Abstraction Layer
+- **`phylax/_internal/surfaces/surface.py`**: Generic `Surface` model (id, type, raw_payload, metadata), `SurfaceRule` ABC, `SurfaceAdapter` ABC, `SurfaceEvaluator`, `SurfaceRegistry`
+- **`phylax/_internal/surfaces/text.py`**: `TextSurfaceAdapter` — bridges text responses into Surface abstraction
+- **`tests/test_surface_abstraction.py`**: 35 tests covering Surface model, registry, adapter, evaluator, and engine integrity
+- **Surface Registry**: Pre-registers 5 built-in types: `text_output`, `structured_output`, `tool_calls`, `execution_trace`, `cross_run_snapshot`
+- **Engine Integrity**: Core engine code (`rules.py`, `evaluator.py`, `schema.py`) remains completely unchanged
+
 ## [1.2.6] - 2026-02-14
 
 ### Fixed
