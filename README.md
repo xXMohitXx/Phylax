@@ -155,6 +155,10 @@ Phylax's primary interface is CI verdict enforcement.
 | **Golden Traces** | Baseline comparisons with hash verification |
 | **CI Enforcement** | `phylax check` exits 1 on contract violation |
 | **Multi-Provider** | OpenAI, Gemini, Groq, Mistral, HuggingFace, Ollama |
+| **Structured Output Enforcement** | JSON field existence, type, value, enum, array bounds |
+| **Tool Call Enforcement** | Presence, count, argument, and ordering rules |
+| **Execution Trace Enforcement** | Step count, forbidden transitions, required stages |
+| **Cross-Run Stability** | Hash comparison and whitelisted drift detection |
 
 ### Auxiliary Control Surfaces
 
@@ -176,7 +180,8 @@ Phylax's primary interface is CI verdict enforcement.
 phylax/
 ├── _internal/           # Core enforcement logic
 │   ├── adapters/        # LLM provider adapters
-│   ├── expectations/    # Deterministic rule engine
+│   ├── expectations/    # Deterministic rule engine (Axis 1)
+│   ├── surfaces/        # Surface enforcement layer (Axis 2)
 │   └── graph.py         # Execution graphs
 ├── cli/                 # CLI commands
 ├── server/              # API server
@@ -206,10 +211,10 @@ python demos/07_error_contracts.py   # Error codes
 
 ## Version
 
-**v1.2.6 STABLE**
+**v1.3.3 — Axis 2 Complete**
 
-Stable means execution semantics and verdict behavior are frozen.
-Minor versions focus on correctness and misuse prevention.
+Expectation engine (Axis 1) and Surface Abstraction Layer (Axis 2) are stable.
+17 deterministic enforcement rules across 5 surface types.
 
 ---
 
