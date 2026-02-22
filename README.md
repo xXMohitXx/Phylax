@@ -233,6 +233,8 @@ Expectation engine (Axis 1) and Surface Abstraction Layer (Axis 2) are stable.
 - [Versioning](https://github.com/xXMohitXx/Phylax/blob/main/docs/versioning.md)
 - [Performance](https://github.com/xXMohitXx/Phylax/blob/main/docs/performance.md)
 - [Execution Context](https://github.com/xXMohitXx/Phylax/blob/main/docs/execution-context.md)
+- [Surface Enforcement](https://github.com/xXMohitXx/Phylax/blob/main/docs/surface-enforcement.md)
+- [Axis 2 Testing](https://github.com/xXMohitXx/Phylax/blob/main/docs/axis2-testing.md)
 
 ---
 

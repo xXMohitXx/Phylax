@@ -1,4 +1,4 @@
-# Phylax Invariants (v1.2)
+# Phylax Invariants (v1.3)
 
 > **This is Phylax's constitution.**  
 > These invariants are non-negotiable and enforced by tests.
@@ -189,14 +189,82 @@ INVARIANT: compute_hash() is a pure function.
 
 ---
 
+### 11. Surface Enforcement Preserves Engine Isolation
+
+```
+INVARIANT: Surface rules operate independently from engine rules.
+```
+
+- Core engine files (`rules.py`, `evaluator.py`, `schema.py`) never import surface modules
+- `SurfaceEvaluator` never branches based on `surface.type`
+- Surface rules do not modify the payload they evaluate
+- Adding a surface type does not require engine changes
+
+**Why**: Engine isolation prevents intelligence creep.
+
+**Test**: `test_engine_source_no_surface_imports()`, `test_evaluator_no_type_branching()`
+
+---
+
+### 12. Surface Rules Are Deterministic
+
+```
+INVARIANT: Same surface + same rules = same verdict. Every time.
+```
+
+- 100-run determinism sweep must produce identical verdict hashes
+- Rule evaluation has no random, time, or context dependencies
+- Metadata on surfaces never influences rule outcomes
+
+**Why**: Non-deterministic enforcement is worse than no enforcement.
+
+**Test**: `TestMetaCrossPhase_DeterminismSweep` (100x for each surface type)
+
+---
+
+### 13. Surface Rules Are Literal
+
+```
+INVARIANT: No coercion, no trimming, no fuzzy matching, no inference.
+```
+
+- `"1"` is not `1`, `"true"` is not `True`, `"Approved"` is not `"approved"`
+- No retry collapsing, no deduplication, no loop detection
+- No auto-schema detection from data
+- No baseline auto-updating
+
+**Why**: Coercion hides bugs. Literalism exposes them.
+
+**Test**: `TestPhase21_StrictEquality`, `TestPhase22_RawTraceIntegrity`
+
+---
+
+### 14. Surface Rules Never Interpret Intent
+
+```
+INVARIANT: The engine enforces contracts, it does not understand them.
+```
+
+- Retry = two calls. Contract says one = FAIL.
+- Repeated stage = counted as-is. No redundancy reasoning.
+- Tiny baseline change = FAIL. No harmless exceptions.
+- Source code must not contain interpretation words
+
+**Why**: Interpretation opens an unbounded surface for convenience-driven mutation.
+
+**Test**: `TestMetaCrossPhase_ShouldUnderstand`, `TestAxis2ReadinessCheck`
+
+---
+
 ## Enforcement
 
 These invariants are enforced by:
 
-1. **Contract Tests** — `tests/test_contract.py`
-2. **Axis 2 Invariant Tests** — `tests/test_axis2_invariants.py`
-3. **CI Pipeline** — Invariant tests run on every commit
-4. **Code Review** — Changes that violate invariants are rejected
+1. **Contract Tests** - `tests/test_contract.py`
+2. **Axis 2 Invariant Tests** - `tests/test_axis2_invariants.py`
+3. **Semantic Containment Tests** - `tests/test_axis2_containment.py`
+4. **CI Pipeline** - Invariant tests run on every commit
+5. **Code Review** - Changes that violate invariants are rejected
 
 ### Test Pattern
 
@@ -229,5 +297,5 @@ If an invariant is violated:
 
 ---
 
-*Last updated: 2026-02-14*  
-*Applies to: Phylax v1.0.0+*
+*Last updated: 2026-02-22*  
+*Applies to: Phylax v1.0.0+ (Axis 2 invariants: v1.3.0+)*
