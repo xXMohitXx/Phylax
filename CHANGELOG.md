@@ -44,6 +44,16 @@ All notable changes to Phylax.
 - **`ExecutionTraceSurfaceAdapter`** — step list → Surface conversion
 - **`tests/test_execution_trace_enforcement.py`**: 30+ tests
 
+## [1.3.3] - 2026-02-22
+
+### Added — Axis 2 Phase 2.4: Cross-Run Stability Enforcement
+- **`phylax/_internal/surfaces/stability.py`**: Deterministic cross-run comparison
+  - `ExactStabilityRule` — field/hash must not change between runs
+  - `AllowedDriftRule` — only whitelisted fields may change
+  - `StabilitySurfaceAdapter` — baseline+current snapshot → Surface
+- **`tests/test_stability_enforcement.py`**: 28+ tests including forbidden behavior checks
+- **Axis 2 Complete**: All 5 phases shipped (v1.3.0a0 → v1.3.3)
+
 ## [1.2.6] - 2026-02-14
 
 ### Fixed

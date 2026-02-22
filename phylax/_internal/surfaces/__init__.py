@@ -45,6 +45,11 @@ from phylax._internal.surfaces.execution_trace import (
     RequiredStageRule,
     ExecutionTraceSurfaceAdapter,
 )
+from phylax._internal.surfaces.stability import (
+    ExactStabilityRule,
+    AllowedDriftRule,
+    StabilitySurfaceAdapter,
+)
 
 __all__ = [
     # Core models
@@ -81,4 +86,8 @@ __all__ = [
     "ForbiddenTransitionRule",
     "RequiredStageRule",
     "ExecutionTraceSurfaceAdapter",
+    # Cross-run stability enforcement (Phase 2.4)
+    "ExactStabilityRule",
+    "AllowedDriftRule",
+    "StabilitySurfaceAdapter",
 ]

@@ -69,9 +69,13 @@ from phylax._internal.surfaces import (
     ForbiddenTransitionRule,
     RequiredStageRule,
     ExecutionTraceSurfaceAdapter,
+    # Axis 2 Phase 2.4: Cross-Run Stability Enforcement
+    ExactStabilityRule,
+    AllowedDriftRule,
+    StabilitySurfaceAdapter,
 )
 
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 __all__ = [
     # Core decorators
     "trace",
@@ -127,6 +131,10 @@ __all__ = [
     "ForbiddenTransitionRule",
     "RequiredStageRule",
     "ExecutionTraceSurfaceAdapter",
+    # Axis 2 Phase 2.4: Cross-Run Stability Enforcement
+    "ExactStabilityRule",
+    "AllowedDriftRule",
+    "StabilitySurfaceAdapter",
     # Version
     "__version__",
 ]
