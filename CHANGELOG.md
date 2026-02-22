@@ -34,6 +34,16 @@ All notable changes to Phylax.
 - **`ToolSurfaceAdapter`** — event list → Surface conversion (no dedup, no retry collapsing)
 - **`tests/test_tool_enforcement.py`**: 35+ tests
 
+## [1.3.2] - 2026-02-22
+
+### Added — Axis 2 Phase 2.3: Multi-Step Execution Trace Enforcement
+- **`phylax/_internal/surfaces/execution_trace.py`**: 3 structural trace rules
+  - `StepCountRule` — min/max/exact step count
+  - `ForbiddenTransitionRule` — explicit consecutive transition prohibition
+  - `RequiredStageRule` — stage must appear
+- **`ExecutionTraceSurfaceAdapter`** — step list → Surface conversion
+- **`tests/test_execution_trace_enforcement.py`**: 30+ tests
+
 ## [1.2.6] - 2026-02-14
 
 ### Fixed

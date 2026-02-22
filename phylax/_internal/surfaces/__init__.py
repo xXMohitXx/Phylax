@@ -39,6 +39,12 @@ from phylax._internal.surfaces.tools import (
     ToolOrderingRule,
     ToolSurfaceAdapter,
 )
+from phylax._internal.surfaces.execution_trace import (
+    StepCountRule,
+    ForbiddenTransitionRule,
+    RequiredStageRule,
+    ExecutionTraceSurfaceAdapter,
+)
 
 __all__ = [
     # Core models
@@ -70,4 +76,9 @@ __all__ = [
     "ToolArgumentRule",
     "ToolOrderingRule",
     "ToolSurfaceAdapter",
+    # Execution trace enforcement (Phase 2.3)
+    "StepCountRule",
+    "ForbiddenTransitionRule",
+    "RequiredStageRule",
+    "ExecutionTraceSurfaceAdapter",
 ]

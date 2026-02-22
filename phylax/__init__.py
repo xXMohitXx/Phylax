@@ -64,9 +64,14 @@ from phylax._internal.surfaces import (
     ToolArgumentRule,
     ToolOrderingRule,
     ToolSurfaceAdapter,
+    # Axis 2 Phase 2.3: Execution Trace Enforcement
+    StepCountRule,
+    ForbiddenTransitionRule,
+    RequiredStageRule,
+    ExecutionTraceSurfaceAdapter,
 )
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __all__ = [
     # Core decorators
     "trace",
@@ -117,6 +122,11 @@ __all__ = [
     "ToolArgumentRule",
     "ToolOrderingRule",
     "ToolSurfaceAdapter",
+    # Axis 2 Phase 2.3: Execution Trace Enforcement
+    "StepCountRule",
+    "ForbiddenTransitionRule",
+    "RequiredStageRule",
+    "ExecutionTraceSurfaceAdapter",
     # Version
     "__version__",
 ]
