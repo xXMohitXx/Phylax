@@ -75,7 +75,18 @@ from phylax._internal.surfaces import (
     StabilitySurfaceAdapter,
 )
 
-__version__ = "1.3.3"
+# Axis 3: Metrics Foundation Layer
+from phylax._internal.metrics import (
+    ExpectationIdentity,
+    compute_definition_hash,
+    LedgerEntry,
+    EvaluationLedger,
+    AggregateMetrics,
+    aggregate,
+    aggregate_all,
+)
+
+__version__ = "1.3.4"
 __all__ = [
     # Core decorators
     "trace",
@@ -135,6 +146,14 @@ __all__ = [
     "ExactStabilityRule",
     "AllowedDriftRule",
     "StabilitySurfaceAdapter",
+    # Axis 3: Metrics Foundation Layer
+    "ExpectationIdentity",
+    "compute_definition_hash",
+    "LedgerEntry",
+    "EvaluationLedger",
+    "AggregateMetrics",
+    "aggregate",
+    "aggregate_all",
     # Version
     "__version__",
 ]
