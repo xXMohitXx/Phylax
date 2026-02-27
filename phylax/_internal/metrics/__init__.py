@@ -23,6 +23,11 @@ from phylax._internal.metrics.aggregator import (
     aggregate,
     aggregate_all,
 )
+from phylax._internal.metrics.health import (
+    HealthReport,
+    CoverageReport,
+    get_windowed_health,
+)
 
 __all__ = [
     "ExpectationIdentity",
@@ -32,4 +37,7 @@ __all__ = [
     "AggregateMetrics",
     "aggregate",
     "aggregate_all",
+    "HealthReport",
+    "CoverageReport",
+    "get_windowed_health",
 ]
