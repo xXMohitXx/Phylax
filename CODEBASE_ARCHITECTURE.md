@@ -8,8 +8,6 @@
 - **Trace Capture**: Automatically records every LLM call (input, output, latency, tokens) into an immutable trace schema
 - **Deterministic Expectations**: Four built-in rules (`must_include`, `must_not_include`, `max_latency_ms`, `min_tokens`) produce binary PASS/FAIL verdicts — never AI-based
 - **Expectation Algebra**: Logical composition (AND/OR/NOT), conditional activation (IF/THEN), structural scoping (per-node, per-provider), reusable templates, and self-documenting contracts
-- **Surface Enforcement (Axis 2)**: Generic enforcement over structured outputs (JSON), tool calls, execution traces, and cross-run snapshots via the Surface Abstraction Layer — 17 deterministic rules across 5 surface types
-- **Scale Safety (Axis 3)**: Metrics foundation layer with deterministic aggregation, health exposure API, enforcement modes (enforce/quarantine/observe), and meta-enforcement rules (4 dilution guards) — 108 tests
 - **Execution Context**: Groups multi-step LLM workflows under a shared `execution_id` with automatic parent-child tracking via Python `contextvars`
 - **Execution Graphs (DAG)**: Builds directed acyclic graphs from grouped traces with semantic node roles, hierarchical stages, performance analysis, diffing, and investigation paths
 - **Golden Baselines**: Bless a trace as the known-good reference; `phylax check` replays golden traces and exits 1 if output hash diverges
@@ -1245,9 +1243,8 @@ Phylax/
 │
 ├── phylax/                          # Main package (PyPI-distributed)
 │   ├── __init__.py                  # Public API: exports trace, expect, execution,
-│   │                                  Trace, Verdict, ExecutionGraph, all 6 adapters,
-│   │                                  all Axis 2 surface rules and adapters
-│   │                                  __version__ = "1.3.3"
+│   │                                  Trace, Verdict, ExecutionGraph, all 6 adapters
+│   │                                  __version__ = "1.2.6"
 │   │
 │   ├── _internal/                   # Internal implementation (not for direct import)
 │   │   ├── __init__.py              # Module docstring only
@@ -1300,21 +1297,6 @@ Phylax/
 │   │       ├── ollama.py            # OllamaAdapter: chat_completion(), generate(),
 │   │       │                          list_models()
 │   │       └── llama.py             # LlamaAdapter (local llama.cpp support)
-│   │
-│   │   ├── surfaces/                # Axis 2: Surface Abstraction Layer
-│   │   │   ├── __init__.py          # Re-exports all surface models, rules, adapters
-│   │   │   ├── surface.py           # Surface, SurfaceRule, SurfaceAdapter, SurfaceEvaluator,
-│   │   │   │                          SurfaceVerdict, SurfaceRegistry (Phase 2.0)
-│   │   │   ├── text.py              # TextSurfaceAdapter (Phase 2.0)
-│   │   │   ├── structured.py        # FieldExistsRule, FieldNotExistsRule, TypeEnforcementRule,
-│   │   │   │                          ExactValueRule, EnumEnforcementRule, ArrayBoundsRule,
-│   │   │   │                          StructuredSurfaceAdapter (Phase 2.1)
-│   │   │   ├── tools.py             # ToolPresenceRule, ToolCountRule, ToolArgumentRule,
-│   │   │   │                          ToolOrderingRule, ToolSurfaceAdapter (Phase 2.2)
-│   │   │   ├── execution_trace.py   # StepCountRule, ForbiddenTransitionRule,
-│   │   │   │                          RequiredStageRule, ExecutionTraceSurfaceAdapter (Phase 2.3)
-│   │   │   └── stability.py         # ExactStabilityRule, AllowedDriftRule,
-│   │   │                              StabilitySurfaceAdapter (Phase 2.4)
 │   │
 │   ├── cli/                         # CLI entry point (phylax command)
 │   │   ├── __init__.py
@@ -1675,11 +1657,6 @@ allow_origins = [
 
 | Version | Date | Key Changes |
 |---------|------|-------------|
-| **1.3.3** | 2026-02-22 | Axis 2 Phase 2.4: Cross-Run Stability Enforcement |
-| **1.3.2** | 2026-02-22 | Axis 2 Phase 2.3: Execution Trace Enforcement |
-| **1.3.1** | 2026-02-22 | Axis 2 Phase 2.2: Tool & Function Call Invariants |
-| **1.3.0** | 2026-02-22 | Axis 2 Phase 2.1: Structured Output Enforcement |
-| **1.3.0a0** | 2026-02-22 | Axis 2 Phase 2.0: Surface Abstraction Layer |
 | **1.2.6** | 2026-02-14 | Context manager fix for exception propagation |
 | **1.2.5** | 2026-02-12 | Evidence purity (first_failing_node rename), google-genai update |
 | **1.2.4** | 2026-02-10 | Axis 2 readiness audit, 15 invariant guard tests, doctrine freeze |
@@ -1692,4 +1669,4 @@ allow_origins = [
 ---
 
 **Last Updated**: February 22, 2026  
-**Architecture Version**: 1.3.3 (Axis 2 Complete — Surface Abstraction Layer with 17 enforcement rules across 5 surface types)
+**Architecture Version**: 1.2.6 (Stable — execution semantics and verdict behavior frozen)
