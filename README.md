@@ -159,6 +159,9 @@ Phylax's primary interface is CI verdict enforcement.
 | **Tool Call Enforcement** | Presence, count, argument, and ordering rules |
 | **Execution Trace Enforcement** | Step count, forbidden transitions, required stages |
 | **Cross-Run Stability** | Hash comparison and whitelisted drift detection |
+| **Metrics & Health** | Expectation identity, evaluation ledger, aggregation |
+| **Enforcement Modes** | `enforce` / `quarantine` / `observe` CI behavior |
+| **Meta-Enforcement** | Dilution guards: min count, zero signal, change/removal detection |
 
 ### Auxiliary Control Surfaces
 
@@ -182,9 +185,12 @@ phylax/
 │   ├── adapters/        # LLM provider adapters
 │   ├── expectations/    # Deterministic rule engine (Axis 1)
 │   ├── surfaces/        # Surface enforcement layer (Axis 2)
+│   ├── metrics/         # Metrics, ledger, health (Axis 3)
+│   ├── modes/           # Enforcement modes (Axis 3)
+│   ├── meta/            # Meta-enforcement rules (Axis 3)
 │   └── graph.py         # Execution graphs
 ├── cli/                 # CLI commands
-├── server/              # API server
+├── server/              # API server + health routes
 └── ui/                  # Web interface
 ```
 
@@ -205,16 +211,19 @@ python demos/04_graph_nodes.py       # Graph API
 python demos/05_golden_workflow.py   # CI workflow
 python demos/06_raw_evidence.py      # Evidence API
 python demos/07_error_contracts.py   # Error codes
+python demos/14_metrics_health.py    # Metrics & health reports
+python demos/15_enforcement_modes.py # Enforce/quarantine/observe
+python demos/16_meta_enforcement.py  # Dilution guards
 ```
 
 ---
 
 ## Version
 
-**v1.3.3 — Axis 2 Complete**
+**v1.4.0 — Stable Launch: Scale Safety & Misuse Resistance**
 
-Expectation engine (Axis 1) and Surface Abstraction Layer (Axis 2) are stable.
-17 deterministic enforcement rules across 5 surface types.
+Expectation engine (Axis 1), Surface Abstraction Layer (Axis 2), and Scale Safety (Axis 3) are stable.
+622 tests. 17 enforcement rules. 4 meta-enforcement guards. 3 enforcement modes.
 
 ---
 

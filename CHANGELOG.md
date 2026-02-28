@@ -2,6 +2,59 @@
 
 All notable changes to Phylax.
 
+## [1.4.0] - 2026-02-28 — Stable Launch: Scale Safety & Misuse Resistance
+
+### Added — Axis 3: Scale Safety & Misuse Resistance
+
+#### Phase 3.1: Metric Foundation Layer
+- **`phylax/_internal/metrics/identity.py`**: `ExpectationIdentity` with deterministic SHA256 hashing, canonical serialization, frozen immutability
+- **`phylax/_internal/metrics/ledger.py`**: Append-only `EvaluationLedger` with `LedgerEntry` (JSONL persistence, windowed query support)
+- **`phylax/_internal/metrics/aggregator.py`**: Pure function `aggregate` / `aggregate_all` — no caching, no qualitative labels
+- **`tests/test_metric_foundation.py`**: 42 tests (determinism, immutability, literalism, purity)
+
+#### Phase 3.2: Health Exposure API
+- **`phylax/_internal/metrics/health.py`**: `HealthReport` (pure data), `CoverageReport` (arithmetic only), windowed health queries
+- **`phylax/server/routes/health.py`**: API endpoints for expectation health and coverage
+- **`tests/test_health_api.py`**: 14 tests (no qualitative labels, arithmetic coverage, explicit windowing)
+
+#### Phase 3.3: Enforcement Modes
+- **`phylax/_internal/modes/handler.py`**: `ModeHandler` with `enforce` / `quarantine` / `observe` modes
+- **`phylax/_internal/modes/definitions.py`**: `EnforcementMode`, `VALID_MODES`
+- Modes affect CI exit code only — verdict is **never** modified
+- **`tests/test_enforcement_modes.py`**: 20 tests (verdict invariance, no auto-escalation)
+
+#### Phase 3.4: Meta-Enforcement Rules
+- **`phylax/_internal/meta/rules.py`**: 4 dilution guards
+  - `MinExpectationCountRule` — minimum declared count
+  - `ZeroSignalRule` — fail if never failed (user opt-in)
+  - `DefinitionChangeGuard` — hash-based definition change detection
+  - `ExpectationRemovalGuard` — track IDs across versions
+- **`tests/test_meta_enforcement.py`**: 21 tests (no scoring, no advisory language)
+
+#### Phase 3.5: Scale Validation
+- **`tests/test_scale_validation.py`**: 11 stress tests
+  - 10k+ entry parity tests
+  - Concurrent write safety
+  - Massive JSONL replay
+  - Definition churn determinism
+  - 1000-run nondeterminism sweep
+
+### Added — Public API Surface
+- **`phylax/__init__.py`**: 60+ exports — all features accessible via `from phylax import ...`
+- No `_internal` imports needed for any user-facing functionality
+- **`tests/test_public_api_surface.py`**: 37 tests validating every exported symbol
+
+### Added — Quickstart Demos
+- **`demos/14_metrics_health.py`**: Metrics, ledger, aggregation, health reports
+- **`demos/15_enforcement_modes.py`**: Mode behavior comparison
+- **`demos/16_meta_enforcement.py`**: 4 dilution guards
+
+### Stats
+- **622 tests passing** (108 Axis 3 + 37 public API surface)
+- **12 production branches** merged
+- Engine core unchanged — zero contamination
+- No scoring, no ranking, no advisory language
+
 ## [1.3.0a0] - 2026-02-22
 
 ### Added — Axis 2 Phase 2.0: Surface Abstraction Layer

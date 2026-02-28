@@ -65,19 +65,20 @@ phylax --version      # Show version
 ## Testing
 
 ```bash
-# Run all tests (208 tests)
+# Run all tests (622 tests)
 pytest tests/
 
-# Run Axis 2 invariant tests (must pass before Axis 2 work)
+# Run Axis 3 tests
+pytest tests/test_metric_foundation.py tests/test_health_api.py tests/test_enforcement_modes.py tests/test_meta_enforcement.py tests/test_scale_validation.py -v
+
+# Run public API surface test
+pytest tests/test_public_api_surface.py -v
+
+# Run Axis 2 invariant tests
 pytest tests/test_axis2_invariants.py -v
 
 # Run context tests
 pytest tests/test_context.py -v
-
-# Run specific examples
-python examples/test_graph_unit.py
-python examples/test_graph_features.py
-python examples/test_phases_19_25.py
 ```
 
 ---
@@ -87,7 +88,7 @@ python examples/test_phases_19_25.py
 ```
 Phylax/
 ├── phylax/                    # Main package (PyPI)
-│   ├── __init__.py            # Public API
+│   ├── __init__.py            # Public API (60+ exports)
 │   ├── _internal/             # Internal modules
 │   │   ├── schema.py          # Trace schema
 │   │   ├── decorator.py       # @trace, @expect
@@ -95,21 +96,18 @@ Phylax/
 │   │   ├── context.py         # Execution context
 │   │   ├── graph.py           # Graph models
 │   │   ├── errors.py          # Error codes (PHYLAX_Exxx)
-│   │   ├── expectations/      # 4 rules + evaluator
+│   │   ├── expectations/      # 4 rules + evaluator + composition
+│   │   ├── surfaces/          # Surface enforcement (Axis 2)
+│   │   ├── metrics/           # Metrics, ledger, health (Axis 3)
+│   │   ├── modes/             # Enforcement modes (Axis 3)
+│   │   ├── meta/              # Meta-enforcement rules (Axis 3)
 │   │   └── adapters/          # All LLM provider adapters
-│   │       ├── openai.py      # OpenAI
-│   │       ├── gemini.py      # Gemini (google-genai SDK)
-│   │       ├── groq.py        # Groq LPU
-│   │       ├── mistral.py     # Mistral AI
-│   │       ├── huggingface.py # HuggingFace Inference API
-│   │       └── ollama.py      # Ollama (local models)
 │   ├── cli/                   # CLI commands
-│   ├── server/                # FastAPI backend
+│   ├── server/                # FastAPI backend + health routes
 │   ├── ui/                    # Web UI (HTML/JS)
 │   └── assets/                # Logo, favicon
-├── tests/                     # Unit tests (208 tests)
-├── examples/                  # Demo scripts
-├── demos/                     # Usage demonstrations
+├── tests/                     # Unit tests (622 tests)
+├── demos/                     # Usage demonstrations (16 demos)
 ├── docs/                      # Documentation
 ├── config.yaml                # Default configuration
 └── pyproject.toml             # Package config
@@ -160,7 +158,7 @@ twine upload dist/* -u __token__ -p <PYPI_TOKEN>
 
 ```python
 import phylax
-print(phylax.__version__)  # "1.2.6"
+print(phylax.__version__)  # "1.4.0"
 ```
 
 ```bash
@@ -175,7 +173,7 @@ phylax --version
 2. Create a feature branch
 3. Make your changes
 4. Run tests: `pytest tests/`
-5. Ensure all 208 tests pass
+5. Ensure all 622 tests pass
 6. Submit a pull request
 
 ---

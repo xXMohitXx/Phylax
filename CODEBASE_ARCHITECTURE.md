@@ -9,6 +9,7 @@
 - **Deterministic Expectations**: Four built-in rules (`must_include`, `must_not_include`, `max_latency_ms`, `min_tokens`) produce binary PASS/FAIL verdicts — never AI-based
 - **Expectation Algebra**: Logical composition (AND/OR/NOT), conditional activation (IF/THEN), structural scoping (per-node, per-provider), reusable templates, and self-documenting contracts
 - **Surface Enforcement (Axis 2)**: Generic enforcement over structured outputs (JSON), tool calls, execution traces, and cross-run snapshots via the Surface Abstraction Layer — 17 deterministic rules across 5 surface types
+- **Scale Safety (Axis 3)**: Metrics foundation layer with deterministic aggregation, health exposure API, enforcement modes (enforce/quarantine/observe), and meta-enforcement rules (4 dilution guards) — 108 tests
 - **Execution Context**: Groups multi-step LLM workflows under a shared `execution_id` with automatic parent-child tracking via Python `contextvars`
 - **Execution Graphs (DAG)**: Builds directed acyclic graphs from grouped traces with semantic node roles, hierarchical stages, performance analysis, diffing, and investigation paths
 - **Golden Baselines**: Bless a trace as the known-good reference; `phylax check` replays golden traces and exits 1 if output hash diverges

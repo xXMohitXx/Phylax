@@ -1,6 +1,6 @@
 # Phylax Documentation
 
-Complete technical reference for Phylax v1.2.6 — CI-native regression enforcement for LLM outputs.
+Complete technical reference for Phylax v1.4.0 — CI-native regression enforcement for LLM outputs.
 
 ---
 
@@ -12,10 +12,11 @@ Phylax enforces contracts so LLM behavior changes are caught before production:
 3. **Comparing** against golden baselines
 4. **Failing CI** when declared contracts regress
 
-### Status: ✅ v1.2.6 STABLE
+### Status: ✅ v1.4.0 STABLE
 
 Stable means execution semantics and verdict behavior are frozen.
-Minor versions focus on correctness and misuse prevention.
+Axis 1 (Expectations), Axis 2 (Surfaces), and Axis 3 (Scale Safety) are complete.
+622 tests passing.
 
 ---
 
@@ -57,6 +58,16 @@ Minor versions focus on correctness and misuse prevention.
 from phylax import trace, expect, execution
 from phylax import GeminiAdapter, OpenAIAdapter, GroqAdapter
 from phylax import MistralAdapter, HuggingFaceAdapter, OllamaAdapter
+
+# Axis 3: Metrics, Modes, Meta-Enforcement
+from phylax import (
+    ExpectationIdentity, compute_definition_hash,
+    EvaluationLedger, LedgerEntry, aggregate, aggregate_all,
+    HealthReport, CoverageReport, get_windowed_health,
+    ModeHandler, EnforcementMode, VALID_MODES,
+    MinExpectationCountRule, ZeroSignalRule,
+    DefinitionChangeGuard, ExpectationRemovalGuard,
+)
 ```
 
 ### @trace Decorator
@@ -198,7 +209,7 @@ class GraphVerdict:
 
 ### Building Graphs
 ```python
-from phylax._internal.graph import ExecutionGraph
+from phylax import ExecutionGraph
 
 graph = ExecutionGraph.from_traces(traces)
 verdict = graph.compute_verdict()
@@ -289,6 +300,12 @@ Base: `http://127.0.0.1:8000`
 |--------|----------|-------------|
 | POST | `/v1/chat/completions` | OpenAI compat |
 | GET | `/health` | Health check |
+
+### Health & Metrics (Axis 3)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/v1/health/{expectation_id}` | Expectation health report |
+| GET | `/v1/coverage` | Coverage report |
 
 ---
 
