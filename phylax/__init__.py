@@ -86,7 +86,20 @@ from phylax._internal.metrics import (
     aggregate_all,
 )
 
-__version__ = "1.3.4"
+# Axis 3: Modes (Phase 3.3)
+from phylax._internal.modes.handler import ModeHandler, ModeResult
+from phylax._internal.modes.definitions import EnforcementMode, VALID_MODES
+
+# Axis 3: Meta-Enforcement Rules (Phase 3.4)
+from phylax._internal.meta.rules import (
+    MetaRuleResult,
+    MinExpectationCountRule,
+    ZeroSignalRule,
+    DefinitionChangeGuard,
+    ExpectationRemovalGuard,
+)
+
+__version__ = "1.4.0"
 __all__ = [
     # Core decorators
     "trace",
@@ -154,6 +167,17 @@ __all__ = [
     "AggregateMetrics",
     "aggregate",
     "aggregate_all",
+    # Axis 3: Modes (Phase 3.3)
+    "ModeHandler",
+    "ModeResult",
+    "EnforcementMode",
+    "VALID_MODES",
+    # Axis 3: Meta-Enforcement Rules (Phase 3.4)
+    "MetaRuleResult",
+    "MinExpectationCountRule",
+    "ZeroSignalRule",
+    "DefinitionChangeGuard",
+    "ExpectationRemovalGuard",
     # Version
     "__version__",
 ]
