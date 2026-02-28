@@ -9,7 +9,7 @@ Verifies self-documenting contract features:
 """
 
 import pytest
-from phylax._internal.expectations import (
+from phylax import (
     Evaluator,
     MustIncludeRule,
     MustNotIncludeRule,

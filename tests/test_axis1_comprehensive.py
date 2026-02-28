@@ -13,7 +13,7 @@ import pytest
 import inspect
 from typing import Any
 
-from phylax._internal.expectations import (
+from phylax import (
     Evaluator,
     Rule,
     MustIncludeRule,
@@ -46,7 +46,7 @@ from phylax._internal.expectations import (
     # Phase 4: Templates
     ExpectationTemplate,
     TemplateRegistry,
-    get_registry,
+    get_template_registry,
     register_template,
     get_template,
     get_template_rules,
@@ -459,7 +459,7 @@ class TestPhase4Negative:
     
     def test_4_4_no_adaptive_template(self):
         """Test 4.4 — No adaptive template: templates don't vary by context."""
-        registry = get_registry()
+        registry = get_template_registry()
         template = registry.get("latency-standard")
         
         # No context-dependent attributes

@@ -7,7 +7,7 @@ Verifies IF/THEN conditional expectation logic:
 """
 
 import pytest
-from phylax._internal.expectations import (
+from phylax import (
     Evaluator,
     MustIncludeRule,
     MustNotIncludeRule,

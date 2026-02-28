@@ -13,7 +13,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from phylax._internal.context import (
+from phylax import (
     execution,
     get_execution_id,
     get_parent_node_id,

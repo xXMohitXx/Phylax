@@ -8,7 +8,7 @@ Verifies logical algebra for expectations:
 """
 
 import pytest
-from phylax._internal.expectations import (
+from phylax import (
     Evaluator,
     MustIncludeRule,
     MustNotIncludeRule,

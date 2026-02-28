@@ -7,7 +7,7 @@ Verifies scoped expectation targeting:
 """
 
 import pytest
-from phylax._internal.expectations import (
+from phylax import (
     Evaluator,
     MustIncludeRule,
     MaxLatencyRule,

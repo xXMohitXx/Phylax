@@ -19,8 +19,8 @@ import inspect
 
 import pytest
 
-from phylax._internal.modes.handler import ModeHandler, ModeResult
-from phylax._internal.modes.definitions import EnforcementMode, VALID_MODES
+from phylax import ModeHandler, ModeResult
+from phylax import EnforcementMode, VALID_MODES
 
 
 # ═══════════════════════════════════════════════════════════════════
