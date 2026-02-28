@@ -8,7 +8,7 @@ Verifies template system:
 """
 
 import pytest
-from phylax._internal.expectations import (
+from phylax import (
     Evaluator,
     MustIncludeRule,
     MustNotIncludeRule,
@@ -16,7 +16,7 @@ from phylax._internal.expectations import (
     MinTokensRule,
     ExpectationTemplate,
     TemplateRegistry,
-    get_registry,
+    get_template_registry,
     register_template,
     get_template,
     get_template_rules,
@@ -123,12 +123,12 @@ class TestGlobalRegistry:
     
     def test_get_registry(self):
         """get_registry returns singleton."""
-        registry = get_registry()
+        registry = get_template_registry()
         assert isinstance(registry, TemplateRegistry)
     
     def test_builtin_templates_registered(self):
         """Built-in templates are auto-registered."""
-        registry = get_registry()
+        registry = get_template_registry()
         
         # Check built-in templates exist
         assert registry.exists("safe-response")

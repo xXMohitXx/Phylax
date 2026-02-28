@@ -26,13 +26,14 @@ from phylax import (
     EvaluationLedger,
     LedgerEntry,
     AggregateMetrics,
-)
-from phylax._internal.metrics.identity import (
     compute_definition_hash,
+)
+# Private helpers — not part of public API, used only in meta-tests
+from phylax._internal.metrics.identity import (
     _canonical_serialize,
     _generate_deterministic_id,
 )
-from phylax._internal.metrics.aggregator import aggregate, aggregate_all
+from phylax import aggregate, aggregate_all
 
 
 # ═══════════════════════════════════════════════════════════════════

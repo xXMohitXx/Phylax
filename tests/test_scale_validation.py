@@ -17,19 +17,19 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pytest
 
-from phylax._internal.metrics.identity import (
+from phylax import (
     ExpectationIdentity,
     compute_definition_hash,
 )
-from phylax._internal.metrics.ledger import EvaluationLedger, LedgerEntry
-from phylax._internal.metrics.aggregator import aggregate, aggregate_all
-from phylax._internal.meta.rules import (
+from phylax import EvaluationLedger, LedgerEntry
+from phylax import aggregate, aggregate_all
+from phylax import (
     MinExpectationCountRule,
     ZeroSignalRule,
     DefinitionChangeGuard,
     ExpectationRemovalGuard,
 )
-from phylax._internal.modes.handler import ModeHandler
+from phylax import ModeHandler
 
 
 # ═══════════════════════════════════════════════════════════════════

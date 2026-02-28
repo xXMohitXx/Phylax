@@ -22,11 +22,69 @@ from phylax._internal.schema import (
     TraceRequest,
     TraceResponse,
     TraceRuntime,
+    TraceMessage,
+    TraceParameters,
     Verdict,
 )
 from phylax._internal.decorator import trace, expect
-from phylax._internal.context import execution
+from phylax._internal.context import (
+    execution,
+    get_execution_id,
+    get_parent_node_id,
+    push_node,
+    pop_node,
+    in_execution_context,
+)
 from phylax._internal.graph import ExecutionGraph, NodeRole, GraphStage, GraphDiff, NodeDiff
+
+# Expectations engine
+from phylax._internal.expectations import (
+    evaluate,
+    Evaluator,
+    Rule,
+    RuleResult,
+    MustIncludeRule,
+    MustNotIncludeRule,
+    MaxLatencyRule,
+    MinTokensRule,
+    # Axis 1 Phase 1: Composition
+    ExpectationGroup,
+    AndGroup,
+    OrGroup,
+    NotGroup,
+    # Axis 1 Phase 2: Conditionals
+    Condition,
+    ConditionalExpectation,
+    InputContains,
+    ModelEquals,
+    ProviderEquals,
+    MetadataEquals,
+    FlagSet,
+    when,
+    # Axis 1 Phase 3: Scoping
+    ExpectationScope,
+    ScopedExpectation,
+    for_node,
+    for_provider,
+    for_stage,
+    for_tool,
+    scoped,
+    # Axis 1 Phase 4: Templates
+    ExpectationTemplate,
+    TemplateRegistry,
+    register_template,
+    get_template,
+    get_template_rules,
+)
+from phylax._internal.expectations.templates import get_registry as get_template_registry
+from phylax._internal.expectations.documentation import (
+    describe_rule,
+    describe_condition,
+    describe_template,
+    list_contracts,
+    export_contract_markdown,
+    ContractDocumenter,
+)
 
 # Adapters - lazy import to avoid requiring all dependencies
 from phylax._internal.adapters import (
@@ -84,6 +142,9 @@ from phylax._internal.metrics import (
     AggregateMetrics,
     aggregate,
     aggregate_all,
+    HealthReport,
+    CoverageReport,
+    get_windowed_health,
 )
 
 # Axis 3: Modes (Phase 3.3)
@@ -106,11 +167,18 @@ __all__ = [
     "expect",
     # Context manager
     "execution",
+    "get_execution_id",
+    "get_parent_node_id",
+    "push_node",
+    "pop_node",
+    "in_execution_context",
     # Data models
     "Trace",
     "TraceRequest",
     "TraceResponse",
     "TraceRuntime",
+    "TraceMessage",
+    "TraceParameters",
     "Verdict",
     # Graph (advanced)
     "ExecutionGraph",
@@ -118,6 +186,51 @@ __all__ = [
     "GraphStage",
     "GraphDiff",
     "NodeDiff",
+    # Expectations engine
+    "evaluate",
+    "Evaluator",
+    "Rule",
+    "RuleResult",
+    "MustIncludeRule",
+    "MustNotIncludeRule",
+    "MaxLatencyRule",
+    "MinTokensRule",
+    # Axis 1 Phase 1: Composition
+    "ExpectationGroup",
+    "AndGroup",
+    "OrGroup",
+    "NotGroup",
+    # Axis 1 Phase 2: Conditionals
+    "Condition",
+    "ConditionalExpectation",
+    "InputContains",
+    "ModelEquals",
+    "ProviderEquals",
+    "MetadataEquals",
+    "FlagSet",
+    "when",
+    # Axis 1 Phase 3: Scoping
+    "ExpectationScope",
+    "ScopedExpectation",
+    "for_node",
+    "for_provider",
+    "for_stage",
+    "for_tool",
+    "scoped",
+    # Axis 1 Phase 4: Templates
+    "ExpectationTemplate",
+    "TemplateRegistry",
+    "get_template_registry",
+    "register_template",
+    "get_template",
+    "get_template_rules",
+    # Axis 1 Phase 5: Documentation
+    "describe_rule",
+    "describe_condition",
+    "describe_template",
+    "list_contracts",
+    "export_contract_markdown",
+    "ContractDocumenter",
     # Adapters
     "OpenAIAdapter",
     "GeminiAdapter",
@@ -167,6 +280,9 @@ __all__ = [
     "AggregateMetrics",
     "aggregate",
     "aggregate_all",
+    "HealthReport",
+    "CoverageReport",
+    "get_windowed_health",
     # Axis 3: Modes (Phase 3.3)
     "ModeHandler",
     "ModeResult",

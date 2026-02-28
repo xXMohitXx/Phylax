@@ -18,14 +18,14 @@ import inspect
 import pytest
 from pydantic import ValidationError
 
-from phylax._internal.meta.rules import (
+from phylax import (
     MetaRuleResult,
     MinExpectationCountRule,
     ZeroSignalRule,
     DefinitionChangeGuard,
     ExpectationRemovalGuard,
 )
-from phylax._internal.metrics.identity import compute_definition_hash
+from phylax import compute_definition_hash
 
 
 # ═══════════════════════════════════════════════════════════════════

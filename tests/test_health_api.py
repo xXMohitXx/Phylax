@@ -25,7 +25,7 @@ from phylax import (
     AggregateMetrics,
     aggregate,
 )
-from phylax._internal.metrics.health import (
+from phylax import (
     HealthReport,
     CoverageReport,
     get_windowed_health,
