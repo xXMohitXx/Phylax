@@ -168,7 +168,7 @@ from phylax._internal.artifacts.exit_codes import (
     EXIT_PASS, EXIT_FAIL, EXIT_SYSTEM_ERROR, resolve_exit_code,
 )
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 __all__ = [
     # Core decorators
     "trace",

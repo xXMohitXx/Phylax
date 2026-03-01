@@ -162,6 +162,9 @@ Phylax's primary interface is CI verdict enforcement.
 | **Metrics & Health** | Expectation identity, evaluation ledger, aggregation |
 | **Enforcement Modes** | `enforce` / `quarantine` / `observe` CI behavior |
 | **Meta-Enforcement** | Dilution guards: min count, zero signal, change/removal detection |
+| **Artifact Contracts** | Frozen `verdict.json`, `failures.json`, `trace_diff.json` outputs |
+| **Deterministic Exit Codes** | `0`=PASS, `1`=FAIL, `2`=SYSTEM_ERROR (frozen) |
+| **Constitutional Governance** | `CONSTITUTION.md` — 12 promises Phylax will never break |
 
 ### Auxiliary Control Surfaces
 
