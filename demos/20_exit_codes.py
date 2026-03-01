@@ -1,12 +1,12 @@
-﻿"""
-Demo 20 â€” Deterministic Exit Codes
+"""
+Demo 20 - Deterministic Exit Codes
 
 Shows Phylax's frozen exit code system:
-  0 â†’ PASS or non-blocking mode
-  1 â†’ FAIL in enforce mode
-  2 â†’ System error
+  0 = PASS or non-blocking mode
+  1 = FAIL in enforce mode
+  2 = System error
 
-CI systems consume exit codes â€” no SDK required.
+CI systems consume exit codes - no SDK required.
 
 Usage:
     python demos/20_exit_codes.py
@@ -21,13 +21,13 @@ from phylax import (
 
 
 def main():
-    print("â•â•â• Frozen Exit Codes â•â•â•")
+    print("--- Frozen Exit Codes ---")
     print(f"EXIT_PASS         = {EXIT_PASS}")
     print(f"EXIT_FAIL         = {EXIT_FAIL}")
     print(f"EXIT_SYSTEM_ERROR = {EXIT_SYSTEM_ERROR}")
 
-    # â”€â”€ Resolution table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    print("\nâ•â•â• Resolution Table â•â•â•")
+    # -- Resolution table -------------------------------------------------
+    print("\n--- Resolution Table ---")
     scenarios = [
         ("PASS", "enforce"),
         ("PASS", "quarantine"),
@@ -38,26 +38,26 @@ def main():
     ]
     for verdict, mode in scenarios:
         code = resolve_exit_code(verdict=verdict, mode=mode)
-        print(f"  {verdict:4s} + {mode:12s} â†’ exit {code}")
+        print(f"  {verdict:4s} + {mode:12s} -> exit {code}")
 
-    # â”€â”€ CI usage example â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    print("\nâ•â•â• CI Usage â•â•â•")
+    # -- CI usage example -------------------------------------------------
+    print("\n--- CI Usage ---")
     print("# In your CI pipeline (GitHub Actions, GitLab CI, etc.):")
     print("# ")
     print("#   - run: phylax check")
-    print("#     # Exit 0 â†’ pipeline continues")
-    print("#     # Exit 1 â†’ pipeline fails (enforce mode)")
-    print("#     # Exit 2 â†’ system error, investigate")
+    print("#     # Exit 0 -> pipeline continues")
+    print("#     # Exit 1 -> pipeline fails (enforce mode)")
+    print("#     # Exit 2 -> system error, investigate")
 
-    # â”€â”€ Key properties â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    print("\nâ•â•â• Properties â•â•â•")
-    print("âœ“ Only 3 exit codes â€” frozen, no expansion without MAJOR bump")
-    print("âœ“ Pure function â€” no side effects, no logging")
-    print("âœ“ CI systems need only exit code, no Phylax SDK")
-    print("âœ“ Invalid verdicts/modes raise ValueError")
+    # -- Key properties ---------------------------------------------------
+    print("\n--- Properties ---")
+    print("[OK] Only 3 exit codes - frozen, no expansion without MAJOR bump")
+    print("[OK] Pure function - no side effects, no logging")
+    print("[OK] CI systems need only exit code, no Phylax SDK")
+    print("[OK] Invalid verdicts/modes raise ValueError")
 
-    # â”€â”€ Error handling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    print("\nâ•â•â• Error Handling â•â•â•")
+    # -- Error handling ---------------------------------------------------
+    print("\n--- Error Handling ---")
     try:
         resolve_exit_code(verdict="warning", mode="enforce")
     except ValueError as e:
@@ -71,4 +71,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

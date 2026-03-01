@@ -158,7 +158,7 @@ twine upload dist/* -u __token__ -p <PYPI_TOKEN>
 
 ```python
 import phylax
-print(phylax.__version__)  # "1.4.0"
+print(phylax.__version__)  # "1.4.1"
 ```
 
 ```bash

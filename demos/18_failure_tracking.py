@@ -1,5 +1,5 @@
-﻿"""
-Demo 18 â€” Failure Tracking Artifacts
+"""
+Demo 18 - Failure Tracking Artifacts
 
 Shows how Phylax produces structured failure records:
   - Mechanical fact only
@@ -19,7 +19,7 @@ from phylax import (
 
 
 def main():
-    # â”€â”€ Generate failure artifact from violations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Generate failure artifact from violations ------------------------
     failures = generate_failure_artifact(
         run_id="ci-run-20260301-001",
         failures=[
@@ -44,28 +44,27 @@ def main():
         ],
     )
 
-    print("â•â•â• Failure Artifact â•â•â•")
+    print("--- Failure Artifact ---")
     print(json.dumps(json.loads(failures.model_dump_json()), indent=2))
 
-    # â”€â”€ External consumer parsing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- External consumer parsing ----------------------------------------
     raw = json.loads(failures.model_dump_json())
-    print(f"\nâ•â•â• External CI Consumer â•â•â•")
+    print(f"\n--- External CI Consumer ---")
     print(f"Run: {raw['run_id']}")
     print(f"Total failures: {len(raw['failures'])}")
     for f in raw["failures"]:
-        print(f"  âœ— {f['expectation_id']}: {f['violated_rule']}")
+        print(f"  [FAIL] {f['expectation_id']}: {f['violated_rule']}")
         print(f"    got: {f['raw_value'][:50]}...")
         print(f"    expected: {f['expected_value']}")
 
-    # â”€â”€ Key properties â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    print("\nâ•â•â• Properties â•â•â•")
-    print("âœ“ No 'explanation' field â€” Phylax reports, doesn't explain")
-    print("âœ“ No 'severity' field â€” all failures are equal")
-    print("âœ“ No 'suggestion' field â€” Phylax enforces, doesn't coach")
-    print("âœ“ Frozen after creation")
-    print(f"âœ“ Schema version: {failures.schema_version}")
+    # -- Key properties ---------------------------------------------------
+    print("\n--- Properties ---")
+    print("[OK] No 'explanation' field - Phylax reports, doesn't explain")
+    print("[OK] No 'severity' field - all failures are equal")
+    print("[OK] No 'suggestion' field - Phylax enforces, doesn't coach")
+    print("[OK] Frozen after creation")
+    print(f"[OK] Schema version: {failures.schema_version}")
 
 
 if __name__ == "__main__":
     main()
-

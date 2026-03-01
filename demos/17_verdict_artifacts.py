@@ -1,5 +1,5 @@
-﻿"""
-Demo 17 â€” Verdict Artifacts
+"""
+Demo 17 - Verdict Artifacts
 
 Shows how Phylax produces frozen, machine-consumable verdict artifacts
 that external systems can parse without importing Phylax.
@@ -17,7 +17,7 @@ from phylax import (
 
 
 def main():
-    # â”€â”€ Generate a PASS verdict â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Generate a PASS verdict ------------------------------------------
     definition = {"rule": "must_include", "substrings": ["refund"]}
     snapshot_hash = compute_definition_hash(definition)
 
@@ -30,10 +30,10 @@ def main():
         engine_version="1.4.1",
     )
 
-    print("â•â•â• PASS Verdict Artifact â•â•â•")
+    print("--- PASS Verdict Artifact ---")
     print(json.dumps(json.loads(verdict_pass.model_dump_json()), indent=2))
 
-    # â”€â”€ Generate a FAIL verdict â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Generate a FAIL verdict ------------------------------------------
     verdict_fail = generate_verdict_artifact(
         mode="enforce",
         verdict="FAIL",
@@ -43,28 +43,27 @@ def main():
         engine_version="1.4.1",
     )
 
-    print("\nâ•â•â• FAIL Verdict Artifact â•â•â•")
+    print("\n--- FAIL Verdict Artifact ---")
     print(json.dumps(json.loads(verdict_fail.model_dump_json()), indent=2))
 
-    # â”€â”€ External consumer simulation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- External consumer simulation -------------------------------------
     raw_json = verdict_fail.model_dump_json()
-    # This is what an external CI tool sees â€” plain JSON, no Phylax needed
+    # This is what an external CI tool sees - plain JSON, no Phylax needed
     parsed = json.loads(raw_json)
-    print(f"\nâ•â•â• External Consumer â•â•â•")
+    print("\n--- External Consumer ---")
     print(f"Verdict: {parsed['verdict']}")
     print(f"Failures: {parsed['failures']}/{parsed['expectations_evaluated']}")
     print(f"Mode: {parsed['mode']}")
     print(f"Schema: {parsed['schema_version']}")
 
-    # â”€â”€ Key properties â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    print("\nâ•â•â• Properties â•â•â•")
-    print(f"âœ“ Frozen (immutable after creation)")
-    print(f"âœ“ Schema versioned: {verdict_pass.schema_version}")
-    print(f"âœ“ No commentary fields")
-    print(f"âœ“ Machine-consumable JSON")
-    print(f"âœ“ External systems parse without Phylax SDK")
+    # -- Key properties ---------------------------------------------------
+    print("\n--- Properties ---")
+    print(f"[OK] Frozen (immutable after creation)")
+    print(f"[OK] Schema versioned: {verdict_pass.schema_version}")
+    print(f"[OK] No commentary fields")
+    print(f"[OK] Machine-consumable JSON")
+    print(f"[OK] External systems parse without Phylax SDK")
 
 
 if __name__ == "__main__":
     main()
-

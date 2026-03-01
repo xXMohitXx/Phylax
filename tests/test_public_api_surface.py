@@ -1,5 +1,5 @@
 """
-Public API Surface Test (v1.4.0)
+Public API Surface Test (v1.4.1)
 
 This test validates that EVERY feature of Phylax is accessible
 through `from phylax import ...` — no _internal imports needed.
