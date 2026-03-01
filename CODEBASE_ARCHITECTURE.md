@@ -1142,7 +1142,7 @@ class SQLiteIndex:
 **Purpose**: Expose traces via HTTP, support replay and comparison, serve UI.
 
 ```python
-app = FastAPI(title="Phylax", version="1.0.0")
+app = FastAPI(title="Phylax", version="1.4.0")
 
 # CORS: localhost:3000, localhost:8000
 # Routers: traces, replay, chat (all under /v1 prefix)
@@ -1244,7 +1244,7 @@ Phylax/
 ├── phylax/                          # Main package (PyPI-distributed)
 │   ├── __init__.py                  # Public API: exports trace, expect, execution,
 │   │                                  Trace, Verdict, ExecutionGraph, all 6 adapters
-│   │                                  __version__ = "1.2.6"
+│   │                                  __version__ = "1.4.0"
 │   │
 │   ├── _internal/                   # Internal implementation (not for direct import)
 │   │   ├── __init__.py              # Module docstring only
@@ -1669,4 +1669,4 @@ allow_origins = [
 ---
 
 **Last Updated**: February 22, 2026  
-**Architecture Version**: 1.2.6 (Stable — execution semantics and verdict behavior frozen)
+**Architecture Version**: 1.4.0 (Stable — execution semantics and verdict behavior frozen)
