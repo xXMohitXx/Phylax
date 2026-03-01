@@ -1,16 +1,23 @@
 # ===========================================
-# Phylax - LLM Regression Testing Framework
+# Phylax v1.4.0 — LLM Regression Enforcement
 # ===========================================
+# Derived from pyproject.toml — do NOT use pip freeze
 
-# Core dependencies
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
+# Core (required)
 pydantic>=2.5.0
 pyyaml>=6.0
 
-# LLM Providers
-openai>=1.0.0
-google-genai>=0.5.0
+# Server
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# LLM Providers (all optional — install what you need)
+openai>=1.0.0             # OpenAI
+google-genai>=0.5.0       # Gemini
+groq>=0.4.0               # Groq LPU
+mistralai>=0.1.0          # Mistral AI
+huggingface_hub>=0.20.0   # HuggingFace Inference API
+ollama>=0.1.0             # Ollama (local models)
 
 # HTTP clients
 requests>=2.31.0
@@ -20,5 +27,6 @@ httpx>=0.26.0
 pytest>=7.0.0
 pytest-asyncio>=0.21.0
 
-# Optional: Local model support
-# llama-cpp-python>=0.2.0
+# Build & Publish
+build>=1.0.0
+twine>=5.0.0
