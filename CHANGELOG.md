@@ -2,6 +2,35 @@
 
 All notable changes to Phylax.
 
+## [1.4.0] - 2026-03-01 — Axis 4: Ecosystem Without Platformization
+
+### Added — Axis 4: Perimeter Discipline
+
+#### Phase 4.1: Stable Artifact Contracts
+- **`phylax/_internal/artifacts/verdict.py`**: Frozen `VerdictArtifact` — deterministic, machine-consumable, schema-versioned
+- **`phylax/_internal/artifacts/failures.py`**: `FailureArtifact` + `FailureEntry` — mechanical failures, no explanation/ranking
+- **`phylax/_internal/artifacts/trace_diff.py`**: `TraceDiffArtifact` — literal diffs, sorted, no impact assessment
+- **`phylax/_internal/artifacts/exit_codes.py`**: `EXIT_PASS=0`, `EXIT_FAIL=1`, `EXIT_SYSTEM_ERROR=2` (frozen)
+- **`tests/test_artifact_contracts.py`**: 27 tests (immutability, determinism, no commentary)
+
+#### Phase 4.2: Anti-Integration Guarantees
+- **`ANTI_FEATURES.md`**: Documented non-features (no dashboards, alerting, daemons, plugins)
+- **`tests/test_axis4_integrity.py`**: Anti-integration audit (no network calls, no viz libs, no daemon code)
+
+#### Phase 4.3: Versioning & Constitution
+- **`CONSTITUTION.md`**: 12 constitutional promises — "What Phylax Will Never Do"
+- Governance enforcement tests (constitution existence, schema versioning)
+
+#### Phase 4.4: Ecosystem Fit Validation
+- External consumer simulation (JSON parsing without Phylax SDK)
+- Artifact backward compatibility tests
+- Minimal footprint audit (stdlib + pydantic only)
+
+### Stats
+- **746 tests passing**
+- Phylax produces artifacts. Other systems consume them.
+- No dashboards, no alerting, no plugins, no daemons
+
 ## [1.4.0] - 2026-02-28 — Stable Launch: Scale Safety & Misuse Resistance
 
 ### Added — Axis 3: Scale Safety & Misuse Resistance
