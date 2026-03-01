@@ -1289,14 +1289,24 @@ Phylax/
 │   │   │
 │   │   └── adapters/                # LLM provider adapters (lazy-loaded)
 │   │       ├── __init__.py           # Re-exports all 6 adapters
-│   │       ├── openai.py            # OpenAIAdapter: chat_completion(), completion()
-│   │       ├── gemini.py            # GeminiAdapter: chat_completion(), generate()
-│   │       ├── groq.py              # GroqAdapter: chat_completion(), generate()
-│   │       ├── mistral.py           # MistralAdapter: chat_completion(), generate()
-│   │       ├── huggingface.py       # HuggingFaceAdapter: chat_completion(), generate()
-│   │       ├── ollama.py            # OllamaAdapter: chat_completion(), generate(),
-│   │       │                          list_models()
-│   │       └── llama.py             # LlamaAdapter (local llama.cpp support)
+│   │   ├── adapters/                # LLM provider adapters (lazy-loaded)
+│   │   │   ├── __init__.py           # Re-exports all 6 adapters
+│   │   │   ├── openai.py            # OpenAIAdapter: chat_completion(), completion()
+│   │   │   ├── gemini.py            # GeminiAdapter: chat_completion(), generate()
+│   │   │   ├── groq.py              # GroqAdapter: chat_completion(), generate()
+│   │   │   ├── mistral.py           # MistralAdapter: chat_completion(), generate()
+│   │   │   ├── huggingface.py       # HuggingFaceAdapter: chat_completion(), generate()
+│   │   │   ├── ollama.py            # OllamaAdapter: chat_completion(), generate(),
+│   │   │   │                          list_models()
+│   │   │   └── llama.py             # LlamaAdapter (local llama.cpp support)
+│   │   │
+│   │   ├── artifacts/              # Axis 4: Machine-consumable output contracts
+│   │   │   ├── __init__.py          # Re-exports all artifact types
+│   │   │   ├── verdict.py           # VerdictArtifact, generate_verdict_artifact()
+│   │   │   ├── failures.py          # FailureEntry, FailureArtifact, generate_failure_artifact()
+│   │   │   ├── trace_diff.py        # TraceDiffArtifact, generate_trace_diff()
+│   │   │   └── exit_codes.py        # EXIT_PASS=0, EXIT_FAIL=1, EXIT_SYSTEM_ERROR=2,
+│   │   │                              resolve_exit_code()
 │   │
 │   ├── cli/                         # CLI entry point (phylax command)
 │   │   ├── __init__.py

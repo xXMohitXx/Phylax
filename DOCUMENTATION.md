@@ -15,8 +15,8 @@ Phylax enforces contracts so LLM behavior changes are caught before production:
 ### Status: v1.4.1 STABLE
 
 Stable means execution semantics and verdict behavior are frozen.
-Axis 1 (Expectations), Axis 2 (Surfaces), and Axis 3 (Scale Safety) are complete.
-622 tests passing.
+Axis 1 (Expectations), Axis 2 (Surfaces), Axis 3 (Scale Safety), and Axis 4 (Ecosystem Discipline) are complete.
+799 tests passing.
 
 ---
 
@@ -368,9 +368,153 @@ class Trace:
 
 ---
 
+## Axis 3: Scale Safety & Misuse Resistance
+
+### Metrics Foundation
+
+```python
+from phylax import (
+    ExpectationIdentity, compute_definition_hash,
+    LedgerEntry, EvaluationLedger,
+    AggregateMetrics, aggregate, aggregate_all,
+    HealthReport, CoverageReport, get_windowed_health,
+)
+
+# Compute a stable hash for any expectation definition
+hash_val = compute_definition_hash({"rule": "must_include", "substrings": ["refund"]})
+
+# Evaluation ledger (append-only, no mutation)
+ledger = EvaluationLedger()
+ledger.record(LedgerEntry(expectation_id="e1", verdict="pass"))
+ledger.record(LedgerEntry(expectation_id="e1", verdict="fail"))
+
+# Aggregate metrics (deterministic)
+metrics = aggregate(ledger.entries, "e1")
+# metrics.total_evaluations = 2, metrics.failure_rate = 0.5
+
+# Health report
+report = HealthReport.from_aggregate(metrics, hash_val)
+```
+
+### Enforcement Modes
+
+```python
+from phylax import ModeHandler, VALID_MODES
+
+# VALID_MODES = {"enforce", "quarantine", "observe"}
+handler = ModeHandler("enforce")
+result = handler.apply("fail")
+# result.exit_code = 1 (enforce blocks CI on failure)
+
+handler = ModeHandler("observe")
+result = handler.apply("fail")
+# result.exit_code = 0 (observe logs but does not block)
+```
+
+### Meta-Enforcement Rules
+
+```python
+from phylax import (
+    MinExpectationCountRule,
+    ZeroSignalRule,
+    DefinitionChangeGuard,
+    ExpectationRemovalGuard,
+)
+
+# Fail if fewer than 3 expectations defined
+rule = MinExpectationCountRule(min_count=3)
+result = rule.evaluate(current_count=2)
+# result.passed = False
+
+# Detect silent expectation removal
+guard = ExpectationRemovalGuard()
+result = guard.evaluate(
+    previous_ids={"e1", "e2", "e3"},
+    current_ids={"e1", "e2"},
+)
+# result.passed = False, result.removed = {"e3"}
+```
+
+---
+
+## Axis 4: Ecosystem Without Platformization
+
+### Verdict Artifacts
+
+```python
+from phylax import generate_verdict_artifact
+
+artifact = generate_verdict_artifact(
+    mode="enforce",
+    verdict="FAIL",
+    expectations_evaluated=10,
+    failures=3,
+    definition_snapshot_hash="abc123",
+    engine_version="1.4.1",
+)
+# Frozen, deterministic, machine-consumable JSON
+# No commentary fields. No explanation. No severity.
+print(artifact.model_dump_json())
+```
+
+### Failure Artifacts
+
+```python
+from phylax import generate_failure_artifact
+
+artifact = generate_failure_artifact(
+    run_id="ci-run-001",
+    failures=[
+        {"expectation_id": "e1", "violated_rule": "must_include",
+         "raw_value": "Hello", "expected_value": "refund"},
+    ],
+)
+# Mechanical failure records only.
+# No 'explanation', 'severity', or 'suggestion' fields.
+```
+
+### Trace Diff Artifacts
+
+```python
+from phylax import generate_trace_diff
+
+diff = generate_trace_diff(
+    run_id_before="run-001",
+    run_id_after="run-002",
+    expectations_before={"e1", "e2"},
+    expectations_after={"e2", "e3"},
+    hash_before="hash_a",
+    hash_after="hash_b",
+)
+# diff.added_expectations = ["e3"]
+# diff.removed_expectations = ["e1"]
+# diff.hashes_match = False
+# Literal diffs only. No impact assessment.
+```
+
+### Deterministic Exit Codes
+
+```python
+from phylax import EXIT_PASS, EXIT_FAIL, EXIT_SYSTEM_ERROR, resolve_exit_code
+
+# Frozen: 0=PASS, 1=FAIL(enforce), 2=system error
+code = resolve_exit_code(verdict="FAIL", mode="enforce")  # 1
+code = resolve_exit_code(verdict="FAIL", mode="observe")  # 0
+```
+
+### Governance Documents
+
+- **`CONSTITUTION.md`** -- 12 promises Phylax will never break (explain failures, rank expectations, suggest improvements, add AI inference, embed dashboards, send alerts, etc.)
+- **`ANTI_FEATURES.md`** -- Documented non-features (no dashboards, no alerting, no daemons, no plugins)
+
+---
+
 ## Links
 
 - [README](README.md)
 - [Development Guide](DEVELOPMENT.md)
 - [Changelog](CHANGELOG.md)
+- [Constitution](CONSTITUTION.md)
+- [Anti-Features](ANTI_FEATURES.md)
 - [GitHub](https://github.com/xXMohitXx/Phylax)
+
