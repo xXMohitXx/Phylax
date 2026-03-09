@@ -1655,10 +1655,10 @@ allow_origins = [
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    METRICS FOUNDATION                            │
-│                                                                  │
+│                    METRICS FOUNDATION                           │
+│                                                                 │
 │  ┌──────────────┐   ┌──────────────┐   ┌──────────────────────┐ │
-│  │  Identity     │   │  Ledger      │   │  Aggregator          │ │
+│  │  Identity    │   │  Ledger      │   │  Aggregator          │ │
 │  │              │   │              │   │                      │ │
 │  │ compute_     │──>│ record()     │──>│ aggregate()          │ │
 │  │ definition_  │   │ (append-only)│   │ aggregate_all()      │ │
@@ -1666,16 +1666,16 @@ allow_origins = [
 │  │              │   │ No .update() │   │ total_evaluations    │ │
 │  │ SHA-256      │   │ No .delete() │   │ total_failures       │ │
 │  │ canonical    │   │ No .clear()  │   │ total_passes         │ │
-│  │ JSON sort    │   │ No .pop()    │   │ failure_rate          │ │
-│  │              │   │              │   │ never_failed          │ │
-│  └──────────────┘   └──────────────┘   │ never_passed          │ │
-│                                         └──────────┬───────────┘ │
-│                                                     │             │
-│                                         ┌───────────▼───────────┐ │
-│                                         │  Health Report         │ │
-│                                         │  get_windowed_health() │ │
-│                                         │  CoverageReport        │ │
-│                                         └────────────────────────┘ │
+│  │ JSON sort    │   │ No .pop()    │   │ failure_rate         │ │
+│  │              │   │              │   │ never_failed         │ │
+│  └──────────────┘   └──────────────┘   │ never_passed         │ │
+│                                        └──────────┬───────────┘ │
+│                                                   │             │
+│                                       ┌───────────▼───────────┐ │
+│                                       │  Health Report        │ │
+│                                       │  get_windowed_health()│ │
+│                                       │  CoverageReport       │ │
+│                                       └───────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1685,20 +1685,20 @@ allow_origins = [
 
 ```
 ┌──────────────────────────────────────────────┐
-│           ENFORCEMENT MODES                   │
-│                                               │
-│  ModeHandler(mode) → .apply(verdict)          │
-│                                               │
-│  ┌───────────┐ ┌───────────┐ ┌───────────┐  │
-│  │  enforce   │ │ quarantine│ │  observe   │  │
-│  │           │ │           │ │           │  │
-│  │ FAIL → 1  │ │ FAIL → 0  │ │ FAIL → 0  │  │
-│  │ (blocks   │ │ (logged,  │ │ (logged   │  │
-│  │  CI)      │ │  no block)│ │  only)    │  │
-│  └───────────┘ └───────────┘ └───────────┘  │
-│                                               │
-│  Invariant: Mode NEVER auto-switches.         │
-│  Invalid modes raise ValueError.              │
+│           ENFORCEMENT MODES                  │
+│                                              │
+│  ModeHandler(mode) → .apply(verdict)         │
+│                                              │
+│  ┌───────────┐ ┌───────────┐ ┌───────────┐   │
+│  │  enforce  │ │ quarantine│ │  observe  │   │
+│  │           │ │           │ │           │   │
+│  │ FAIL → 1  │ │ FAIL → 0  │ │ FAIL → 0  │   │
+│  │ (blocks   │ │ (logged,  │ │ (logged   │   │
+│  │  CI)      │ │  no block)│ │  only)    │   │
+│  └───────────┘ └───────────┘ └───────────┘   │
+│                                              │
+│  Invariant: Mode NEVER auto-switches.        │
+│  Invalid modes raise ValueError.             │
 └──────────────────────────────────────────────┘
 ```
 
@@ -1706,24 +1706,24 @@ allow_origins = [
 
 ```
 ┌──────────────────────────────────────────────┐
-│         META-ENFORCEMENT RULES                │
-│                                               │
-│  Guards against silent dilution of coverage.  │
-│                                               │
-│  MinExpectationCountRule(min_count=N)          │
-│    → FAIL if fewer than N expectations        │
-│                                               │
-│  ZeroSignalRule()                              │
-│    → FAIL if no evaluations produce signal    │
-│                                               │
-│  DefinitionChangeGuard()                      │
-│    → FAIL if definition hash changed          │
-│                                               │
-│  ExpectationRemovalGuard()                    │
-│    → FAIL if expectations silently removed    │
-│                                               │
-│  All rules: pure functions, no side effects,  │
-│  no advisory language, deterministic.         │
+│         META-ENFORCEMENT RULES               │
+│                                              │
+│  Guards against silent dilution of coverage. │
+│                                              │
+│  MinExpectationCountRule(min_count=N)        │
+│    → FAIL if fewer than N expectations       │
+│                                              │
+│  ZeroSignalRule()                            │
+│    → FAIL if no evaluations produce signal   │
+│                                              │
+│  DefinitionChangeGuard()                     │
+│    → FAIL if definition hash changed         │
+│                                              │
+│  ExpectationRemovalGuard()                   │
+│    → FAIL if expectations silently removed   │
+│                                              │
+│  All rules: pure functions, no side effects, │
+│  no advisory language, deterministic.        │
 └──────────────────────────────────────────────┘
 ```
 
@@ -1734,45 +1734,45 @@ allow_origins = [
 ### Artifact Contracts Layer (`phylax/_internal/artifacts/`)
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────────────────────┐
 │              MACHINE-CONSUMABLE ARTIFACTS                         │
 │                                                                   │
 │  All artifacts are:                                               │
 │    • Frozen (immutable after creation)                            │
 │    • Deterministic (100 runs → 1 hash)                            │
 │    • Schema-versioned (currently 1.0.0)                           │
-│    • Commentary-free (no explanation/suggestion/severity)          │
+│    • Commentary-free (no explanation/suggestion/severity)         │
 │                                                                   │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
-│  │ verdict.py       │  │ failures.py      │  │ trace_diff.py   │  │
-│  │                 │  │                 │  │                 │  │
-│  │ VerdictArtifact │  │ FailureArtifact │  │ TraceDiffArtifact│  │
-│  │ generate_       │  │ FailureEntry    │  │ generate_       │  │
-│  │ verdict_        │  │ generate_       │  │ trace_diff()    │  │
-│  │ artifact()      │  │ failure_        │  │                 │  │
-│  │                 │  │ artifact()      │  │ added/removed   │  │
-│  │ run_id, mode,  │  │                 │  │ expectations    │  │
-│  │ verdict, count │  │ id, rule,       │  │ hash comparison │  │
-│  └─────────────────┘  │ raw, expected   │  └─────────────────┘  │
-│                        └─────────────────┘                        │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────┐   │
+│  │ verdict.py      │  │ failures.py     │  │ trace_diff.py    │   │
+│  │                 │  │                 │  │                  │   │
+│  │ VerdictArtifact │  │ FailureArtifact │  │ TraceDiffArtifact│   │
+│  │ generate_       │  │ FailureEntry    │  │ generate_        │   │
+│  │ verdict_        │  │ generate_       │  │ trace_diff()     │   │
+│  │ artifact()      │  │ failure_        │  │                  │   │
+│  │                 │  │ artifact()      │  │ added/removed    │   │
+│  │ run_id, mode,   │  │                 │  │ expectations     │   │
+│  │ verdict, count  │  │ id, rule,       │  │ hash comparison  │   │
+│  └─────────────────┘  │ raw, expected   │  └──────────────────┘   │
+│                       └─────────────────┘                         │
 │                                                                   │
 │  ┌─────────────────────────────────────────────────────────────┐  │
-│  │ exit_codes.py                                                │  │
-│  │                                                              │  │
-│  │ EXIT_PASS = 0         (PASS or non-blocking mode)            │  │
-│  │ EXIT_FAIL = 1         (FAIL in enforce mode)                 │  │
-│  │ EXIT_SYSTEM_ERROR = 2 (malformed config)                     │  │
-│  │                                                              │  │
-│  │ resolve_exit_code(verdict, mode) → int                       │  │
-│  │ _VALID_EXIT_CODES = frozenset({0, 1, 2})                     │  │
+│  │ exit_codes.py                                               │  │
+│  │                                                             │  │
+│  │ EXIT_PASS = 0         (PASS or non-blocking mode)           │  │
+│  │ EXIT_FAIL = 1         (FAIL in enforce mode)                │  │
+│  │ EXIT_SYSTEM_ERROR = 2 (malformed config)                    │  │
+│  │                                                             │  │
+│  │ resolve_exit_code(verdict, mode) → int                      │  │
+│  │ _VALID_EXIT_CODES = frozenset({0, 1, 2})                    │  │
 │  └─────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────────────────┘
 ```
 
 ### Governance Layer
 
 ```
-┌──────────────────────────────────────────────┐
+┌───────────────────────────────────────────────┐
 │            CONSTITUTIONAL GOVERNANCE          │
 │                                               │
 │  CONSTITUTION.md — 12 "Will Never" Promises:  │
@@ -1796,7 +1796,7 @@ allow_origins = [
 │    • No plugin system                         │
 │                                               │
 │  Breaking any of these = MAJOR version bump   │
-└──────────────────────────────────────────────┘
+└───────────────────────────────────────────────┘
 ```
 
 ### Anti-Platformization Data Flow
