@@ -1649,6 +1649,173 @@ allow_origins = [
 ]
 ```
 
+## Axis 3 — Scale Safety & Misuse Resistance Architecture
+
+### Metrics Layer (`phylax/_internal/metrics/`)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    METRICS FOUNDATION                            │
+│                                                                  │
+│  ┌──────────────┐   ┌──────────────┐   ┌──────────────────────┐ │
+│  │  Identity     │   │  Ledger      │   │  Aggregator          │ │
+│  │              │   │              │   │                      │ │
+│  │ compute_     │──>│ record()     │──>│ aggregate()          │ │
+│  │ definition_  │   │ (append-only)│   │ aggregate_all()      │ │
+│  │ hash()       │   │              │   │                      │ │
+│  │              │   │ No .update() │   │ total_evaluations    │ │
+│  │ SHA-256      │   │ No .delete() │   │ total_failures       │ │
+│  │ canonical    │   │ No .clear()  │   │ total_passes         │ │
+│  │ JSON sort    │   │ No .pop()    │   │ failure_rate          │ │
+│  │              │   │              │   │ never_failed          │ │
+│  └──────────────┘   └──────────────┘   │ never_passed          │ │
+│                                         └──────────┬───────────┘ │
+│                                                     │             │
+│                                         ┌───────────▼───────────┐ │
+│                                         │  Health Report         │ │
+│                                         │  get_windowed_health() │ │
+│                                         │  CoverageReport        │ │
+│                                         └────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Key constraint**: All metrics are derived facts. No opinions, no scoring, no ranking.
+
+### Enforcement Modes Layer (`phylax/_internal/modes/`)
+
+```
+┌──────────────────────────────────────────────┐
+│           ENFORCEMENT MODES                   │
+│                                               │
+│  ModeHandler(mode) → .apply(verdict)          │
+│                                               │
+│  ┌───────────┐ ┌───────────┐ ┌───────────┐  │
+│  │  enforce   │ │ quarantine│ │  observe   │  │
+│  │           │ │           │ │           │  │
+│  │ FAIL → 1  │ │ FAIL → 0  │ │ FAIL → 0  │  │
+│  │ (blocks   │ │ (logged,  │ │ (logged   │  │
+│  │  CI)      │ │  no block)│ │  only)    │  │
+│  └───────────┘ └───────────┘ └───────────┘  │
+│                                               │
+│  Invariant: Mode NEVER auto-switches.         │
+│  Invalid modes raise ValueError.              │
+└──────────────────────────────────────────────┘
+```
+
+### Meta-Enforcement Layer (`phylax/_internal/meta/`)
+
+```
+┌──────────────────────────────────────────────┐
+│         META-ENFORCEMENT RULES                │
+│                                               │
+│  Guards against silent dilution of coverage.  │
+│                                               │
+│  MinExpectationCountRule(min_count=N)          │
+│    → FAIL if fewer than N expectations        │
+│                                               │
+│  ZeroSignalRule()                              │
+│    → FAIL if no evaluations produce signal    │
+│                                               │
+│  DefinitionChangeGuard()                      │
+│    → FAIL if definition hash changed          │
+│                                               │
+│  ExpectationRemovalGuard()                    │
+│    → FAIL if expectations silently removed    │
+│                                               │
+│  All rules: pure functions, no side effects,  │
+│  no advisory language, deterministic.         │
+└──────────────────────────────────────────────┘
+```
+
+---
+
+## Axis 4 — Ecosystem Without Platformization Architecture
+
+### Artifact Contracts Layer (`phylax/_internal/artifacts/`)
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│              MACHINE-CONSUMABLE ARTIFACTS                         │
+│                                                                   │
+│  All artifacts are:                                               │
+│    • Frozen (immutable after creation)                            │
+│    • Deterministic (100 runs → 1 hash)                            │
+│    • Schema-versioned (currently 1.0.0)                           │
+│    • Commentary-free (no explanation/suggestion/severity)          │
+│                                                                   │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
+│  │ verdict.py       │  │ failures.py      │  │ trace_diff.py   │  │
+│  │                 │  │                 │  │                 │  │
+│  │ VerdictArtifact │  │ FailureArtifact │  │ TraceDiffArtifact│  │
+│  │ generate_       │  │ FailureEntry    │  │ generate_       │  │
+│  │ verdict_        │  │ generate_       │  │ trace_diff()    │  │
+│  │ artifact()      │  │ failure_        │  │                 │  │
+│  │                 │  │ artifact()      │  │ added/removed   │  │
+│  │ run_id, mode,  │  │                 │  │ expectations    │  │
+│  │ verdict, count │  │ id, rule,       │  │ hash comparison │  │
+│  └─────────────────┘  │ raw, expected   │  └─────────────────┘  │
+│                        └─────────────────┘                        │
+│                                                                   │
+│  ┌─────────────────────────────────────────────────────────────┐  │
+│  │ exit_codes.py                                                │  │
+│  │                                                              │  │
+│  │ EXIT_PASS = 0         (PASS or non-blocking mode)            │  │
+│  │ EXIT_FAIL = 1         (FAIL in enforce mode)                 │  │
+│  │ EXIT_SYSTEM_ERROR = 2 (malformed config)                     │  │
+│  │                                                              │  │
+│  │ resolve_exit_code(verdict, mode) → int                       │  │
+│  │ _VALID_EXIT_CODES = frozenset({0, 1, 2})                     │  │
+│  └─────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Governance Layer
+
+```
+┌──────────────────────────────────────────────┐
+│            CONSTITUTIONAL GOVERNANCE          │
+│                                               │
+│  CONSTITUTION.md — 12 "Will Never" Promises:  │
+│    1. Explain failures                        │
+│    2. Rank expectations                       │
+│    3. Suggest improvements                    │
+│    4. Score outputs                           │
+│    5. Add AI inference                        │
+│    6. Embed dashboards                        │
+│    7. Send alerts                             │
+│    8. Auto-adjust thresholds                  │
+│    9. Modify user expectations                │
+│   10. Add a plugin system                     │
+│   11. Run as a daemon                         │
+│   12. Make outbound network calls             │
+│                                               │
+│  ANTI_FEATURES.md — Documented Non-Features:  │
+│    • No dashboards                            │
+│    • No alerting                              │
+│    • No background services                   │
+│    • No plugin system                         │
+│                                               │
+│  Breaking any of these = MAJOR version bump   │
+└──────────────────────────────────────────────┘
+```
+
+### Anti-Platformization Data Flow
+
+```
+┌──────────┐     ┌──────────────┐     ┌──────────────────────┐
+│ Phylax   │────>│ verdict.json │────>│ External Dashboard   │
+│ Engine   │────>│ failures.json│────>│ External Alerting    │
+│          │────>│ exit code    │────>│ CI Pipeline (0/1/2)  │
+└──────────┘     └──────────────┘     └──────────────────────┘
+                       ▲                        ▲
+                       │                        │
+              Phylax produces           External consumes
+              artifacts ONLY.           Phylax does NOT
+              No integrations.          embed these systems.
+```
+
+---
+
 ### Storage Layout
 ```
 ~/.Phylax/
@@ -1663,10 +1830,13 @@ allow_origins = [
 
 ---
 
-## 📈 Version History Highlights
+## Version History Highlights
 
 | Version | Date | Key Changes |
 |---------|------|-------------|
+| **1.4.1** | 2026-03-01 | Axis 4 fortress tests (53), demos 17-20, full docs update, version sync |
+| **1.4.0** | 2026-03-01 | Axis 4: Artifact contracts, exit codes, CONSTITUTION.md, ANTI_FEATURES.md |
+| **1.3.0** | 2026-02-28 | Axis 3: Metrics foundation, enforcement modes, meta-enforcement rules |
 | **1.2.6** | 2026-02-14 | Context manager fix for exception propagation |
 | **1.2.5** | 2026-02-12 | Evidence purity (first_failing_node rename), google-genai update |
 | **1.2.4** | 2026-02-10 | Axis 2 readiness audit, 15 invariant guard tests, doctrine freeze |
@@ -1678,5 +1848,6 @@ allow_origins = [
 
 ---
 
-**Last Updated**: February 22, 2026  
-**Architecture Version**: 1.4.1 (Stable -- execution semantics and verdict behavior frozen)
+**Last Updated**: March 9, 2026
+**Architecture Version**: 1.4.1 (Stable -- all 4 axes complete, 799 tests passing)
+
