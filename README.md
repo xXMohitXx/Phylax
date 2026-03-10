@@ -1,260 +1,302 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/xXMohitXx/Phylax/main/assets/logo/phylax_logo.png" alt="Phylax Logo" width="200">
+  <img src="https://raw.githubusercontent.com/xXMohitXx/Phylax/main/assets/logo/phylax_logo.png" alt="Phylax Logo" width="180">
 </p>
 
-# Phylax
+<h1 align="center">Phylax — CI for AI Behavior</h1>
 
-**CI-native regression enforcement for LLM outputs.**
+<p align="center">
+  <strong>Stop AI regressions before they reach production.</strong>
+</p>
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI version](https://img.shields.io/pypi/v/phylax.svg)](https://pypi.org/project/phylax/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<p align="center">
+  <a href="https://pypi.org/project/phylax/"><img src="https://img.shields.io/pypi/v/phylax.svg" alt="PyPI"></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
+</p>
 
 ---
 
-## The Problem
-
-LLM systems change across model versions, prompts, and environments.
-Phylax enforces contracts so these changes are caught before production.
-
-## Installation
+## ⚡ 30-Second Example
 
 ```bash
 pip install phylax
 ```
 
-For all LLM providers (OpenAI, Gemini, Groq, Mistral, HuggingFace, Ollama):
-```bash
-pip install phylax[all]
+```python
+from phylax import trace, expect
+
+@trace(provider="openai")
+@expect(must_include=["refund"], must_not_include=["lawsuit"])
+def reply(prompt):
+    return llm(prompt)  # your LLM call
 ```
 
-Individual providers:
 ```bash
-pip install phylax[openai]       # OpenAI
-pip install phylax[google]       # Gemini (google-genai SDK)
-pip install phylax[groq]         # Groq LPU
-pip install phylax[mistral]      # Mistral AI
-pip install phylax[huggingface]  # HuggingFace Inference API
-pip install phylax[ollama]       # Ollama (local models)
+phylax check
 ```
 
-## Quick Start
+```
+❌ FAIL — expected "refund" in response
+   Trace ID: abc-123
+   Violation: must_include rule failed
+```
+
+**That's it.** Your CI now blocks AI behavior regressions.
+
+---
+
+## 🎯 What Phylax Does
+
+Phylax enforces **deterministic contracts** on LLM outputs. When your AI's behavior changes across model versions, prompts, or configurations — Phylax catches it.
+
+```
+Developer writes rules   →   Phylax tests every response   →   CI blocks regressions
+```
+
+**Phylax is NOT** monitoring, observability, or AI-based evaluation. It's a test framework for AI behavior.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Install
+
+```bash
+pip install phylax[openai]   # or phylax[google], phylax[groq], phylax[all]
+```
+
+### 2. Write Traced Code
 
 ```python
-from phylax import trace, expect, execution, GeminiAdapter
+from phylax import trace, expect, execution, OpenAIAdapter
 
-@trace(provider="gemini")
-@expect(must_include=["hello"], max_latency_ms=5000)
-def greet(name: str):
-    """Traced Gemini call with expectations."""
-    adapter = GeminiAdapter()
-    response, _ = adapter.generate(
-        prompt=f"Say hello to {name}",
-        model="gemini-2.5-flash",
-    )
+# Single call with expectations
+@trace(provider="openai")
+@expect(must_include=["refund"], max_latency_ms=3000)
+def handle_refund(message: str) -> str:
+    adapter = OpenAIAdapter()
+    response, _ = adapter.generate(prompt=message)
     return response
 
-# Single call
-result = greet("World")
-print(result.text)
+# Multi-step agent flow
+@trace(provider="openai")
+@expect(must_include=["intent"])
+def classify(message: str) -> str:
+    adapter = OpenAIAdapter()
+    response, _ = adapter.generate(prompt=f"Classify: {message}")
+    return response
 
-# Track multi-step agent flows
+# Track agent workflows as execution graphs
 with execution() as exec_id:
-    step1 = greet("Alice")
-    step2 = greet("Bob")
+    intent = classify("I want a refund")
+    response = handle_refund("Process refund for order #123")
 ```
 
-```bash
-# Start the server
-phylax server
-
-# Mark a known-good response as baseline
-phylax bless <trace_id>
-
-# In CI: fail if output violates declared expectations
-phylax check  # exits 1 on contract violation
-```
-
-**That's it. Your CI now blocks LLM contract violations.**
-
----
-
-## Supported Providers
-
-| Provider | Adapter | Env Variable |
-|----------|---------|--------------|
-| OpenAI | `OpenAIAdapter` | `OPENAI_API_KEY` |
-| Gemini | `GeminiAdapter` | `GOOGLE_API_KEY` |
-| Groq | `GroqAdapter` | `GROQ_API_KEY` |
-| Mistral | `MistralAdapter` | `MISTRAL_API_KEY` |
-| HuggingFace | `HuggingFaceAdapter` | `HF_TOKEN` |
-| Ollama | `OllamaAdapter` | `OLLAMA_HOST` |
-
-```python
-from phylax import OpenAIAdapter, GroqAdapter, MistralAdapter
-
-# All adapters share the same interface
-adapter = GroqAdapter()
-response, trace = adapter.generate(prompt="Hello!", model="llama3-70b-8192")
-```
-
----
-
-## What Phylax is NOT
-
-- ❌ **Not monitoring or observability** — no metrics, no dashboards, no analytics
-- ❌ **Not production runtime tooling** — CI enforcement only
-- ❌ **Not AI-based judgment or scoring** — rules are deterministic, never LLM-based
-- ❌ **Not exploratory prompt evaluation** — tests outputs against declared contracts
-- ❌ **Not adaptive or heuristic-driven** — exact match, explicit expectations
-
-**If you need subjective evaluation or live insights, Phylax is the wrong tool.**
-
----
-
-## CI Integration (Primary Interface)
-
-Phylax's primary interface is CI verdict enforcement.
+### 3. Enforce in CI
 
 ```yaml
 # .github/workflows/phylax.yml
-- run: phylax check
-  env:
-    GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+name: Phylax CI
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install phylax[openai]
+      - run: phylax check    # exits 1 on contract violation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
-
-**Exit codes:**
-- `0` — All golden traces pass declared expectations
-- `1` — Contract violation detected
 
 ---
 
-## Commands
+## 📋 Expectation Rules
 
-| Command | What it does |
-|---------|--------------|
+| Rule | What It Enforces | Example |
+|------|------------------|---------|
+| `must_include` | Response contains required text | `["refund", "policy"]` |
+| `must_not_include` | Response excludes forbidden text | `["lawsuit", "attorney"]` |
+| `max_latency_ms` | Response time limit | `3000` (3 seconds) |
+| `min_tokens` | Minimum response length | `50` tokens |
+
+### Combine with Logic
+
+```python
+from phylax import trace, expect, AndGroup, OrGroup, MustIncludeRule, MaxLatencyRule
+
+@trace(provider="openai")
+@expect(rules=AndGroup([
+    MustIncludeRule("refund"),
+    OrGroup([
+        MaxLatencyRule(3000),
+        MustIncludeRule("processing"),
+    ]),
+]))
+def handle(message):
+    ...
+```
+
+---
+
+## 🔬 Surface Enforcement
+
+Enforce contracts on **any** LLM output type — not just text.
+
+```python
+from phylax import (
+    Surface, SurfaceEvaluator,
+    FieldExistsRule,             # JSON field must exist
+    TypeEnforcementRule,          # Strict type checking
+    ToolPresenceRule,             # Tool must be called
+    StepCountRule,                # Execution must have N steps
+    ExactStabilityRule,           # Output must not change between runs
+)
+```
+
+| Surface Type | Rules | Use Case |
+|-------------|-------|----------|
+| **Structured Output** | Field exists, type, value, enum, array bounds | JSON API responses |
+| **Tool Calls** | Presence, count, argument, ordering | Agent tool usage |
+| **Execution Traces** | Step count, forbidden transitions, required stages | Multi-step workflows |
+| **Cross-Run Stability** | Exact match, allowed drift | Regression detection |
+
+---
+
+## 📊 Execution Graphs
+
+Visualize and debug multi-step agent workflows:
+
+```python
+from phylax import trace, expect, execution
+
+with execution() as exec_id:
+    step1 = classify(message)      # → Node 1
+    step2 = research(step1)        # → Node 2
+    step3 = respond(step2)         # → Node 3
+
+# Phylax builds a DAG:
+#   [classify] → [research] → [respond]
+#
+# View it:
+#   phylax server → http://127.0.0.1:8000/ui
+```
+
+---
+
+## 🛡️ Enforcement Modes
+
+```python
+from phylax import ModeHandler, EnforcementMode
+
+handler = ModeHandler(mode=EnforcementMode.ENFORCE)
+# enforce    → CI fails on violation (default)
+# quarantine → CI fails, but logs for review
+# observe    → CI passes, violations logged only
+```
+
+---
+
+## 🔧 Commands
+
+| Command | What It Does |
+|---------|----|
 | `phylax init` | Initialize config |
-| `phylax server` | Start API server + UI |
-| `phylax list` | List traces |
-| `phylax list --failed` | Show only failed traces |
-| `phylax show <id>` | Show trace details |
-| `phylax replay <id>` | Re-run a trace |
+| `phylax server` | Start API + UI |
+| `phylax list` | List traces (`--failed` for failures only) |
+| `phylax show <id>` | Inspect a trace |
 | `phylax bless <id>` | Mark as golden baseline |
-| `phylax check` | **CI regression enforcement** |
+| `phylax check` | **CI enforcement** — exits 1 on violation |
 | `phylax --version` | Show version |
 
 ---
 
-## Capabilities
+## 🔌 Supported Providers
 
-| Capability | Description |
-|------------|-------------|
-| **Trace Capture** | Record every LLM call automatically |
-| **Expectations** | Validate with `@expect` rules |
-| **Execution Context** | Group traces by `execution()` context |
-| **Golden Traces** | Baseline comparisons with hash verification |
-| **CI Enforcement** | `phylax check` exits 1 on contract violation |
-| **Multi-Provider** | OpenAI, Gemini, Groq, Mistral, HuggingFace, Ollama |
-| **Structured Output Enforcement** | JSON field existence, type, value, enum, array bounds |
-| **Tool Call Enforcement** | Presence, count, argument, and ordering rules |
-| **Execution Trace Enforcement** | Step count, forbidden transitions, required stages |
-| **Cross-Run Stability** | Hash comparison and whitelisted drift detection |
-| **Metrics & Health** | Expectation identity, evaluation ledger, aggregation |
-| **Enforcement Modes** | `enforce` / `quarantine` / `observe` CI behavior |
-| **Meta-Enforcement** | Dilution guards: min count, zero signal, change/removal detection |
-| **Artifact Contracts** | Frozen `verdict.json`, `failures.json`, `trace_diff.json` outputs |
-| **Deterministic Exit Codes** | `0`=PASS, `1`=FAIL, `2`=SYSTEM_ERROR (frozen) |
-| **Constitutional Governance** | `CONSTITUTION.md` — 12 promises Phylax will never break |
+```bash
+pip install phylax[all]   # Install all providers
+```
 
-### Auxiliary Control Surfaces
-
-The UI and API are auxiliary control surfaces.
-Phylax's primary interface is CI verdict enforcement.
-
-| Surface | Purpose |
-|---------|---------|
-| **Web UI** | Inspect traces at http://127.0.0.1:8000/ui |
-| **Golden Reference UI** | Bless/unbless traces from interface |
-| **Trace ID Search** | Find traces by ID |
-| **REST API** | Programmatic trace access |
+| Provider | Import | Env Variable |
+|----------|--------|--------------|
+| OpenAI | `from phylax import OpenAIAdapter` | `OPENAI_API_KEY` |
+| Gemini | `from phylax import GeminiAdapter` | `GOOGLE_API_KEY` |
+| Groq | `from phylax import GroqAdapter` | `GROQ_API_KEY` |
+| Mistral | `from phylax import MistralAdapter` | `MISTRAL_API_KEY` |
+| HuggingFace | `from phylax import HuggingFaceAdapter` | `HF_TOKEN` |
+| Ollama | `from phylax import OllamaAdapter` | `OLLAMA_HOST` |
 
 ---
 
-## Architecture
+## 📁 Examples & Templates
+
+### Examples — Learn by doing
+
+| Example | What You'll Learn |
+|---------|-------------------|
+| [`examples/quickstart/`](examples/quickstart/) | Basic tracing in 10 lines |
+| [`examples/support_bot/`](examples/support_bot/) | Content safety enforcement |
+| [`examples/summarization/`](examples/summarization/) | Latency + quality contracts |
+| [`examples/agent_workflow/`](examples/agent_workflow/) | Multi-step agents with execution graphs |
+
+### Templates — Start building
+
+| Template | What It Includes |
+|----------|------------------|
+| [`templates/ai-chatbot/`](templates/ai-chatbot/) | Chatbot + contracts + CI config |
+| [`templates/ai-agent/`](templates/ai-agent/) | Multi-step agent + execution tracking |
+| [`templates/ai-rag/`](templates/ai-rag/) | RAG pipeline + grounding enforcement |
+
+---
+
+## 📖 Documentation
+
+**Start here:**
+- [Quickstart](docs/quickstart.md) — 10 minutes to CI enforcement
+- [Mental Model](docs/mental-model.md) — What Phylax is and isn't
+- [Providers](docs/providers.md) — LLM provider reference
+- [Error Codes](docs/errors.md) — Error code reference
+
+**Reference:**
+- [API Contract](docs/reference/contract.md) — Stability guarantees
+- [Execution Context](docs/reference/execution-context.md) — Trace grouping
+- [Non-Goals](docs/reference/non-goals.md) — What Phylax will never do
+- [Versioning](docs/reference/versioning.md) — Release policy
+
+**Advanced:**
+- [Surface Enforcement](docs/advanced/surface-enforcement.md)
+- [Graph Model](docs/advanced/graph-model.md)
+- [Failure Playbook](docs/advanced/failure-playbook.md)
+- [Performance](docs/advanced/performance.md)
+- [Invariants](docs/advanced/invariants.md)
+
+---
+
+## 🏛️ Architecture
 
 ```
 phylax/
-├── _internal/           # Core enforcement logic
+├── _internal/
+│   ├── expectations/    # Deterministic rule engine
+│   ├── surfaces/        # Surface enforcement (JSON, tools, traces)
+│   ├── metrics/         # Expectation health & coverage
+│   ├── modes/           # Enforcement mode control
+│   ├── meta/            # Dilution guards
+│   ├── artifacts/       # Machine-consumable CI outputs
 │   ├── adapters/        # LLM provider adapters
-│   ├── expectations/    # Deterministic rule engine (Axis 1)
-│   ├── surfaces/        # Surface enforcement layer (Axis 2)
-│   ├── metrics/         # Metrics, ledger, health (Axis 3)
-│   ├── modes/           # Enforcement modes (Axis 3)
-│   ├── meta/            # Meta-enforcement rules (Axis 3)
 │   └── graph.py         # Execution graphs
 ├── cli/                 # CLI commands
-├── server/              # API server + health routes
-└── ui/                  # Web interface
+├── server/              # API + health routes
+└── ui/                  # Web inspector
 ```
 
-The API server exists to support Phylax operations (trace storage, golden management, CI verdicts).
-It is not an extensibility platform.
-
----
-
-## Demos
-
-See the `demos/` directory for runnable examples:
-
-```bash
-python demos/01_basic_trace.py       # Basic tracing
-python demos/02_expectations.py      # All @expect rules
-python demos/03_execution_context.py # Trace grouping
-python demos/04_graph_nodes.py       # Graph API
-python demos/05_golden_workflow.py   # CI workflow
-python demos/06_raw_evidence.py      # Evidence API
-python demos/07_error_contracts.py   # Error codes
-python demos/14_metrics_health.py    # Metrics & health reports
-python demos/15_enforcement_modes.py # Enforce/quarantine/observe
-python demos/16_meta_enforcement.py  # Dilution guards
-```
-
----
-
-## Version
-
-**v1.4.0 — Stable Launch: Scale Safety & Misuse Resistance**
-
-Expectation engine (Axis 1), Surface Abstraction Layer (Axis 2), and Scale Safety (Axis 3) are stable.
-622 tests. 17 enforcement rules. 4 meta-enforcement guards. 3 enforcement modes.
-
----
-
-## Documentation
-
-- [Quickstart](https://github.com/xXMohitXx/Phylax/blob/main/docs/quickstart.md)
-- [Providers](https://github.com/xXMohitXx/Phylax/blob/main/docs/providers.md)
-- [Error Codes](https://github.com/xXMohitXx/Phylax/blob/main/docs/errors.md)
-- [Correct Usage](https://github.com/xXMohitXx/Phylax/blob/main/docs/correct-usage.md)
-- [API Contract](https://github.com/xXMohitXx/Phylax/blob/main/docs/contract.md)
-- [Graph Model](https://github.com/xXMohitXx/Phylax/blob/main/docs/graph-model.md)
-- [Invariants](https://github.com/xXMohitXx/Phylax/blob/main/docs/invariants.md)
-- [Failure Modes](https://github.com/xXMohitXx/Phylax/blob/main/docs/failure-modes.md)
-- [Failure Playbook](https://github.com/xXMohitXx/Phylax/blob/main/docs/failure-playbook.md)
-- [Mental Model](https://github.com/xXMohitXx/Phylax/blob/main/docs/mental-model.md)
-- [Versioning](https://github.com/xXMohitXx/Phylax/blob/main/docs/versioning.md)
-- [Performance](https://github.com/xXMohitXx/Phylax/blob/main/docs/performance.md)
-- [Execution Context](https://github.com/xXMohitXx/Phylax/blob/main/docs/execution-context.md)
-- [Surface Enforcement](https://github.com/xXMohitXx/Phylax/blob/main/docs/surface-enforcement.md)
-- [Axis 2 Testing](https://github.com/xXMohitXx/Phylax/blob/main/docs/axis2-testing.md)
+**799 tests** · **v1.4.1** · All 4 axes complete
 
 ---
 
 ## TL;DR
 
-Phylax is a CI-native, deterministic regression enforcement system for LLM outputs.
-It records LLM behavior, evaluates explicit expectations, and fails builds when declared contracts regress.
-Phylax does not explain, score, or optimize outputs — it enforces consistency.
+Phylax is **CI for AI behavior**. It records LLM outputs, evaluates them against declared contracts, and fails builds when behavior regresses. No scoring. No judgment. No AI-based evaluation. Just deterministic enforcement.
 
 ---
 
