@@ -1,5 +1,5 @@
 """
-Public API Surface Test (v1.4.1)
+Public API Surface Test (v1.5.0)
 
 This test validates that EVERY feature of Phylax is accessible
 through `from phylax import ...` — no _internal imports needed.
@@ -75,7 +75,7 @@ from phylax import (
 
 class TestVersion:
     def test_version_is_1_4_0(self):
-        assert __version__ == "1.4.1"
+        assert __version__ == "1.5.0"
 
 
 class TestExpectationsPublicAPI:
