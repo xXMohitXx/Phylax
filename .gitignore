@@ -51,3 +51,8 @@ Thumbs.db
 #videos
 my-video
 my-video/src
+
+# Build artifacts & media
+phylax-*/
+demo_phylax.py
+Main.mp4

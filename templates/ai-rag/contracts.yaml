@@ -1,0 +1,20 @@
+dataset: rag_grounding
+
+cases:
+  - input: "What is Phylax?"
+    expectations:
+      must_include: ["Phylax", "enforcement"]
+      must_not_include: ["I don't know"]
+      min_tokens: 30
+
+  - input: "How does Phylax work?"
+    expectations:
+      must_include: ["trace", "expectations"]
+      must_not_include: ["I'm not sure"]
+      max_latency_ms: 5000
+
+  - input: "What providers does Phylax support?"
+    expectations:
+      must_include: ["OpenAI"]
+      must_not_include: ["I cannot find"]
+      max_latency_ms: 3000
