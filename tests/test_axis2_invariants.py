@@ -191,7 +191,7 @@ class TestNonGoalsDocumented:
     def test_non_goals_file_exists(self):
         """docs/non-goals.md must exist."""
         project_root = Path(__file__).parent.parent
-        non_goals = project_root / "docs" / "non-goals.md"
+        non_goals = project_root / "docs" / "reference" / "non-goals.md"
         assert non_goals.exists(), (
             "PHYLAX_INVARIANT_VIOLATION: docs/non-goals.md does not exist"
         )
@@ -199,7 +199,7 @@ class TestNonGoalsDocumented:
     def test_non_goals_contains_five_items(self):
         """Non-goals doc must list all 5 required non-goals."""
         project_root = Path(__file__).parent.parent
-        non_goals = project_root / "docs" / "non-goals.md"
+        non_goals = project_root / "docs" / "reference" / "non-goals.md"
         content = non_goals.read_text()
         
         required = [

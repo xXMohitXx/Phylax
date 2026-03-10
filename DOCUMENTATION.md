@@ -38,16 +38,20 @@ Axis 1 (Expectations), Axis 2 (Surfaces), Axis 3 (Scale Safety), and Axis 4 (Eco
 |----------|---------|
 | [docs/quickstart.md](docs/quickstart.md) | 10 min to CI enforcement |
 | [docs/mental-model.md](docs/mental-model.md) | What Phylax is/isn't |
-| [docs/graph-model.md](docs/graph-model.md) | How to read graphs |
-| [docs/execution-context.md](docs/execution-context.md) | Execution context usage |
-| [docs/failure-playbook.md](docs/failure-playbook.md) | Debug procedures |
-| [docs/contract.md](docs/contract.md) | API stability guarantees |
-| [docs/invariants.md](docs/invariants.md) | Semantic invariants |
-| [docs/failure-modes.md](docs/failure-modes.md) | Error behavior |
-| [docs/versioning.md](docs/versioning.md) | Release policy |
-| [docs/performance.md](docs/performance.md) | Scale limits |
 | [docs/providers.md](docs/providers.md) | LLM provider reference |
 | [docs/errors.md](docs/errors.md) | Error code reference |
+| [docs/correct-usage.md](docs/correct-usage.md) | Intended usage patterns |
+| [docs/when-not-to-use.md](docs/when-not-to-use.md) | Anti-patterns |
+| [docs/advanced/graph-model.md](docs/advanced/graph-model.md) | How to read graphs |
+| [docs/advanced/failure-playbook.md](docs/advanced/failure-playbook.md) | Debug procedures |
+| [docs/advanced/invariants.md](docs/advanced/invariants.md) | Semantic invariants |
+| [docs/advanced/failure-modes.md](docs/advanced/failure-modes.md) | Error behavior |
+| [docs/advanced/performance.md](docs/advanced/performance.md) | Scale limits |
+| [docs/advanced/surface-enforcement.md](docs/advanced/surface-enforcement.md) | Surface enforcement guide |
+| [docs/reference/contract.md](docs/reference/contract.md) | API stability guarantees |
+| [docs/reference/execution-context.md](docs/reference/execution-context.md) | Execution context usage |
+| [docs/reference/non-goals.md](docs/reference/non-goals.md) | 5 permanent constraints |
+| [docs/reference/versioning.md](docs/reference/versioning.md) | Release policy |
 
 ---
 
