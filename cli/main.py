@@ -441,6 +441,61 @@ def cmd_graph_check(args):
     
     return 1 if failures > 0 else 0
 
+
+def cmd_dataset_run(args):
+    """
+    Run a dataset contract against a function.
+    
+    Usage:
+        phylax dataset run contracts/support_bot.yaml
+    
+    Exit codes:
+        0: All cases passed
+        1: Any case failed
+    """
+    from phylax import load_dataset, run_dataset, format_report, format_json_report
+
+    # Load the dataset
+    try:
+        dataset = load_dataset(args.path)
+    except (FileNotFoundError, ValueError) as e:
+        print(f"❌ {e}")
+        return 1
+
+    # Define the function under test
+    # If --module is provided, import it; otherwise use a simple echo
+    if args.module:
+        import importlib
+        try:
+            mod = importlib.import_module(args.module)
+            func_name = args.function or "handle"
+            if not hasattr(mod, func_name):
+                print(f"❌ Module '{args.module}' has no function '{func_name}'")
+                return 1
+            func = getattr(mod, func_name)
+        except ImportError as e:
+            print(f"❌ Cannot import module '{args.module}': {e}")
+            return 1
+    else:
+        # Dry-run mode: echo the input back
+        def func(input_text):
+            return f"[dry-run] echo: {input_text}"
+        print("⚠ No --module specified. Running in dry-run mode (echo).")
+        print("  Use: phylax dataset run contracts.yaml --module my_app --function handle")
+        print()
+
+    # Run the dataset
+    result = run_dataset(dataset, func)
+
+    # Output results
+    if args.json:
+        print(format_json_report(result))
+    else:
+        print(format_report(result))
+
+    return 0 if result.all_passed else 1
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -490,13 +545,33 @@ def main():
     
     # graph-check command - Phase 16 (graph-level CI)
     graph_check_parser = subparsers.add_parser("graph-check", help="Check execution graphs (CI-safe)")
-    
+
+    # dataset command - Dataset contracts
+    dataset_parser = subparsers.add_parser("dataset", help="Dataset contract commands")
+    dataset_subparsers = dataset_parser.add_subparsers(dest="dataset_command", help="Dataset sub-commands")
+
+    # dataset run <path>
+    dataset_run_parser = dataset_subparsers.add_parser("run", help="Run a dataset contract")
+    dataset_run_parser.add_argument("path", help="Path to dataset YAML contract file")
+    dataset_run_parser.add_argument("--module", "-m", help="Python module containing the function to test")
+    dataset_run_parser.add_argument("--function", "-f", default="handle", help="Function name to call (default: handle)")
+    dataset_run_parser.add_argument("--json", "-j", action="store_true", help="Output JSON report")
+
     args = parser.parse_args()
     
     if args.command is None:
         parser.print_help()
         return 0
     
+    # Handle dataset sub-commands
+    if args.command == "dataset":
+        if not hasattr(args, 'dataset_command') or args.dataset_command is None:
+            dataset_parser.print_help()
+            return 0
+        if args.dataset_command == "run":
+            return cmd_dataset_run(args)
+        return 0
+
     commands = {
         "init": cmd_init,
         "server": cmd_server,

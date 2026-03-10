@@ -168,6 +168,18 @@ from phylax._internal.artifacts.exit_codes import (
     EXIT_PASS, EXIT_FAIL, EXIT_SYSTEM_ERROR, resolve_exit_code,
 )
 
+# Dataset Contracts
+from phylax._internal.datasets import (
+    Dataset,
+    DatasetCase,
+    DatasetResult,
+    CaseResult,
+    load_dataset,
+    run_dataset,
+    format_report,
+    format_json_report,
+)
+
 __version__ = "1.4.1"
 __all__ = [
     # Core decorators
@@ -314,6 +326,15 @@ __all__ = [
     "EXIT_FAIL",
     "EXIT_SYSTEM_ERROR",
     "resolve_exit_code",
+    # Dataset Contracts
+    "Dataset",
+    "DatasetCase",
+    "DatasetResult",
+    "CaseResult",
+    "load_dataset",
+    "run_dataset",
+    "format_report",
+    "format_json_report",
     # Version
     "__version__",
 ]
