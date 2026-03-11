@@ -178,6 +178,12 @@ from phylax._internal.datasets import (
     run_dataset,
     format_report,
     format_json_report,
+    # Behavioral Diff Engine
+    CaseDiff,
+    DatasetDiff,
+    diff_runs,
+    format_diff_report,
+    format_diff_json,
 )
 
 __version__ = "1.5.0"
@@ -335,6 +341,12 @@ __all__ = [
     "run_dataset",
     "format_report",
     "format_json_report",
+    # Behavioral Diff Engine
+    "CaseDiff",
+    "DatasetDiff",
+    "diff_runs",
+    "format_diff_report",
+    "format_diff_json",
     # Version
     "__version__",
 ]

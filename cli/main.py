@@ -496,6 +496,55 @@ def cmd_dataset_run(args):
     return 0 if result.all_passed else 1
 
 
+def cmd_dataset_diff(args):
+    """
+    Compare two dataset run results (JSON) and show behavioral diff.
+    
+    Usage:
+        phylax dataset diff runA.json runB.json
+    
+    Exit codes:
+        0: No regressions
+        1: Regressions detected
+    """
+    import json as json_module
+    from pathlib import Path
+    from phylax import DatasetResult, diff_runs, format_diff_report, format_diff_json
+
+    # Load run A
+    path_a = Path(args.run_a)
+    if not path_a.exists():
+        print(f"❌ File not found: {path_a}")
+        return 1
+
+    # Load run B
+    path_b = Path(args.run_b)
+    if not path_b.exists():
+        print(f"❌ File not found: {path_b}")
+        return 1
+
+    try:
+        with open(path_a, "r", encoding="utf-8") as f:
+            run_a = DatasetResult.model_validate_json(f.read())
+        with open(path_b, "r", encoding="utf-8") as f:
+            run_b = DatasetResult.model_validate_json(f.read())
+    except Exception as e:
+        print(f"❌ Failed to parse run files: {e}")
+        return 1
+
+    try:
+        diff = diff_runs(run_a, run_b)
+    except ValueError as e:
+        print(f"❌ {e}")
+        return 1
+
+    if args.json:
+        print(format_diff_json(diff))
+    else:
+        print(format_diff_report(diff))
+
+    return 1 if diff.has_regressions else 0
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -557,6 +606,12 @@ def main():
     dataset_run_parser.add_argument("--function", "-f", default="handle", help="Function name to call (default: handle)")
     dataset_run_parser.add_argument("--json", "-j", action="store_true", help="Output JSON report")
 
+    # dataset diff <runA.json> <runB.json>
+    dataset_diff_parser = dataset_subparsers.add_parser("diff", help="Compare two dataset runs")
+    dataset_diff_parser.add_argument("run_a", help="Path to run A result JSON")
+    dataset_diff_parser.add_argument("run_b", help="Path to run B result JSON")
+    dataset_diff_parser.add_argument("--json", "-j", action="store_true", help="Output JSON report")
+
     args = parser.parse_args()
     
     if args.command is None:
@@ -570,6 +625,8 @@ def main():
             return 0
         if args.dataset_command == "run":
             return cmd_dataset_run(args)
+        if args.dataset_command == "diff":
+            return cmd_dataset_diff(args)
         return 0
 
     commands = {
