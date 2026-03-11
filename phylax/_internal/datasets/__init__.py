@@ -7,6 +7,7 @@ This module provides:
     - Executor for running cases against a callable
     - Reporter for formatting results
     - Diff engine for comparing runs
+    - Model upgrade simulator
 """
 from phylax._internal.datasets.schema import Dataset, DatasetCase, DatasetResult, CaseResult
 from phylax._internal.datasets.loader import load_dataset
@@ -14,6 +15,9 @@ from phylax._internal.datasets.executor import run_dataset
 from phylax._internal.datasets.reporter import format_report, format_json_report
 from phylax._internal.datasets.diff import (
     CaseDiff, DatasetDiff, diff_runs, format_diff_report, format_diff_json,
+)
+from phylax._internal.datasets.simulator import (
+    SimulationResult, simulate_upgrade, format_simulation_report,
 )
 
 __all__ = [
@@ -30,4 +34,7 @@ __all__ = [
     "diff_runs",
     "format_diff_report",
     "format_diff_json",
+    "SimulationResult",
+    "simulate_upgrade",
+    "format_simulation_report",
 ]

@@ -184,6 +184,10 @@ from phylax._internal.datasets import (
     diff_runs,
     format_diff_report,
     format_diff_json,
+    # Model Upgrade Simulator
+    SimulationResult,
+    simulate_upgrade,
+    format_simulation_report,
 )
 
 __version__ = "1.5.0"
@@ -347,6 +351,10 @@ __all__ = [
     "diff_runs",
     "format_diff_report",
     "format_diff_json",
+    # Model Upgrade Simulator
+    "SimulationResult",
+    "simulate_upgrade",
+    "format_simulation_report",
     # Version
     "__version__",
 ]
