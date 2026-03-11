@@ -2125,7 +2125,9 @@ allow_origins = [
 
 | Version | Date | Key Changes |
 |---------|------|-------------|
-| **1.4.1** | 2026-03-01 | Axis 4 fortress tests (53), demos 17-20, full docs update, version sync |
+| **1.6.0** | 2026-03-11 | Behavioral diff engine, model upgrade simulator, CI kits, guardrail packs, 910 tests |
+| **1.5.0** | 2026-03-10 | Repo restructuring, README rewrite, docs reorg, dataset contracts, 844 tests |
+| **1.4.1** | 2026-03-09 | Axis 4 fortress tests (53), demos 17-20, full docs update, version sync |
 | **1.4.0** | 2026-03-01 | Axis 4: Artifact contracts, exit codes, CONSTITUTION.md, ANTI_FEATURES.md |
 | **1.3.3** | 2026-02-22 | Axis 2 Phase 2.4: Cross-run stability enforcement (ExactStabilityRule, AllowedDriftRule) |
 | **1.3.2** | 2026-02-22 | Axis 2 Phase 2.3: Multi-step execution trace enforcement (3 rules) |
@@ -2143,6 +2145,6 @@ allow_origins = [
 
 ---
 
-**Last Updated**: March 10, 2026
-**Architecture Version**: 1.4.1 (Stable — all 4 axes complete, 799 tests passing)
+**Last Updated**: March 11, 2026
+**Architecture Version**: 1.6.0 (Stable — all 4 axes + dataset contracts + behavioral diff + model simulator + CI kits + guardrail packs, 910 tests passing)
 
