@@ -64,7 +64,7 @@ class SimulationResult:
 
     @property
     def safe_to_upgrade(self) -> bool:
-        """True if no regressions detected — safe to deploy candidate."""
+        """True if no regressions detected -- safe to deploy candidate."""
         return not self.diff.has_regressions
 
     @property
@@ -118,7 +118,7 @@ def format_simulation_report(sim: SimulationResult) -> str:
     lines = []
     lines.append("")
     lines.append("=" * 60)
-    lines.append("🔬 MODEL UPGRADE SIMULATION")
+    lines.append("MODEL UPGRADE SIMULATION")
     lines.append("=" * 60)
     lines.append(f"Baseline:  {sim.baseline_name}")
     lines.append(f"Candidate: {sim.candidate_name}")
@@ -129,22 +129,22 @@ def format_simulation_report(sim: SimulationResult) -> str:
     lines.append("")
 
     if sim.regressions > 0:
-        lines.append(f"🔴 {sim.regressions} REGRESSION(S) detected")
+        lines.append(f"[!!] {sim.regressions} REGRESSION(S) detected")
         for cd in sim.diff.case_diffs:
             if cd.change == "regression":
-                lines.append(f"  ❌ [{cd.case_name}] PASS → FAIL")
+                lines.append(f"  [FAIL] [{cd.case_name}] PASS -> FAIL")
                 for v in cd.violations_after:
-                    lines.append(f"     ⚠ {v}")
+                    lines.append(f"     [!] {v}")
 
     if sim.resolved > 0:
-        lines.append(f"🟢 {sim.resolved} issue(s) RESOLVED")
+        lines.append(f"[OK] {sim.resolved} issue(s) RESOLVED")
 
     lines.append("")
     lines.append("=" * 60)
     if sim.safe_to_upgrade:
-        lines.append("✅ SAFE TO UPGRADE — no regressions detected")
+        lines.append("[PASS] SAFE TO UPGRADE -- no regressions detected")
     else:
-        lines.append("❌ UPGRADE BLOCKED — regressions detected")
+        lines.append("[FAIL] UPGRADE BLOCKED -- regressions detected")
     lines.append("=" * 60)
     lines.append("")
     return "\n".join(lines)

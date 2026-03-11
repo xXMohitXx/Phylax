@@ -2,8 +2,8 @@
 Behavioral Diff Engine — Compare two dataset runs to detect regressions.
 
 Given two DatasetResult objects (run A and run B), produces a diff showing:
-    - Cases that changed from PASS → FAIL (new failures / regressions)
-    - Cases that changed from FAIL → PASS (resolved failures)
+    - Cases that changed from PASS -> FAIL (new failures / regressions)
+    - Cases that changed from FAIL -> PASS (resolved failures)
     - Cases that remained the same
     - Summary statistics
 
@@ -59,8 +59,8 @@ class DatasetDiff(BaseModel):
         run_id_before: Run ID of run A.
         run_id_after: Run ID of run B.
         total_cases: Total cases compared.
-        regressions: Number of PASS → FAIL cases.
-        resolved: Number of FAIL → PASS cases.
+        regressions: Number of PASS -> FAIL cases.
+        resolved: Number of FAIL -> PASS cases.
         unchanged_pass: Cases that stayed PASS.
         unchanged_fail: Cases that stayed FAIL.
         case_diffs: Per-case diffs.
@@ -79,7 +79,7 @@ class DatasetDiff(BaseModel):
 
     @property
     def has_regressions(self) -> bool:
-        """True if any case regressed (PASS → FAIL)."""
+        """True if any case regressed (PASS -> FAIL)."""
         return self.regressions > 0
 
 
@@ -170,20 +170,20 @@ def format_diff_report(diff: DatasetDiff) -> str:
     regressions = [d for d in diff.case_diffs if d.change == "regression"]
     if regressions:
         lines.append("")
-        lines.append(f"🔴 REGRESSIONS ({len(regressions)}):")
+        lines.append(f"[!!] REGRESSIONS ({len(regressions)}):")
         for d in regressions:
-            lines.append(f"  ❌ [{d.case_name}] PASS → FAIL")
+            lines.append(f"  [FAIL] [{d.case_name}] PASS -> FAIL")
             lines.append(f"     Input: {d.input[:50]}")
             for v in d.violations_after:
-                lines.append(f"     ⚠ {v}")
+                lines.append(f"     [!] {v}")
 
     # Show resolved
     resolved = [d for d in diff.case_diffs if d.change == "resolved"]
     if resolved:
         lines.append("")
-        lines.append(f"🟢 RESOLVED ({len(resolved)}):")
+        lines.append(f"[OK] RESOLVED ({len(resolved)}):")
         for d in resolved:
-            lines.append(f"  ✅ [{d.case_name}] FAIL → PASS")
+            lines.append(f"  [PASS] [{d.case_name}] FAIL -> PASS")
 
     # Summary
     lines.append("")
@@ -196,10 +196,10 @@ def format_diff_report(diff: DatasetDiff) -> str:
 
     if diff.has_regressions:
         lines.append("")
-        lines.append("❌ REGRESSIONS DETECTED")
+        lines.append("[FAIL] REGRESSIONS DETECTED")
     else:
         lines.append("")
-        lines.append("✅ NO REGRESSIONS")
+        lines.append("[PASS] NO REGRESSIONS")
 
     lines.append("")
     return "\n".join(lines)
