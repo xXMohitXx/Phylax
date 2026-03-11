@@ -1,0 +1,32 @@
+stages:
+  - test
+
+phylax:
+  stage: test
+  image: python:3.12-slim
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+  cache:
+    paths:
+      - .pip-cache/
+  before_script:
+    - pip install phylax
+    - pip install -r requirements.txt 2>/dev/null || true
+  script:
+    # Golden trace enforcement
+    - phylax check
+
+    # Dataset contract testing (if contracts exist)
+    - |
+      if ls contracts/*.yaml 2>/dev/null; then
+        for contract in contracts/*.yaml; do
+          echo "Running: $contract"
+          phylax dataset run "$contract" --json
+        done
+      fi
+
+    # Graph-level checks
+    - phylax graph-check
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"

@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        GOOGLE_API_KEY = credentials('google-api-key')
+        OPENAI_API_KEY = credentials('openai-api-key')
+    }
+
+    stages {
+        stage('Setup') {
+            steps {
+                sh 'pip install phylax'
+                sh 'pip install -r requirements.txt || true'
+            }
+        }
+
+        stage('Golden Trace Check') {
+            steps {
+                sh 'phylax check'
+            }
+        }
+
+        stage('Dataset Contracts') {
+            when {
+                expression { fileExists('contracts/') }
+            }
+            steps {
+                sh '''
+                    for contract in contracts/*.yaml; do
+                        echo "Running: $contract"
+                        phylax dataset run "$contract" --json
+                    done
+                '''
+            }
+        }
+
+        stage('Graph Check') {
+            steps {
+                sh 'phylax graph-check'
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Phylax detected behavioral regressions!'
+        }
+        success {
+            echo 'All Phylax checks passed.'
+        }
+    }
+}

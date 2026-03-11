@@ -1,0 +1,40 @@
+name: Phylax CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  phylax:
+    name: Phylax Behavioral Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install phylax
+          pip install -r requirements.txt 2>/dev/null || true
+
+      - name: Run golden trace checks
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: phylax check
+
+      - name: Run dataset contracts
+        if: hashFiles('contracts/*.yaml') != ''
+        run: |
+          for contract in contracts/*.yaml; do
+            echo "Running: $contract"
+            phylax dataset run "$contract" --json
+          done
+
+      - name: Run graph checks
+        run: phylax graph-check
