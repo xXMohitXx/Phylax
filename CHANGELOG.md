@@ -2,7 +2,83 @@
 
 All notable changes to Phylax.
 
-## [1.4.0] - 2026-03-01 — Axis 4: Ecosystem Without Platformization
+## [1.6.0] - 2026-03-11 — Behavioral Intelligence & Ecosystem
+
+### Added — Phase 3: Behavioral Diff Engine
+- **`phylax/_internal/datasets/diff.py`**: `CaseDiff`, `DatasetDiff` models (frozen Pydantic)
+- `diff_runs()` — compare two `DatasetResult` objects, detect regressions (PASS→FAIL) and resolved (FAIL→PASS)
+- `format_diff_report()` / `format_diff_json()` — console + JSON output
+- **CLI**: `phylax dataset diff runA.json runB.json [--json]`
+- **23 tests** in `test_behavioral_diff.py`
+
+### Added — Phase 4: Model Upgrade Simulator
+- **`phylax/_internal/datasets/simulator.py`**: `SimulationResult` with `safe_to_upgrade` property
+- `simulate_upgrade(dataset, baseline_func, candidate_func)` — run same dataset against two models, auto-diff
+- `format_simulation_report()` — console output with upgrade verdict
+- **14 tests** in `test_model_simulator.py`
+
+### Added — Phase 5: CI Integration Kits
+- **`ci-kits/github-actions/phylax.yml`**: GitHub Actions workflow template
+- **`ci-kits/gitlab-ci/phylax.yml`**: GitLab CI pipeline template
+- **`ci-kits/jenkins/Jenkinsfile`**: Jenkins declarative pipeline template
+- All kits include: golden trace checks + dataset contracts + graph checks
+
+### Added — Phase 6: Guardrail Packs
+- **`phylax/_internal/guardrails/packs.py`**: `GuardrailRule`, `GuardrailPack` models
+- 3 built-in packs: `safety_pack()`, `quality_pack()`, `compliance_pack()`
+- Pack registry: `list_packs()`, `get_pack()`, `apply_pack()`
+- Dataset integration via `to_expectations()` converter
+- **30 tests** in `test_guardrail_packs.py`
+
+### Stats
+- **910 tests passing** (up from 844)
+- Public API: `from phylax import diff_runs, simulate_upgrade, safety_pack, ...`
+- No `_internal` imports needed for any new feature
+
+---
+
+## [1.5.0] - 2026-03-10 — Dataset Contracts & Repo Transformation
+
+### Added — Phase 0.1: Repository Restructuring
+- Created `examples/` with 4 developer examples: `quickstart/`, `support_bot/`, `summarization/`, `agent_workflow/`
+- Created `templates/` with 3 starter templates: `ai-chatbot/`, `ai-agent/`, `ai-rag/`
+- Moved old examples to `examples/integration_tests/`
+- Updated `.gitignore` (dist/, demo artifacts)
+
+### Added — Phase 0.2: README Rewrite
+- Complete FastAPI-style onboarding rewrite
+- Hero section, 30-second example, quick start guide
+- Expectation rules table, surface enforcement overview
+- Examples & templates directory navigation
+
+### Added — Phase 0.3: Documentation Reorganization
+- Moved 11 advanced docs to `docs/advanced/`
+- Moved 4 reference docs to `docs/reference/`
+- 6 beginner docs remain at `docs/` root
+- Updated all hardcoded links in `DOCUMENTATION.md`
+
+### Added — Phase 2: Dataset Contracts
+- **`phylax/_internal/datasets/`** module: `schema.py`, `loader.py`, `executor.py`, `reporter.py`
+- YAML contract format: `dataset`, `cases`, `expectations` (`must_include`, `must_not_include`, `min_tokens`, `max_latency_ms`)
+- **CLI**: `phylax dataset run contracts.yaml [--module app --function handle --json]`
+- Public API: `from phylax import Dataset, load_dataset, run_dataset`
+- **45 tests** in `test_dataset_contracts.py`
+
+### Stats
+- **844 tests passing** (up from 799)
+- Repository transformed for developer-first experience
+
+---
+
+## [1.4.1] - 2026-03-09 — Documentation Polish
+
+### Changed
+- Updated `CODEBASE_ARCHITECTURE.md` with comprehensive Axis 3 & 4 details
+- Added complete version history table through v1.4.1
+- Clarified all architectural principles and design decisions
+
+---
+
 
 ### Added — Axis 4: Perimeter Discipline
 
