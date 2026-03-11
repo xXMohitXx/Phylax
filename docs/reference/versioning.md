@@ -121,7 +121,7 @@ Example:
 
 ```python
 import phylax
-print(phylax.__version__)  # "1.4.1"
+print(phylax.__version__)  # "1.6.3"
 ```
 
 ```bash

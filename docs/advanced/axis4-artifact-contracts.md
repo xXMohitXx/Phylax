@@ -20,7 +20,7 @@ artifact = generate_verdict_artifact(
     expectations_evaluated=10,
     failures=3,
     definition_snapshot_hash=snapshot_hash,
-    engine_version="1.4.1",
+    engine_version="1.6.3",
 )
 ```
 
@@ -36,7 +36,7 @@ artifact = generate_verdict_artifact(
   "expectations_evaluated": 10,
   "failures": 3,
   "definition_snapshot_hash": "sha256",
-  "engine_version": "1.4.1"
+  "engine_version": "1.6.3"
 }
 ```
 
