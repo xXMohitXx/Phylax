@@ -27,7 +27,7 @@ def main():
         expectations_evaluated=5,
         failures=0,
         definition_snapshot_hash=snapshot_hash,
-        engine_version="1.4.1",
+        engine_version="1.6.3",
     )
 
     print("--- PASS Verdict Artifact ---")
@@ -40,7 +40,7 @@ def main():
         expectations_evaluated=10,
         failures=3,
         definition_snapshot_hash=snapshot_hash,
-        engine_version="1.4.1",
+        engine_version="1.6.3",
     )
 
     print("\n--- FAIL Verdict Artifact ---")

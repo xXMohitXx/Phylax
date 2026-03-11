@@ -1,6 +1,6 @@
 # Phylax Demos
 
-Replicable examples demonstrating all Phylax features (v1.6.1).
+Replicable examples demonstrating all Phylax features (v1.6.3).
 
 ## Setup
 
