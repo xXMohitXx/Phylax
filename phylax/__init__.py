@@ -190,6 +190,17 @@ from phylax._internal.datasets import (
     format_simulation_report,
 )
 
+# Guardrail Packs
+from phylax._internal.guardrails import (
+    GuardrailPack,
+    get_pack,
+    list_packs,
+    apply_pack,
+    safety_pack,
+    quality_pack,
+    compliance_pack,
+)
+
 __version__ = "1.5.0"
 __all__ = [
     # Core decorators
@@ -355,6 +366,14 @@ __all__ = [
     "SimulationResult",
     "simulate_upgrade",
     "format_simulation_report",
+    # Guardrail Packs
+    "GuardrailPack",
+    "get_pack",
+    "list_packs",
+    "apply_pack",
+    "safety_pack",
+    "quality_pack",
+    "compliance_pack",
     # Version
     "__version__",
 ]
