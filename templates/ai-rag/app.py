@@ -1,55 +1,63 @@
 """
-AI RAG Pipeline Template — Ready-to-use Phylax starter for RAG.
+AI RAG Template — Retrieval-Augmented Generation with grounding enforcement.
 
-This template includes:
-    - RAG pipeline with retrieval + generation steps
-    - Grounding enforcement (response must reference retrieved context)
-    - GitHub Actions CI configuration
+Features:
+    - Must-include enforcement for grounding
+    - Quality guardrails
+    - Dataset contract testing for RAG accuracy
 
 Usage:
-    1. Copy this template to your project
-    2. Set your API key
-    3. Run: python app.py
-    4. CI: phylax check
+    pip install phylax
+    python app.py
 """
-from phylax import trace, expect, execution
-
-@trace(provider="openai")
-@expect(must_include=["document"], max_latency_ms=2000)
-def retrieve(query: str) -> str:
-    """Retrieve relevant documents for the query."""
-    # In production: vector search, database lookup, etc.
-    return (
-        "document: Phylax is a CI-native regression enforcement tool for "
-        "LLM outputs. It captures traces, evaluates expectations, and "
-        "fails builds when contracts regress."
-    )
-
-@trace(provider="openai")
-@expect(
-    must_include=["Phylax"],          # Must reference retrieved content
-    must_not_include=["I don't know"], # Must not hallucinate
-    max_latency_ms=5000,
-    min_tokens=30,
+from phylax import (
+    trace, expect, execution,
+    quality_pack,
+    Dataset, DatasetCase, run_dataset, format_report,
 )
-def generate(query: str, context: str) -> str:
-    """Generate a grounded response using retrieved context."""
-    # In production: call LLM with context
+
+
+_quality = quality_pack().to_expectations()
+
+
+@trace(provider="mock")
+@expect(
+    must_include=["source"],
+    min_tokens=15,
+)
+def retrieve_and_respond(question: str) -> str:
+    """RAG pipeline with grounding enforcement. Must cite source."""
+    context = f"According to the documentation about {question}"
     return (
-        "Based on the documentation, Phylax is a CI-native regression "
-        "enforcement tool for LLM outputs. It works by capturing traces "
-        "of LLM calls, evaluating them against declared expectations, "
-        "and failing CI builds when contracts are violated."
+        f"{context}, here is the relevant information. "
+        f"The source material indicates several key points "
+        f"that address your question comprehensively."
     )
 
-def rag_pipeline(query: str) -> str:
-    """Run the full RAG pipeline with execution tracking."""
-    with execution() as exec_id:
-        context = retrieve(query)
-        response = generate(query, context)
-        return response
+
+def main():
+    print("=== AI RAG with Grounding Enforcement ===\n")
+
+    with execution():
+        response = retrieve_and_respond("Python best practices")
+        print(f"Response: {response[:80]}...\n")
+
+    ds = Dataset(dataset="rag_accuracy", cases=[
+        DatasetCase(
+            input="What is machine learning?",
+            name="ml_question",
+            expectations={"must_include": ["source", "information"], "min_tokens": 10},
+        ),
+        DatasetCase(
+            input="How does Python handle memory?",
+            name="python_memory",
+            expectations={"must_include": ["source"], "min_tokens": 10},
+        ),
+    ])
+
+    result = run_dataset(ds, retrieve_and_respond)
+    print(format_report(result))
+
 
 if __name__ == "__main__":
-    answer = rag_pipeline("What is Phylax?")
-    print(f"Answer: {answer}")
-    print("\n✅ Run 'phylax check' to enforce grounding in CI.")
+    main()
