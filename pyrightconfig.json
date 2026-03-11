@@ -1,0 +1,9 @@
+{
+  "include": ["phylax", "cli", "tests", "demos"],
+  "extraPaths": ["."],
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "off",
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "reportGeneralTypeIssues": false
+}
