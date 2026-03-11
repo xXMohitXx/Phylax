@@ -75,7 +75,7 @@ from phylax import (
 
 class TestVersion:
     def test_version_is_1_4_0(self):
-        assert __version__ == "1.6.0"
+        assert __version__ == "1.6.1"
 
 
 class TestExpectationsPublicAPI:
