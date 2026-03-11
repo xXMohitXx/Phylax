@@ -43,14 +43,14 @@ def main():
     print("\n--- Available Guardrail Packs ---")
     for name in list_packs():
         pack = get_pack(name)
-        print(f"  📦 {name}: {pack.description}")
+        print(f"  [pack] {name}: {pack.description}")
         print(f"     Rules: {len(pack.rules)}, Version: {pack.version}")
 
     # 2. Inspect safety pack
     print("\n--- Safety Pack Rules ---")
     safety = safety_pack()
     for rule in safety.rules:
-        print(f"  🛡️  {rule.name} ({rule.severity}): {rule.type}")
+        print(f"  [rule] {rule.name} ({rule.severity}): {rule.type}")
 
     # 3. Convert to expectations
     print("\n--- Safety Expectations ---")

@@ -195,7 +195,7 @@ class TestDiffReport:
         diff = diff_runs(a, b)
         report = format_diff_report(diff)
         assert "REGRESSIONS DETECTED" in report
-        assert "PASS → FAIL" in report
+        assert "PASS -> FAIL" in report
 
     def test_resolved_in_report(self):
         from phylax import diff_runs, format_diff_report
@@ -204,7 +204,7 @@ class TestDiffReport:
         diff = diff_runs(a, b)
         report = format_diff_report(diff)
         assert "RESOLVED" in report
-        assert "FAIL → PASS" in report
+        assert "FAIL -> PASS" in report
 
     def test_json_report_valid(self):
         from phylax import diff_runs, format_diff_json
