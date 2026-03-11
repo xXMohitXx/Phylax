@@ -1,6 +1,6 @@
 # Phylax Documentation
 
-Complete technical reference for Phylax v1.4.1 -- CI-native regression enforcement for LLM outputs.
+Complete technical reference for Phylax v1.6.0 -- CI-native regression enforcement for LLM outputs.
 
 ---
 
@@ -12,7 +12,7 @@ Phylax enforces contracts so LLM behavior changes are caught before production:
 3. **Comparing** against golden baselines
 4. **Failing CI** when declared contracts regress
 
-### Status: v1.4.1 STABLE
+### Status: v1.6.0 STABLE
 
 Stable means execution semantics and verdict behavior are frozen.
 Axis 1 (Expectations), Axis 2 (Surfaces), Axis 3 (Scale Safety), and Axis 4 (Ecosystem Discipline) are complete.

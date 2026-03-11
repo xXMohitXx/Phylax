@@ -290,7 +290,7 @@ phylax/
 └── ui/                  # Web inspector
 ```
 
-**799 tests** · **v1.4.1** · All 4 axes complete
+**910 tests** · **v1.6.0** · All 4 axes complete + Dataset Contracts + Behavioral Diff + Model Simulator + CI Kits + Guardrail Packs
 
 ---
 
