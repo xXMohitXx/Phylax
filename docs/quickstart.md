@@ -159,10 +159,76 @@ response, trace = adapter.generate(prompt="Hello!", model="llama3-70b-8192")
 
 ---
 
+## 8. Dataset Contracts (v1.6.0+)
+
+Batch-test LLM behavior:
+
+```python
+from phylax import Dataset, DatasetCase, run_dataset, format_report
+
+ds = Dataset(dataset="my_bot", cases=[
+    DatasetCase(
+        input="help with refund",
+        expectations={"must_include": ["refund"], "min_tokens": 10},
+    ),
+])
+
+result = run_dataset(ds, my_handler)
+print(format_report(result))
+```
+
+Or from CLI:
+```bash
+phylax dataset run contracts.yaml
+```
+
+---
+
+## 9. Guardrail Packs (v1.6.0+)
+
+Apply pre-built safety rules:
+
+```python
+from phylax import safety_pack, quality_pack, get_pack
+
+safety = safety_pack()  # Blocks hate speech, PII, harmful content
+quality = quality_pack()  # Min response length, latency ceiling
+
+# Use with dataset contracts
+expectations = safety.to_expectations()
+```
+
+Available packs: `safety`, `quality`, `compliance`
+
+---
+
+## 10. Model Upgrade Simulator (v1.6.0+)
+
+Test model upgrades safely:
+
+```python
+from phylax import simulate_upgrade, format_simulation_report
+
+sim = simulate_upgrade(
+    dataset=ds,
+    baseline_func=gpt4_handler,
+    candidate_func=gpt45_handler,
+    baseline_name="GPT-4",
+    candidate_name="GPT-4.5",
+)
+
+if sim.safe_to_upgrade:
+    print("✅ Safe to deploy!")
+print(format_simulation_report(sim))
+```
+
+---
+
 ## Next Steps
 
 - [Providers](providers.md) — All supported providers
 - [Error Codes](errors.md) — PHYLAX_Exxx error reference
 - [Correct Usage](correct-usage.md) — Valid configurations
 - [Mental Model](mental-model.md) — What Phylax is
-- [Failure Playbook](failure-playbook.md) — Debug failures
+- [Examples](../examples/) — Real-world usage patterns
+- [Demos](../demos/) — All 24 feature demos
