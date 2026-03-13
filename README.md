@@ -12,6 +12,7 @@
   <a href="https://pypi.org/project/phylax/"><img src="https://img.shields.io/pypi/v/phylax.svg" alt="PyPI"></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
+  <a href="https://pepy.tech/projects/phylax"><img src="https://static.pepy.tech/personalized-badge/phylax?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=Downloads" alt="PyPI Downloads"></a>
 </p>
 
 ---
