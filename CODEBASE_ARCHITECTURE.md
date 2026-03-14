@@ -815,211 +815,7 @@ def evaluate(response_text, latency_ms, must_include, must_not_include, max_late
 
 ---
 
-### Layer 6: Surface Abstraction Layer (Axis 2)
-**Files**: `phylax/_internal/surfaces/` (7 files)
-
-**Purpose**: Generic enforcement surface so the engine can enforce contracts over any payload type — text, JSON, tool calls, execution traces, or cross-run snapshots — without knowing or caring about the surface type.
-
-**Design Rules**:
-- All surfaces preserve raw payloads (no normalization, no transformation)
-- Verdicts remain binary: PASS / FAIL
-- No inference, no scoring, no interpretation
-
-#### 6.1 Core Models & Infrastructure (`surface.py`)
-
-```python
-SurfaceType = Literal[
-    "text_output",
-    "structured_output",
-    "tool_calls",
-    "execution_trace",
-    "cross_run_snapshot",
-]
-
-class Surface(BaseModel):
-    """
-    Generic enforcement surface. All enforcement inputs reduce to this model.
-    
-    Attributes:
-        id: UUID, auto-generated
-        type: SurfaceType
-        raw_payload: Any — preserved as-is, never transformed
-        metadata: Optional user-defined metadata
-    """
-    Config: frozen = True
-
-class SurfaceRuleResult:
-    """Result of evaluating a single surface rule."""
-    passed: bool
-    rule_name: str
-    violation_message: str
-
-class SurfaceVerdict(BaseModel):
-    """
-    Binary PASS/FAIL verdict for surface enforcement.
-    
-    Attributes:
-        status: "pass" or "fail" — only two values, ever
-        violations: List of human-readable violation messages
-        surface_id: ID of the surface that was evaluated
-    """
-    Config: frozen = True
-
-class SurfaceRule(ABC):
-    """Base class for surface enforcement rules. Operates on generic Surface."""
-    name: str
-    evaluate(self, surface: Surface) → SurfaceRuleResult
-
-class SurfaceAdapter(ABC):
-    """Converts raw data into a Surface. Must preserve raw payload as-is."""
-    surface_type: str
-    adapt(self, raw_data: Any, **kwargs) → Surface
-
-class SurfaceEvaluator:
-    """
-    Evaluates surface rules against a Surface.
-    All rules evaluated (no short-circuit). Produces SurfaceVerdict.
-    
-    Methods:
-        add_rule(rule) → self
-        rules → list[SurfaceRule]
-        evaluate(surface) → SurfaceVerdict
-    """
-
-class SurfaceRegistry:
-    """
-    Central registry for surface types and their adapters.
-    
-    Pre-registers 5 built-in types:
-        text_output, structured_output, tool_calls,
-        execution_trace, cross_run_snapshot
-    
-    Methods:
-        register(surface_type, adapter) → self
-        get_adapter(surface_type) → SurfaceAdapter
-        list_types() → list[str]
-    """
-
-def get_registry() → SurfaceRegistry:
-    """Returns the global singleton SurfaceRegistry instance."""
-```
-
-#### 6.2 Text Surface Adapter (`text.py`) — Phase 2.0
-
-```python
-class TextSurfaceAdapter(SurfaceAdapter):
-    """
-    Bridges text LLM responses into the Surface abstraction.
-    Converts text string into Surface with type="text_output".
-    Raw text preserved without modification.
-    """
-    surface_type = "text_output"
-    adapt(raw_data, **kwargs) → Surface
-```
-
-#### 6.3 Structured Output Enforcement (`structured.py`) — Phase 2.1
-
-Deterministic structural validation for JSON/dict outputs.
-
-```python
-class FieldExistsRule(SurfaceRule):
-    """Dot-notation path must exist. No wildcards."""
-
-class FieldNotExistsRule(SurfaceRule):
-    """Dot-notation path must NOT exist."""
-
-class TypeEnforcementRule(SurfaceRule):
-    """
-    Value at path must be of specified type. Strict — NO coercion.
-    "1" (string) != 1 (number) → FAIL.
-    Valid types: "string", "number", "boolean", "array", "object", "null"
-    """
-
-class ExactValueRule(SurfaceRule):
-    """Value at path must be exactly equal. No case folding, no trimming."""
-
-class EnumEnforcementRule(SurfaceRule):
-    """Value at path must be member of explicit set. No fuzzy matching."""
-
-class ArrayBoundsRule(SurfaceRule):
-    """Array at path must satisfy length constraint. Operators: ==, <=, >="""
-
-class StructuredSurfaceAdapter(SurfaceAdapter):
-    """JSON/dict → Surface with type="structured_output"."""
-    surface_type = "structured_output"
-```
-
-#### 6.4 Tool & Function Call Invariants (`tools.py`) — Phase 2.2
-
-Enforce invariants over tool usage as a structural log — not behavior quality.
-
-```python
-class ToolPresenceRule(SurfaceRule):
-    """Tool must or must not appear in the tool call sequence."""
-
-class ToolCountRule(SurfaceRule):
-    """Tool must appear exactly N / at least N / at most N times."""
-
-class ToolArgumentRule(SurfaceRule):
-    """Tool argument at path must equal expected value. Strict comparison."""
-
-class ToolOrderingRule(SurfaceRule):
-    """
-    Index-based ordering constraint between two tools.
-    Modes: "before" (A must occur before B) or "not_after" (A must NOT occur after B)
-    """
-
-class ToolSurfaceAdapter(SurfaceAdapter):
-    """Event list → Surface with type="tool_calls". No dedup, no retry collapsing."""
-    surface_type = "tool_calls"
-```
-
-#### 6.5 Execution Trace Enforcement (`execution_trace.py`) — Phase 2.3
-
-Enforce graph-level structural invariants across multi-step flows.
-
-```python
-class StepCountRule(SurfaceRule):
-    """Total step count must satisfy constraint (==, <=, >=)."""
-
-class ForbiddenTransitionRule(SurfaceRule):
-    """Explicit consecutive stage transition prohibition."""
-
-class RequiredStageRule(SurfaceRule):
-    """Named stage must appear at least once."""
-
-class ExecutionTraceSurfaceAdapter(SurfaceAdapter):
-    """Step list → Surface with type="execution_trace"."""
-    surface_type = "execution_trace"
-```
-
-#### 6.6 Cross-Run Stability Enforcement (`stability.py`) — Phase 2.4
-
-Enforce invariants across executions for deterministic regression detection.
-
-```python
-class ExactStabilityRule(SurfaceRule):
-    """
-    Field at path (or entire payload hash) must not change between runs.
-    No tolerance. No probabilistic matching. Exact only.
-    """
-
-class AllowedDriftRule(SurfaceRule):
-    """
-    Only user-whitelisted fields may change between runs.
-    All other fields must remain stable. No auto-updating baselines.
-    """
-
-class StabilitySurfaceAdapter(SurfaceAdapter):
-    """Baseline+current snapshot → Surface with type="cross_run_snapshot"."""
-    surface_type = "cross_run_snapshot"
-```
-
-**Non-negotiable**: Surfaces preserve raw payloads. No normalization. No coercion. No transformation.
-
----
-
-### Layer 7: Raw Evidence Module
+### Layer 6: Raw Evidence Module
 **File**: `phylax/_internal/evidence.py`
 
 **Purpose**: Expose raw facts for machine consumption. Observations, not explanations. Data, not insights.
@@ -1072,7 +868,7 @@ def compare_paths(original_path, new_path) → PathEvidence:
 
 ---
 
-### Layer 8: Error System
+### Layer 7: Error System
 **File**: `phylax/_internal/errors.py`
 
 **Purpose**: Canonical error codes for machine-readable failures. No explanations. No diagnostics. No suggestions.
@@ -1090,12 +886,12 @@ def compare_paths(original_path, new_path) → PathEvidence:
 
 ---
 
-### Layer 9: Execution Graph Engine
+### Layer 8: Execution Graph Engine
 **File**: `phylax/_internal/graph.py` (~834 lines)
 
 **Purpose**: Model execution as a read-only Directed Acyclic Graph with semantic roles, hierarchical stages, performance analysis, diffing, investigation, and enterprise hardening.
 
-#### 9.1 Semantic Node Roles (Phase 19)
+#### 8.1 Semantic Node Roles (Phase 19)
 ```python
 class NodeRole(str, Enum):
     """
@@ -1110,7 +906,7 @@ class NodeRole(str, Enum):
     """
 ```
 
-#### 9.2 Graph Models
+#### 8.2 Graph Models
 ```python
 class GraphNode(BaseModel):      # Immutable node: node_id, trace_id, role, human_label,
                                   # description, model, provider, latency_ms, verdict_status, blessed
@@ -1132,7 +928,7 @@ class GraphDiff(BaseModel):      # Phase 23: Complete diff between two graphs
                                  # changed_nodes, total_changes, latency_delta_ms, verdict_changed
 ```
 
-#### 9.3 `ExecutionGraph` Class — Full API
+#### 8.3 `ExecutionGraph` Class — Full API
 ```python
 class ExecutionGraph(BaseModel):
     """
@@ -1188,7 +984,7 @@ class ExecutionGraph(BaseModel):
     """
 ```
 
-#### 9.4 Helper Functions
+#### 8.4 Helper Functions
 ```python
 def _get_label(trace) → str:
     """Generate short label from first message content (truncated to 30 chars)."""
@@ -1212,8 +1008,8 @@ def _generate_stages(nodes) → list[GraphStage]:
 
 ---
 
-### Layer 10: LLM Provider Adapters
-**Files**: `phylax/_internal/adapters/` (8 files)
+### Layer 9: LLM Provider Adapters
+**Files**: `phylax/_internal/adapters/` (7 files)
 
 **Purpose**: Unified interface for all supported LLM providers with automatic tracing.
 
@@ -1253,7 +1049,7 @@ class <Provider>Adapter:
 
 ---
 
-### Layer 11: File Storage Backend
+### Layer 10: File Storage Backend
 **File**: `server/storage/files.py` (~393 lines)
 
 **Purpose**: Zero-infrastructure trace persistence using JSON files as ground truth.
@@ -1307,7 +1103,7 @@ class FileStorage:
 
 ---
 
-### Layer 12: SQLite Index (Optional)
+### Layer 11: SQLite Index (Optional)
 **File**: `server/storage/sqlite.py` (~207 lines)
 
 **Purpose**: Optional indexing layer for faster queries over JSON files.
@@ -1340,23 +1136,23 @@ class SQLiteIndex:
 
 ---
 
-### Layer 13: FastAPI Server
+### Layer 12: FastAPI Server
 **File**: `server/main.py`
 
 **Purpose**: Expose traces via HTTP, support replay and comparison, serve UI.
 
 ```python
-app = FastAPI(title="Phylax", version="1.4.1")
+app = FastAPI(title="Phylax", version="1.0.0")
 
 # CORS: localhost:3000, localhost:8000
-# Routers: traces, replay, chat, health (all under /v1 prefix)
+# Routers: traces, replay, chat (all under /v1 prefix)
 # Static files: /ui → ui/, /assets → assets/
 
 GET  /          → API info
 GET  /health    → {"status": "healthy"}
 ```
 
-#### 13.1 Traces Routes (`server/routes/traces.py`)
+#### 12.1 Traces Routes (`server/routes/traces.py`)
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
@@ -1375,7 +1171,7 @@ GET  /health    → {"status": "healthy"}
 | `/v1/executions/{id}/export` | GET | Export graph as JSON artifact (Phase 25) |
 | `/v1/executions/{id}/verify` | GET | Verify graph integrity (Phase 25) |
 
-#### 13.2 Replay Routes (`server/routes/replay.py`)
+#### 12.2 Replay Routes (`server/routes/replay.py`)
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
@@ -1383,22 +1179,15 @@ GET  /health    → {"status": "healthy"}
 | `/v1/replay/{id}/preview` | GET | Preview what a replay would execute |
 | `/v1/executions/{id}/replay` | POST | Subgraph replay from specific node (Phase 17) |
 
-#### 13.3 Chat Routes (`server/routes/chat.py`)
+#### 12.3 Chat Routes (`server/routes/chat.py`)
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
 | `/v1/chat/completions` | POST | OpenAI-compatible chat endpoint with automatic tracing |
 
-#### 13.4 Health Routes (`server/routes/health.py`) — Axis 3
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/v1/health/expectations` | GET | Expectation health reports (windowed queries) |
-| `/v1/health/coverage` | GET | Arithmetic coverage reports |
-
 ---
 
-### Layer 14: CLI — Command Line Interface
+### Layer 13: CLI — Command Line Interface
 **File**: `cli/main.py` (~516 lines)
 
 **Purpose**: Primary user interface for CI enforcement and trace management.
@@ -1416,7 +1205,7 @@ GET  /health    → {"status": "healthy"}
 
 ---
 
-### Layer 15: Web UI — Failure-First Inspector
+### Layer 14: Web UI — Failure-First Inspector
 **Files**: `ui/index.html` (~1282 lines), `ui/app.js` (~826 lines)
 
 **Purpose**: Auxiliary visual interface for inspecting traces, managing golden baselines, and failure forensics.
@@ -1453,8 +1242,9 @@ blessTrace(id)        // POST to /v1/traces/{id}/bless
 Phylax/
 │
 ├── phylax/                          # Main package (PyPI-distributed)
-│   ├── __init__.py                  # Public API: exports 100+ symbols via
-│   │                                  `from phylax import ...`, __version__ = "1.4.1"
+│   ├── __init__.py                  # Public API: exports trace, expect, execution,
+│   │                                  Trace, Verdict, ExecutionGraph, all 6 adapters
+│   │                                  __version__ = "1.2.6"
 │   │
 │   ├── _internal/                   # Internal implementation (not for direct import)
 │   │   ├── __init__.py              # Module docstring only
@@ -1480,7 +1270,7 @@ Phylax/
 │   │   │                             TimestampEvidence, compare_outputs(),
 │   │   │                             compare_latency(), compare_paths()
 │   │   │
-│   │   ├── expectations/            # Axis 1: Deterministic rule engine (5 phases)
+│   │   ├── expectations/            # Deterministic rule engine (5 Axis 1 phases)
 │   │   │   ├── __init__.py          # Re-exports all rules, groups, conditionals,
 │   │   │   │                          scoping, templates, documentation
 │   │   │   ├── rules.py             # 4 base rules: MustIncludeRule, MustNotIncludeRule,
@@ -1497,77 +1287,23 @@ Phylax/
 │   │   │                              describe_template(), list_contracts(),
 │   │   │                              export_contract_markdown(), ContractDocumenter
 │   │   │
-│   │   ├── surfaces/                # Axis 2: Surface Abstraction Layer (5 phases)
-│   │   │   ├── __init__.py          # Re-exports all surface models, rules, adapters
-│   │   │   ├── surface.py           # Phase 2.0: Surface, SurfaceType, SurfaceRule,
-│   │   │   │                          SurfaceAdapter, SurfaceEvaluator, SurfaceRegistry,
-│   │   │   │                          SurfaceVerdict, SurfaceRuleResult, get_registry()
-│   │   │   ├── text.py              # Phase 2.0: TextSurfaceAdapter (text → Surface)
-│   │   │   ├── structured.py        # Phase 2.1: FieldExistsRule, FieldNotExistsRule,
-│   │   │   │                          TypeEnforcementRule, ExactValueRule,
-│   │   │   │                          EnumEnforcementRule, ArrayBoundsRule,
-│   │   │   │                          StructuredSurfaceAdapter
-│   │   │   ├── tools.py             # Phase 2.2: ToolPresenceRule, ToolCountRule,
-│   │   │   │                          ToolArgumentRule, ToolOrderingRule,
-│   │   │   │                          ToolSurfaceAdapter
-│   │   │   ├── execution_trace.py   # Phase 2.3: StepCountRule, ForbiddenTransitionRule,
-│   │   │   │                          RequiredStageRule, ExecutionTraceSurfaceAdapter
-│   │   │   └── stability.py         # Phase 2.4: ExactStabilityRule, AllowedDriftRule,
-│   │   │                              StabilitySurfaceAdapter
-│   │   │
-│   │   ├── adapters/                # LLM provider adapters (lazy-loaded)
-│   │   │   ├── __init__.py          # Re-exports all 7 adapters
-│   │   │   ├── openai.py            # OpenAIAdapter: chat_completion(), completion()
-│   │   │   ├── gemini.py            # GeminiAdapter: chat_completion(), generate()
-│   │   │   ├── groq.py              # GroqAdapter: chat_completion(), generate()
-│   │   │   ├── mistral.py           # MistralAdapter: chat_completion(), generate()
-│   │   │   ├── huggingface.py       # HuggingFaceAdapter: chat_completion(), generate()
-│   │   │   ├── ollama.py            # OllamaAdapter: chat_completion(), generate(),
-│   │   │   │                          list_models()
-│   │   │   └── llama.py             # LlamaAdapter (local llama.cpp support)
-│   │   │
-│   │   ├── metrics/                 # Axis 3: Metrics Foundation (Phase 3.1-3.2)
-│   │   │   ├── __init__.py          # Re-exports identity, ledger, aggregator, health
-│   │   │   ├── identity.py          # ExpectationIdentity, compute_definition_hash()
-│   │   │   ├── ledger.py            # EvaluationLedger, LedgerEntry (append-only, JSONL)
-│   │   │   ├── aggregator.py        # aggregate(), aggregate_all(), AggregateMetrics
-│   │   │   └── health.py            # HealthReport, CoverageReport, get_windowed_health()
-│   │   │
-│   │   ├── modes/                   # Axis 3: Enforcement Modes (Phase 3.3)
-│   │   │   ├── __init__.py          # Re-exports ModeHandler, EnforcementMode
-│   │   │   ├── definitions.py       # EnforcementMode, VALID_MODES
-│   │   │   └── handler.py           # ModeHandler: enforce/quarantine/observe, ModeResult
-│   │   │
-│   │   ├── meta/                    # Axis 3: Meta-Enforcement (Phase 3.4)
-│   │   │   ├── __init__.py          # Re-exports meta rules
-│   │   │   └── rules.py             # MinExpectationCountRule, ZeroSignalRule,
-│   │   │                              DefinitionChangeGuard, ExpectationRemovalGuard
-│   │   │
-│   │   └── artifacts/               # Axis 4: Machine-consumable output contracts
-│   │       ├── __init__.py          # Re-exports all artifact types
-│   │       ├── verdict.py           # VerdictArtifact, generate_verdict_artifact()
-│   │       ├── failures.py          # FailureEntry, FailureArtifact, generate_failure_artifact()
-│   │       ├── trace_diff.py        # TraceDiffArtifact, generate_trace_diff()
-│   │       └── exit_codes.py        # EXIT_PASS=0, EXIT_FAIL=1, EXIT_SYSTEM_ERROR=2,
-│   │                                  resolve_exit_code()
+│   │   └── adapters/                # LLM provider adapters (lazy-loaded)
+│   │       ├── __init__.py           # Re-exports all 6 adapters
+│   │       ├── openai.py            # OpenAIAdapter: chat_completion(), completion()
+│   │       ├── gemini.py            # GeminiAdapter: chat_completion(), generate()
+│   │       ├── groq.py              # GroqAdapter: chat_completion(), generate()
+│   │       ├── mistral.py           # MistralAdapter: chat_completion(), generate()
+│   │       ├── huggingface.py       # HuggingFaceAdapter: chat_completion(), generate()
+│   │       ├── ollama.py            # OllamaAdapter: chat_completion(), generate(),
+│   │       │                          list_models()
+│   │       └── llama.py             # LlamaAdapter (local llama.cpp support)
 │   │
 │   ├── cli/                         # CLI entry point (phylax command)
 │   │   ├── __init__.py
 │   │   └── main.py                  # Alias/wrapper for top-level cli/main.py
 │   │
 │   ├── server/                      # Server entry point
-│   │   ├── __init__.py
-│   │   ├── main.py                  # FastAPI app wrapper
-│   │   ├── routes/
-│   │   │   ├── __init__.py
-│   │   │   ├── traces.py            # Trace CRUD, executions, graphs, analysis
-│   │   │   ├── replay.py            # Replay with overrides, preview, subgraph
-│   │   │   ├── chat.py              # OpenAI-compatible /v1/chat/completions
-│   │   │   └── health.py            # Axis 3: expectation health & coverage API
-│   │   └── storage/
-│   │       ├── __init__.py
-│   │       ├── files.py             # FileStorage (JSON persistence)
-│   │       └── sqlite.py            # SQLiteIndex (optional)
+│   │   └── (wrappers for top-level server/)
 │   │
 │   ├── ui/                          # Packaged UI files
 │   │   └── (HTML/JS/CSS)
@@ -1621,35 +1357,19 @@ Phylax/
 │                                      Trace loading, filtering, selection,
 │                                      golden management, graph visualization
 │
-├── tests/                           # Test suite (799 tests)
+├── tests/                           # Test suite (208 tests)
 │   ├── __init__.py
-│   ├── test_schema.py               # Trace schema tests
-│   ├── test_expectations.py         # Base rule tests
+│   ├── test_axis1_comprehensive.py  # Axis 1 phases 1-5 tests
+│   ├── test_axis2_invariants.py     # 15 invariant guard tests
+│   ├── test_conditional_expectations.py
 │   ├── test_context.py              # Execution context tests
 │   ├── test_contract.py             # API contract tests
-│   ├── test_conditional_expectations.py
+│   ├── test_expectation_documentation.py
 │   ├── test_expectation_groups.py   # AND/OR/NOT tests
 │   ├── test_expectation_scoping.py  # Scoping tests
 │   ├── test_expectation_templates.py
-│   ├── test_expectation_documentation.py
-│   ├── test_axis1_comprehensive.py  # Axis 1 phases 1-5 tests
-│   ├── test_axis2_invariants.py     # 15 invariant guard tests
-│   ├── test_axis2_containment.py    # Axis 2 containment guards
-│   ├── test_surface_abstraction.py  # Surface model, registry, adapter, evaluator
-│   ├── test_structured_enforcement.py  # Structured output enforcement (50 tests)
-│   ├── test_tool_enforcement.py     # Tool/function call invariants (35+ tests)
-│   ├── test_execution_trace_enforcement.py  # Multi-step trace enforcement (30+ tests)
-│   ├── test_stability_enforcement.py  # Cross-run stability enforcement (28+ tests)
-│   ├── test_metric_foundation.py    # Metrics identity, ledger, aggregator (42 tests)
-│   ├── test_health_api.py           # Health/coverage API (14 tests)
-│   ├── test_enforcement_modes.py    # Mode handler tests (20 tests)
-│   ├── test_meta_enforcement.py     # Dilution guard tests (21 tests)
-│   ├── test_scale_validation.py     # Scale stress tests (11 tests)
-│   ├── test_public_api_surface.py   # Public API export validation (37 tests)
-│   ├── test_artifact_contracts.py   # Artifact immutability/determinism (27 tests)
-│   ├── test_axis3_integrity.py      # Axis 3 integrity guards
-│   ├── test_axis4_fortress.py       # Axis 4 fortress tests (53 tests)
-│   └── test_axis4_integrity.py      # Anti-integration audit
+│   ├── test_expectations.py         # Base rule tests
+│   └── test_schema.py              # Trace schema tests
 │
 ├── examples/                        # Integration & feature test scripts
 │   ├── test_execution_context.py
@@ -1664,7 +1384,7 @@ Phylax/
 │       ├── github_actions.yml       # CI workflow example
 │       └── pytest_example.py
 │
-├── demos/                           # Runnable demonstration scripts (20 demos)
+├── demos/                           # Runnable demonstration scripts
 │   ├── 01_basic_trace.py            # Basic tracing
 │   ├── 02_expectations.py           # All @expect rules
 │   ├── 03_execution_context.py      # Trace grouping
@@ -1678,16 +1398,9 @@ Phylax/
 │   ├── 11_templates.py              # Templates & registry
 │   ├── 12_documentation.py          # Self-documenting contracts
 │   ├── 13_gemini_live.py            # Live Gemini integration
-│   ├── 14_metrics_health.py         # Axis 3: Metrics, ledger, health reports
-│   ├── 15_enforcement_modes.py      # Axis 3: Mode behavior comparison
-│   ├── 16_meta_enforcement.py       # Axis 3: 4 dilution guards
-│   ├── 17_verdict_artifacts.py      # Axis 4: Verdict artifact generation
-│   ├── 18_failure_tracking.py       # Axis 4: Failure artifact tracking
-│   ├── 19_trace_diffs.py            # Axis 4: Trace diff artifacts
-│   ├── 20_exit_codes.py             # Axis 4: Exit code resolution
 │   └── README.md
 │
-├── docs/                            # Documentation (21 files)
+├── docs/                            # Documentation
 │   ├── quickstart.md                # 10 min to CI enforcement
 │   ├── mental-model.md              # What Phylax is/isn't
 │   ├── contract.md                  # API stability guarantees
@@ -1702,13 +1415,7 @@ Phylax/
 │   ├── performance.md               # Scale limits
 │   ├── providers.md                 # LLM provider reference
 │   ├── versioning.md                # Release policy
-│   ├── when-not-to-use.md           # Anti-patterns
-│   ├── surface-enforcement.md       # Surface abstraction guide
-│   ├── axis2-testing.md             # Axis 2 test strategy
-│   ├── axis3-scale-safety.md        # Axis 3 scale safety guide
-│   ├── axis3-axis4-testing.md       # Axis 3 & 4 test strategy
-│   ├── axis4-artifact-contracts.md  # Axis 4 artifact documentation
-│   └── axis4-ecosystem-discipline.md  # Axis 4 ecosystem discipline
+│   └── when-not-to-use.md           # Anti-patterns
 │
 ├── assets/                          # Static assets
 │   ├── logo/                        # Phylax logo PNG
@@ -1721,8 +1428,6 @@ Phylax/
 ├── DOCUMENTATION.md                 # Complete technical reference
 ├── DEVELOPMENT.md                   # Contributor guide
 ├── CHANGELOG.md                     # Version history
-├── CONSTITUTION.md                  # 12 constitutional promises
-├── ANTI_FEATURES.md                 # Documented non-features
 └── LICENSE                          # MIT License
 ```
 
@@ -1882,21 +1587,16 @@ Developer investigates via UI or CLI:
 | **3. Capture** | LLM call interception | `_internal/capture.py` | ~280 | `CaptureLayer`, `CaptureContext` |
 | **4. Context** | Execution grouping | `_internal/context.py` | ~110 | `execution()`, `push_node()`, `pop_node()` |
 | **5. Expectations** | Rule engine (5 phases) | `_internal/expectations/` | ~1450+ | `Evaluator`, 4 rules, groups, conditionals, scoping, templates, docs |
-| **6. Surfaces** | Generic enforcement (Axis 2) | `_internal/surfaces/` | ~1500+ | `Surface`, `SurfaceEvaluator`, 15 rules, 5 adapters |
-| **7. Evidence** | Raw facts | `_internal/evidence.py` | ~160 | `HashEvidence`, `LatencyEvidence`, `PathEvidence` |
-| **8. Errors** | Error codes | `_internal/errors.py` | ~95 | `PHYLAX_E101`–`PHYLAX_E301` |
-| **9. Graph** | Execution DAGs | `_internal/graph.py` | ~834 | `ExecutionGraph`, `GraphNode`, `NodeRole`, `GraphDiff` |
-| **10. Adapters** | LLM providers | `_internal/adapters/` | ~700+ | 7 adapters: OpenAI, Gemini, Groq, Mistral, HF, Ollama, Llama |
-| **11. Storage** | File persistence | `server/storage/files.py` | ~393 | `FileStorage` (JSON ground truth) |
-| **12. SQLite** | Fast queries | `server/storage/sqlite.py` | ~207 | `SQLiteIndex` (optional optimization) |
-| **13. Server** | REST API | `server/` | ~850+ | FastAPI, 30+ endpoints across 4 route modules |
-| **14. CLI** | CI interface | `cli/main.py` | ~516 | 8 commands: init, server, list, show, replay, bless, check, graph-check |
-| **15. UI** | Web inspector | `ui/` | ~2100+ | Failure-first dark-theme inspector |
-| **16. Metrics** | Derived facts (Axis 3) | `_internal/metrics/` | ~450+ | `EvaluationLedger`, `AggregateMetrics`, `HealthReport` |
-| **17. Modes** | Enforcement modes (Axis 3) | `_internal/modes/` | ~130+ | `ModeHandler`: enforce, quarantine, observe |
-| **18. Meta** | Dilution guards (Axis 3) | `_internal/meta/` | ~150+ | 4 meta-rules: count, signal, definition, removal |
-| **19. Artifacts** | CI output contracts (Axis 4) | `_internal/artifacts/` | ~200+ | `VerdictArtifact`, `FailureArtifact`, `TraceDiffArtifact`, exit codes |
-| **20. Tests** | Verification | `tests/` | 799 tests | 28 test files covering all 4 axes |
+| **6. Evidence** | Raw facts | `_internal/evidence.py` | ~160 | `HashEvidence`, `LatencyEvidence`, `PathEvidence` |
+| **7. Errors** | Error codes | `_internal/errors.py` | ~95 | `PHYLAX_E101`–`PHYLAX_E301` |
+| **8. Graph** | Execution DAGs | `_internal/graph.py` | ~834 | `ExecutionGraph`, `GraphNode`, `NodeRole`, `GraphDiff` |
+| **9. Adapters** | LLM providers | `_internal/adapters/` | ~700+ | 6 adapters: OpenAI, Gemini, Groq, Mistral, HF, Ollama |
+| **10. Storage** | File persistence | `server/storage/files.py` | ~393 | `FileStorage` (JSON ground truth) |
+| **11. SQLite** | Fast queries | `server/storage/sqlite.py` | ~207 | `SQLiteIndex` (optional optimization) |
+| **12. Server** | REST API | `server/` | ~850+ | FastAPI, 30+ endpoints across 3 route modules |
+| **13. CLI** | CI interface | `cli/main.py` | ~516 | 8 commands: init, server, list, show, replay, bless, check, graph-check |
+| **14. UI** | Web inspector | `ui/` | ~2100+ | Failure-first dark-theme inspector |
+| **15. Tests** | Verification | `tests/` | 208 tests | Schema, expectations, context, invariants |
 
 ---
 
@@ -1906,14 +1606,13 @@ Developer investigates via UI or CLI:
 ✅ **Immutable Traces**: Write-once audit artifacts with Pydantic frozen models  
 ✅ **CI-First Design**: `phylax check` exit codes drive CI pipelines  
 ✅ **Zero Infrastructure**: JSON files as ground truth, no database required  
-✅ **Multi-Provider**: 7 LLM adapters with unified interface and lazy-loading  
+✅ **Multi-Provider**: 6 LLM adapters with unified interface and lazy-loading  
 ✅ **Rich Expectation Algebra**: 4 rules × logical composition × conditionals × scoping × templates × self-documentation  
 ✅ **Execution Graphs**: DAGs with semantic roles, performance analysis, diffing, investigation, and enterprise hardening  
 ✅ **Evidence, Not Analysis**: Raw facts with disclaimers — interpretation is external  
 ✅ **Machine-Readable Errors**: PHYLAX_Exxx codes, no prose  
-✅ **Modular & Testable**: Each layer independently developed and tested (799 tests across 28 files)  
+✅ **Modular & Testable**: Each layer independently developed and tested (208 tests)  
 ✅ **Doctrine Frozen**: Semantic invariants enforced by guard tests that fail the build
-✅ **Surface Abstraction**: Generic enforcement over text, JSON, tool calls, execution traces, and cross-run snapshots
 
 ---
 
@@ -1940,173 +1639,6 @@ allow_origins = [
 ]
 ```
 
-## Axis 3 — Scale Safety & Misuse Resistance Architecture
-
-### Metrics Layer (`phylax/_internal/metrics/`)
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    METRICS FOUNDATION                           │
-│                                                                 │
-│  ┌──────────────┐   ┌──────────────┐   ┌──────────────────────┐ │
-│  │  Identity    │   │  Ledger      │   │  Aggregator          │ │
-│  │              │   │              │   │                      │ │
-│  │ compute_     │──>│ record()     │──>│ aggregate()          │ │
-│  │ definition_  │   │ (append-only)│   │ aggregate_all()      │ │
-│  │ hash()       │   │              │   │                      │ │
-│  │              │   │ No .update() │   │ total_evaluations    │ │
-│  │ SHA-256      │   │ No .delete() │   │ total_failures       │ │
-│  │ canonical    │   │ No .clear()  │   │ total_passes         │ │
-│  │ JSON sort    │   │ No .pop()    │   │ failure_rate         │ │
-│  │              │   │              │   │ never_failed         │ │
-│  └──────────────┘   └──────────────┘   │ never_passed         │ │
-│                                        └──────────┬───────────┘ │
-│                                                   │             │
-│                                       ┌───────────▼───────────┐ │
-│                                       │  Health Report        │ │
-│                                       │  get_windowed_health()│ │
-│                                       │  CoverageReport       │ │
-│                                       └───────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**Key constraint**: All metrics are derived facts. No opinions, no scoring, no ranking.
-
-### Enforcement Modes Layer (`phylax/_internal/modes/`)
-
-```
-┌──────────────────────────────────────────────┐
-│           ENFORCEMENT MODES                  │
-│                                              │
-│  ModeHandler(mode) → .apply(verdict)         │
-│                                              │
-│  ┌───────────┐ ┌───────────┐ ┌───────────┐   │
-│  │  enforce  │ │ quarantine│ │  observe  │   │
-│  │           │ │           │ │           │   │
-│  │ FAIL → 1  │ │ FAIL → 0  │ │ FAIL → 0  │   │
-│  │ (blocks   │ │ (logged,  │ │ (logged   │   │
-│  │  CI)      │ │  no block)│ │  only)    │   │
-│  └───────────┘ └───────────┘ └───────────┘   │
-│                                              │
-│  Invariant: Mode NEVER auto-switches.        │
-│  Invalid modes raise ValueError.             │
-└──────────────────────────────────────────────┘
-```
-
-### Meta-Enforcement Layer (`phylax/_internal/meta/`)
-
-```
-┌──────────────────────────────────────────────┐
-│         META-ENFORCEMENT RULES               │
-│                                              │
-│  Guards against silent dilution of coverage. │
-│                                              │
-│  MinExpectationCountRule(min_count=N)        │
-│    → FAIL if fewer than N expectations       │
-│                                              │
-│  ZeroSignalRule()                            │
-│    → FAIL if no evaluations produce signal   │
-│                                              │
-│  DefinitionChangeGuard()                     │
-│    → FAIL if definition hash changed         │
-│                                              │
-│  ExpectationRemovalGuard()                   │
-│    → FAIL if expectations silently removed   │
-│                                              │
-│  All rules: pure functions, no side effects, │
-│  no advisory language, deterministic.        │
-└──────────────────────────────────────────────┘
-```
-
----
-
-## Axis 4 — Ecosystem Without Platformization Architecture
-
-### Artifact Contracts Layer (`phylax/_internal/artifacts/`)
-
-```
-┌───────────────────────────────────────────────────────────────────┐
-│              MACHINE-CONSUMABLE ARTIFACTS                         │
-│                                                                   │
-│  All artifacts are:                                               │
-│    • Frozen (immutable after creation)                            │
-│    • Deterministic (100 runs → 1 hash)                            │
-│    • Schema-versioned (currently 1.0.0)                           │
-│    • Commentary-free (no explanation/suggestion/severity)         │
-│                                                                   │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────┐   │
-│  │ verdict.py      │  │ failures.py     │  │ trace_diff.py    │   │
-│  │                 │  │                 │  │                  │   │
-│  │ VerdictArtifact │  │ FailureArtifact │  │ TraceDiffArtifact│   │
-│  │ generate_       │  │ FailureEntry    │  │ generate_        │   │
-│  │ verdict_        │  │ generate_       │  │ trace_diff()     │   │
-│  │ artifact()      │  │ failure_        │  │                  │   │
-│  │                 │  │ artifact()      │  │ added/removed    │   │
-│  │ run_id, mode,   │  │                 │  │ expectations     │   │
-│  │ verdict, count  │  │ id, rule,       │  │ hash comparison  │   │
-│  └─────────────────┘  │ raw, expected   │  └──────────────────┘   │
-│                       └─────────────────┘                         │
-│                                                                   │
-│  ┌─────────────────────────────────────────────────────────────┐  │
-│  │ exit_codes.py                                               │  │
-│  │                                                             │  │
-│  │ EXIT_PASS = 0         (PASS or non-blocking mode)           │  │
-│  │ EXIT_FAIL = 1         (FAIL in enforce mode)                │  │
-│  │ EXIT_SYSTEM_ERROR = 2 (malformed config)                    │  │
-│  │                                                             │  │
-│  │ resolve_exit_code(verdict, mode) → int                      │  │
-│  │ _VALID_EXIT_CODES = frozenset({0, 1, 2})                    │  │
-│  └─────────────────────────────────────────────────────────────┘  │
-└───────────────────────────────────────────────────────────────────┘
-```
-
-### Governance Layer
-
-```
-┌───────────────────────────────────────────────┐
-│            CONSTITUTIONAL GOVERNANCE          │
-│                                               │
-│  CONSTITUTION.md — 12 "Will Never" Promises:  │
-│    1. Explain failures                        │
-│    2. Rank expectations                       │
-│    3. Suggest improvements                    │
-│    4. Score outputs                           │
-│    5. Add AI inference                        │
-│    6. Embed dashboards                        │
-│    7. Send alerts                             │
-│    8. Auto-adjust thresholds                  │
-│    9. Modify user expectations                │
-│   10. Add a plugin system                     │
-│   11. Run as a daemon                         │
-│   12. Make outbound network calls             │
-│                                               │
-│  ANTI_FEATURES.md — Documented Non-Features:  │
-│    • No dashboards                            │
-│    • No alerting                              │
-│    • No background services                   │
-│    • No plugin system                         │
-│                                               │
-│  Breaking any of these = MAJOR version bump   │
-└───────────────────────────────────────────────┘
-```
-
-### Anti-Platformization Data Flow
-
-```
-┌──────────┐     ┌──────────────┐     ┌──────────────────────┐
-│ Phylax   │────>│ verdict.json │────>│ External Dashboard   │
-│ Engine   │────>│ failures.json│────>│ External Alerting    │
-│          │────>│ exit code    │────>│ CI Pipeline (0/1/2)  │
-└──────────┘     └──────────────┘     └──────────────────────┘
-                       ▲                        ▲
-                       │                        │
-              Phylax produces           External consumes
-              artifacts ONLY.           Phylax does NOT
-              No integrations.          embed these systems.
-```
-
----
-
 ### Storage Layout
 ```
 ~/.Phylax/
@@ -2121,19 +1653,10 @@ allow_origins = [
 
 ---
 
-## Version History Highlights
+## 📈 Version History Highlights
 
 | Version | Date | Key Changes |
 |---------|------|-------------|
-| **1.6.0** | 2026-03-11 | Behavioral diff engine, model upgrade simulator, CI kits, guardrail packs, 910 tests |
-| **1.5.0** | 2026-03-10 | Repo restructuring, README rewrite, docs reorg, dataset contracts, 844 tests |
-| **1.4.1** | 2026-03-09 | Axis 4 fortress tests (53), demos 17-20, full docs update, version sync |
-| **1.4.0** | 2026-03-01 | Axis 4: Artifact contracts, exit codes, CONSTITUTION.md, ANTI_FEATURES.md |
-| **1.3.3** | 2026-02-22 | Axis 2 Phase 2.4: Cross-run stability enforcement (ExactStabilityRule, AllowedDriftRule) |
-| **1.3.2** | 2026-02-22 | Axis 2 Phase 2.3: Multi-step execution trace enforcement (3 rules) |
-| **1.3.1** | 2026-02-22 | Axis 2 Phase 2.2: Tool & function call invariants (4 rules) |
-| **1.3.0** | 2026-02-22 | Axis 2 Phase 2.1: Structured output enforcement (6 rules); Axis 3: Metrics, modes, meta |
-| **1.3.0a0** | 2026-02-22 | Axis 2 Phase 2.0: Surface abstraction layer (Surface, SurfaceRule, SurfaceEvaluator, registry) |
 | **1.2.6** | 2026-02-14 | Context manager fix for exception propagation |
 | **1.2.5** | 2026-02-12 | Evidence purity (first_failing_node rename), google-genai update |
 | **1.2.4** | 2026-02-10 | Axis 2 readiness audit, 15 invariant guard tests, doctrine freeze |
@@ -2145,6 +1668,5 @@ allow_origins = [
 
 ---
 
-**Last Updated**: March 11, 2026
-**Architecture Version**: 1.6.0 (Stable — all 4 axes + dataset contracts + behavioral diff + model simulator + CI kits + guardrail packs, 910 tests passing)
-
+**Last Updated**: February 22, 2026  
+**Architecture Version**: 1.2.6 (Stable — execution semantics and verdict behavior frozen)
