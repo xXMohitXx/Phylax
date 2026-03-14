@@ -45,6 +45,23 @@ Thumbs.db
 .phylax/
 .sentinel/
 
+# Node
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+
+# Next.js boilerplate SVGs (keep favicon.png)
+phylax-landing-page/public/file.svg
+phylax-landing-page/public/globe.svg
+phylax-landing-page/public/next.svg
+phylax-landing-page/public/vercel.svg
+phylax-landing-page/public/window.svg
+phylax-landing-page/scripts/generate-docs.js
+
+# Phylax runtime temp data
+.temp_phylax/
+
 # Environment variables
 .env
 
@@ -53,6 +70,5 @@ my-video
 my-video/src
 
 # Build artifacts & media
-phylax-*/
 demo_phylax.py
 Main.mp4
