@@ -59,7 +59,7 @@ export function MouseFollower() {
       <div 
         className={`transition-all duration-300 ease-out flex items-center justify-center ${
           isHovering 
-            ? 'w-20 h-20 -ml-4 -mt-4 rounded-2xl bg-gradient-to-br from-white/40 to-white/10 backdrop-blur-md border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.1)]' 
+            ? 'w-16 h-16 -ml-5 -mt-5 rounded-full border border-coffee-bean/30 bg-coffee-bean/5' 
             : 'w-6 h-6 rounded-full bg-coffee-bean/10 border border-coffee-bean/20 mix-blend-multiply'
         }`} 
       />
