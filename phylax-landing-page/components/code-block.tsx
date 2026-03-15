@@ -35,12 +35,18 @@ export function CodeBlock({ code, language = 'python', title, highlightedLines =
       <div className="p-4 overflow-x-auto text-sm font-mono leading-relaxed text-porcelain">
         {lines.map((line, i) => {
           const isHighlighted = highlightedLines.includes(i + 1);
-          
+          // Escape HTML characters to prevent < and > (e.g., in type hints -> or imports) being treated as actual HTML tags.
+          const escapedLine = line
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
           // Extremely basic static syntax highlighting for python/yaml look
-          let formattedLine = line
+          let formattedLine = escapedLine
+            .replace(/(&quot;.*?&quot;|'.*?')/g, '<span class="text-beige">$1</span>') // Strings (now handling &quot; from escaping, but strings with single or double quotes)
+            .replace(/(".*?"|'.*?')/g, '<span class="text-beige">$1</span>') // Strings (covering unescaped quotes just in case)
             .replace(/(@\w+)/g, '<span class="text-lime-cream">$1</span>') // Decorators
-            .replace(/(from|import|def|return|with|as):?/g, '<span class="text-porcelain/60">$1</span>') // Keywords
-            .replace(/("|'.*?'|")/g, '<span class="text-beige">$1</span>') // Strings
+            .replace(/\b(from|import|def|return|with|as)\b:?/g, '<span class="text-porcelain/60">$1</span>') // Keywords
             .replace(/\b(must_include|must_not_include|provider|dataset|cases|input|expectations|max_latency_ms)\b:/g, '<span class="text-lime-cream">$1:</span>') // Yaml keys
             .replace(/\b(phylax|trace|expect)\b/g, '<span class="text-porcelain/80 font-bold">$1</span>'); // Phylax specific
 
@@ -52,7 +58,7 @@ export function CodeBlock({ code, language = 'python', title, highlightedLines =
               <span className="select-none text-porcelain/30 font-mono w-4 text-right flex-shrink-0">
                 {i + 1}
               </span>
-              <span dangerouslySetInnerHTML={{ __html: formattedLine || ' ' }} />
+              <span className="whitespace-pre" dangerouslySetInnerHTML={{ __html: formattedLine || ' ' }} />
             </div>
           );
         })}
