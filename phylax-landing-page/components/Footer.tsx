@@ -30,7 +30,7 @@ export function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-white mb-4">Product</h4>
             <ul className="space-y-3 text-sm text-beige/80">
-              <li><Link href="/docs/concepts/dataset-contracts" className="hover:text-lime-cream transition-colors">Dataset Contracts</Link></li>
+              <li><Link href="/docs/dataset-contracts" className="hover:text-lime-cream transition-colors">Dataset Contracts</Link></li>
               <li><Link href="/docs/concepts/execution-graphs" className="hover:text-lime-cream transition-colors">Execution Graphs</Link></li>
               <li><Link href="/docs/model-upgrade-testing" className="hover:text-lime-cream transition-colors">Model Upgrades</Link></li>
               <li><Link href="/why-phylax" className="hover:text-lime-cream transition-colors">Why Phylax?</Link></li>
