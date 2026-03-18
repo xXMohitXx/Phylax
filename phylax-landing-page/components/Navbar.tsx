@@ -10,11 +10,12 @@ export function Navbar() {
           <img src="/favicon.png" alt="Phylax Logo" className="w-7 h-7 rounded-md shadow-[0_0_10px_rgba(197,216,109,0.1)] group-hover:shadow-[0_0_15px_rgba(197,216,109,0.4)] transition-all" />
           <span className="text-lg font-bold tracking-tight text-coffee-bean">Phylax</span>
         </Link>
-        
+
         <nav className="ml-10 hidden md:flex items-center gap-6">
           <Link href="/docs" className="text-[13px] font-medium text-coffee-bean/80 hover:text-lime-cream transition-colors">Documentation</Link>
           <Link href="/blog" className="text-[13px] font-medium text-coffee-bean/80 hover:text-lime-cream transition-colors">Blog</Link>
           <Link href="/examples" className="text-[13px] font-medium text-coffee-bean/80 hover:text-lime-cream transition-colors">Examples</Link>
+          <Link href="/pricing" className="text-[13px] font-medium text-coffee-bean/80 hover:text-lime-cream transition-colors">Pricing</Link>
           <Link href="/why-phylax" className="text-[13px] font-medium text-coffee-bean/80 hover:text-lime-cream transition-colors">Why Phylax?</Link>
         </nav>
 

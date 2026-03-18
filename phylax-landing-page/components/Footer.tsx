@@ -16,7 +16,7 @@ export function Footer() {
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
-          
+
           <div className="col-span-2 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5 mb-4 group">
               <img src="/favicon.png" alt="Phylax Logo" className="w-6 h-6 rounded-sm opacity-90 group-hover:opacity-100 transition-opacity" />
@@ -34,6 +34,7 @@ export function Footer() {
               <li><Link href="/docs/concepts/execution-graphs" className="hover:text-lime-cream transition-colors">Execution Graphs</Link></li>
               <li><Link href="/docs/model-upgrade-testing" className="hover:text-lime-cream transition-colors">Model Upgrades</Link></li>
               <li><Link href="/why-phylax" className="hover:text-lime-cream transition-colors">Why Phylax?</Link></li>
+              <li><Link href="/pricing" className="hover:text-lime-cream transition-colors">Pricing</Link></li>
             </ul>
           </div>
 

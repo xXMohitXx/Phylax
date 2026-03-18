@@ -15,9 +15,13 @@
   <a href="https://pepy.tech/projects/phylax"><img src="https://static.pepy.tech/personalized-badge/phylax?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=Downloads" alt="PyPI Downloads"></a>
 </p>
 
+<p align="center">
+  <a href="https://phylax.dev/docs/quickstart">Quickstart</a> · <a href="https://phylax.dev/docs">Docs</a> · <a href="https://phylax.dev/examples">Examples</a> · <a href="https://phylax.dev/blog">Blog</a> · <a href="https://phylax.dev/pricing">Cloud</a>
+</p>
+
 ---
 
-## ⚡ 30-Second Example
+## ⚡ 10-Second Example
 
 ```bash
 pip install phylax
@@ -33,7 +37,7 @@ def reply(prompt):
 ```
 
 ```bash
-phylax check
+phylax check   # exits 1 on contract violation
 ```
 
 ```
@@ -42,58 +46,61 @@ phylax check
    Violation: must_include rule failed
 ```
 
-**That's it.** Your CI now blocks AI behavior regressions.
+**That's it.** Your CI now blocks AI behavior regressions. No AI judges, no probabilistic scoring — just deterministic PASS/FAIL.
 
 ---
 
-## 🎯 What Phylax Does
+## 📦 Dataset Contracts
 
-Phylax enforces **deterministic contracts** on LLM outputs. When your AI's behavior changes across model versions, prompts, or configurations — Phylax catches it.
+Define behavioral test suites in YAML. Batch-test hundreds of prompts against live models. Run in CI.
 
+```yaml
+# datasets/support_bot.yaml
+dataset: support_bot
+cases:
+  - input: "I want a refund for my last purchase"
+    expectations:
+      must_include: ["refund_policy", "30_days"]
+      must_not_include: ["credit_card_number"]
+      max_latency_ms: 3000
+
+  - input: "How do I reset my password?"
+    expectations:
+      must_include: ["password", "reset"]
+      max_latency_ms: 2000
+
+  - input: "Tell me a joke"
+    expectations:
+      must_not_include: ["internal_error", "SQL"]
+      min_tokens: 10
 ```
-Developer writes rules   →   Phylax tests every response   →   CI blocks regressions
-```
-
-**Phylax is NOT** monitoring, observability, or AI-based evaluation. It's a test framework for AI behavior.
-
----
-
-## 🚀 Quick Start
-
-### 1. Install
 
 ```bash
-pip install phylax[openai]   # or phylax[google], phylax[groq], phylax[all]
+phylax dataset run datasets/support_bot.yaml
+
+# Running dataset 'support_bot'...
+# [Case 1/3] "I want a refund..."    ✓ PASS
+# [Case 2/3] "How do I reset..."     ✓ PASS
+# [Case 3/3] "Tell me a joke"        ✗ FAIL — min_tokens (actual: 4, minimum: 10)
+#
+# ❌ 1 of 3 cases failed. Exit code 1.
 ```
 
-### 2. Write Traced Code
+Or use the Python API:
 
 ```python
-from phylax import trace, expect, execution, OpenAIAdapter
+from phylax import Dataset, load_dataset, run_dataset, format_report
 
-# Single call with expectations
-@trace(provider="openai")
-@expect(must_include=["refund"], max_latency_ms=3000)
-def handle_refund(message: str) -> str:
-    adapter = OpenAIAdapter()
-    response, _ = adapter.generate(prompt=message)
-    return response
-
-# Multi-step agent flow
-@trace(provider="openai")
-@expect(must_include=["intent"])
-def classify(message: str) -> str:
-    adapter = OpenAIAdapter()
-    response, _ = adapter.generate(prompt=f"Classify: {message}")
-    return response
-
-# Track agent workflows as execution graphs
-with execution() as exec_id:
-    intent = classify("I want a refund")
-    response = handle_refund("Process refund for order #123")
+ds = load_dataset("datasets/support_bot.yaml")
+result = run_dataset(ds, handler_function)
+print(format_report(result))
 ```
 
-### 3. Enforce in CI
+---
+
+## 🔄 CI Enforcement
+
+Phylax runs inside your existing CI pipeline. Exit code 0 = all pass. Exit code 1 = regression detected. PR blocked.
 
 ```yaml
 # .github/workflows/phylax.yml
@@ -105,9 +112,90 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: pip install phylax[openai]
-      - run: phylax check    # exits 1 on contract violation
+      - run: phylax check
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - run: phylax dataset run datasets/*.yaml
+```
+
+Works with GitHub Actions, GitLab CI, Jenkins, CircleCI — anything that reads exit codes.
+
+---
+
+## 📊 Execution Graphs
+
+Track multi-step agent workflows as directed acyclic graphs (DAGs). Phylax automatically captures parent-child relationships across LLM calls.
+
+```python
+from phylax import trace, expect, execution, OpenAIAdapter
+
+@trace(provider="openai")
+@expect(must_include=["intent"])
+def classify(message: str) -> str:
+    adapter = OpenAIAdapter()
+    response, _ = adapter.generate(prompt=f"Classify: {message}")
+    return response
+
+@trace(provider="openai")
+@expect(must_include=["refund"])
+def handle_refund(message: str) -> str:
+    adapter = OpenAIAdapter()
+    response, _ = adapter.generate(prompt=message)
+    return response
+
+# Group into execution graph
+with execution() as exec_id:
+    intent = classify("I want a refund")
+    response = handle_refund("Process refund for order #123")
+
+# Phylax builds:
+#   [classify] → [handle_refund]
+#
+# If classify fails → Phylax reports the first failing node.
+# View the graph: phylax server → http://127.0.0.1:8000/ui
+```
+
+**Graph capabilities**: topological ordering, critical path analysis, bottleneck detection, graph diffing, investigation paths, SHA256 integrity verification.
+
+---
+
+## 🧪 Model Upgrade Simulation
+
+Upgrading from GPT-4 to GPT-4.5? Run your entire dataset contract against both models and diff the results:
+
+```bash
+phylax simulate --from gpt-4 --to gpt-4.5 datasets/support_bot.yaml
+```
+
+```python
+from phylax import simulate_upgrade, format_simulation_report
+
+result = simulate_upgrade(
+    dataset=ds,
+    baseline_func=gpt4_handler,
+    candidate_func=gpt45_handler,
+)
+print(format_simulation_report(result))
+# safe_to_upgrade: False — 3 regressions detected
+```
+
+---
+
+## 🛡️ Guardrail Packs
+
+Pre-built contract templates for common safety, quality, and compliance scenarios:
+
+```python
+from phylax import safety_pack, quality_pack, compliance_pack
+
+# Safety: blocks PII, hate speech, prompt injection
+safety_rules = safety_pack()
+
+# Quality: min response length, max latency, coherence
+quality_rules = quality_pack()
+
+# Compliance: regulatory output constraints
+compliance_rules = compliance_pack()
 ```
 
 ---
@@ -164,50 +252,18 @@ from phylax import (
 
 ---
 
-## 📊 Execution Graphs
-
-Visualize and debug multi-step agent workflows:
-
-```python
-from phylax import trace, expect, execution
-
-with execution() as exec_id:
-    step1 = classify(message)      # → Node 1
-    step2 = research(step1)        # → Node 2
-    step3 = respond(step2)         # → Node 3
-
-# Phylax builds a DAG:
-#   [classify] → [research] → [respond]
-#
-# View it:
-#   phylax server → http://127.0.0.1:8000/ui
-```
-
----
-
-## 🛡️ Enforcement Modes
-
-```python
-from phylax import ModeHandler, EnforcementMode
-
-handler = ModeHandler(mode=EnforcementMode.ENFORCE)
-# enforce    → CI fails on violation (default)
-# quarantine → CI fails, but logs for review
-# observe    → CI passes, violations logged only
-```
-
----
-
 ## 🔧 Commands
 
 | Command | What It Does |
-|---------|----|
+|---------|---|
+| `phylax check` | **CI enforcement** — exits 1 on violation |
+| `phylax dataset run` | Execute dataset contracts |
+| `phylax simulate` | Model upgrade simulation |
 | `phylax init` | Initialize config |
 | `phylax server` | Start API + UI |
 | `phylax list` | List traces (`--failed` for failures only) |
 | `phylax show <id>` | Inspect a trace |
 | `phylax bless <id>` | Mark as golden baseline |
-| `phylax check` | **CI enforcement** — exits 1 on violation |
 | `phylax --version` | Show version |
 
 ---
@@ -250,26 +306,52 @@ pip install phylax[all]   # Install all providers
 
 ---
 
+## ☁️ Phylax Cloud — Coming Soon
+
+**Zero infrastructure CI enforcement for teams.**
+
+Managed cloud platform with:
+
+- **Trace Upload**: `phylax init --cloud` + `PHYLAX_API_KEY` — traces upload automatically
+- **Dataset Replay Engine**: Upload 1,000 prompts, run baselines and regression detection at scale
+- **Team Collaboration**: Shared projects, datasets, rules, and baselines across developers
+- **Dashboard**: Failed cases, dataset history, diff visualizations, graph analysis
+
+**[Join the Cloud Beta Waitlist →](https://phylax.dev)**
+
+---
+
 ## 📖 Documentation
 
 **Start here:**
+
 - [Quickstart](docs/quickstart.md) — 10 minutes to CI enforcement
 - [Mental Model](docs/mental-model.md) — What Phylax is and isn't
 - [Providers](docs/providers.md) — LLM provider reference
 - [Error Codes](docs/errors.md) — Error code reference
 
 **Reference:**
+
 - [API Contract](docs/reference/contract.md) — Stability guarantees
 - [Execution Context](docs/reference/execution-context.md) — Trace grouping
 - [Non-Goals](docs/reference/non-goals.md) — What Phylax will never do
 - [Versioning](docs/reference/versioning.md) — Release policy
 
 **Advanced:**
+
 - [Surface Enforcement](docs/advanced/surface-enforcement.md)
 - [Graph Model](docs/advanced/graph-model.md)
 - [Failure Playbook](docs/advanced/failure-playbook.md)
 - [Performance](docs/advanced/performance.md)
 - [Invariants](docs/advanced/invariants.md)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+Good first issues are tagged with `good first issue`. Community guardrail packs and example datasets are always welcome.
 
 ---
 
@@ -280,6 +362,8 @@ phylax/
 ├── _internal/
 │   ├── expectations/    # Deterministic rule engine
 │   ├── surfaces/        # Surface enforcement (JSON, tools, traces)
+│   ├── datasets/        # Dataset contracts & behavioral diff
+│   ├── guardrails/      # Guardrail packs (safety, quality, compliance)
 │   ├── metrics/         # Expectation health & coverage
 │   ├── modes/           # Enforcement mode control
 │   ├── meta/            # Dilution guards
@@ -291,7 +375,7 @@ phylax/
 └── ui/                  # Web inspector
 ```
 
-**910 tests** · **v1.6.0** · All 4 axes complete + Dataset Contracts + Behavioral Diff + Model Simulator + CI Kits + Guardrail Packs
+**910 tests** · **v1.6.3** · All 4 axes complete + Dataset Contracts + Behavioral Diff + Model Simulator + CI Kits + Guardrail Packs
 
 ---
 
