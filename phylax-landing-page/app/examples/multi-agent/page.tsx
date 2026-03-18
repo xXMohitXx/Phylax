@@ -53,7 +53,7 @@ export default function MultiAgentExample() {
                         <CodeBlock
                             title="agent_enforcement.py"
                             language="python"
-                            code={`from phylax._internal.surfaces.agents import (
+                            code={`from phylax.agents import (
     ToolSequenceRule,
     ToolPresenceValidator,
     AgentStepValidator,

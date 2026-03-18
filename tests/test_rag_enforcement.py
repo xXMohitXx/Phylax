@@ -8,7 +8,7 @@ Tests cover:
     - evaluate_rag: combined evaluation
 """
 import pytest
-from phylax._internal.surfaces.rag import (
+from phylax.rag import (
     ContextUsedRule,
     NoHallucinationRule,
     CitationRequiredRule,

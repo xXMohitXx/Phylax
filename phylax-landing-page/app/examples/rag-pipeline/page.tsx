@@ -56,7 +56,7 @@ export default function RagPipelineExample() {
                         <CodeBlock
                             title="rag_rules.py"
                             language="python"
-                            code={`from phylax._internal.surfaces.rag import (
+                            code={`from phylax.rag import (
     ContextUsedRule,
     NoHallucinationRule,
     CitationRequiredRule,

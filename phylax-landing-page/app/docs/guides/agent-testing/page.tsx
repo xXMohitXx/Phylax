@@ -74,7 +74,7 @@ if verdict.status == "fail":
       <p className="text-coffee-bean/80 mb-4">
         Phylax provides dedicated rules for validating tool call behavior in agent workflows:
       </p>
-      <CodeBlock language="python" title="tool_enforcement.py" code={`from phylax._internal.surfaces.agents import (
+      <CodeBlock language="python" title="tool_enforcement.py" code={`from phylax.agents import (
     ToolSequenceRule,
     ToolPresenceValidator,
     AgentStepValidator,

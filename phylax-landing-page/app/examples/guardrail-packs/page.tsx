@@ -70,7 +70,7 @@ export default function GuardrailPacksExample() {
     safety_pack, quality_pack, apply_pack,
     trace, expect,
 )
-from phylax_guardrails import (
+from phylax.guardrails import (
     pii_pack, security_pack,
     finance_pack, healthcare_pack,
 )
@@ -100,10 +100,10 @@ def handle_customer_query(message: str):
                         <CodeBlock
                             title="custom_pack.py"
                             language="python"
-                            code={`from phylax._internal.guardrails.packs import (
+                            code={`from phylax.guardrails import (
     GuardrailPack, GuardrailRule,
 )
-from phylax_guardrails import register_pack
+from phylax.guardrails import register_pack
 
 # Create a custom pack
 def legal_pack():
@@ -128,7 +128,7 @@ register_pack("legal", legal_pack)`}
                         <CodeBlock
                             title="Terminal"
                             language="bash"
-                            code={`$ python -c "from phylax._internal.guardrails.packs import list_packs; print(list_packs())"
+                            code={`$ python -c "from phylax.guardrails import list_packs; print(list_packs())"
 
 ['safety', 'quality', 'compliance', 'pii', 'security', 'finance', 'healthcare']`}
                         />

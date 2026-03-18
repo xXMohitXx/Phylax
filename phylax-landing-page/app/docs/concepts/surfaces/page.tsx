@@ -89,7 +89,7 @@ evaluator.add_rule(AllowedDriftRule(max_delta=0.05))  # Up to 5% drift`} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">RAG Pipeline Enforcement</h2>
       <p className="text-coffee-bean/80 mb-4">Validate RAG outputs with dedicated context-aware rules:</p>
-      <CodeBlock language="python" title="rag_enforcement.py" code={`from phylax._internal.surfaces.rag import (
+      <CodeBlock language="python" title="rag_enforcement.py" code={`from phylax.rag import (
     ContextUsedRule,       # Response must reference context terms
     NoHallucinationRule,   # Response must not contain forbidden claims
     CitationRequiredRule,  # Response must include citations

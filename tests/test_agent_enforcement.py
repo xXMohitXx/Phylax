@@ -7,7 +7,7 @@ Tests cover:
     - AgentStepValidator: step count, required types, first failing node
 """
 import pytest
-from phylax._internal.surfaces.agents import (
+from phylax.agents import (
     ToolSequenceRule,
     ToolPresenceValidator,
     AgentStepValidator,
