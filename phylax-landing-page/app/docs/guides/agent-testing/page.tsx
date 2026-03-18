@@ -69,6 +69,40 @@ if verdict.status == "fail":
     path = graph.investigation_path()
     for step in path:
         print(f"  → {step}")`} />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Tool Call Enforcement Rules</h2>
+      <p className="text-coffee-bean/80 mb-4">
+        Phylax provides dedicated rules for validating tool call behavior in agent workflows:
+      </p>
+      <CodeBlock language="python" title="tool_enforcement.py" code={`from phylax._internal.surfaces.agents import (
+    ToolSequenceRule,
+    ToolPresenceValidator,
+    AgentStepValidator,
+)
+
+# Enforce tool ordering (relaxed — other tools may interleave)
+sequence = ToolSequenceRule(
+    required_sequence=["classify", "search", "respond"],
+    strict=False,
+)
+
+# Enforce which tools must/must-not be called
+presence = ToolPresenceValidator(
+    must_call=["search"],
+    must_not_call=["delete_user", "drop_table"],
+)
+
+# Validate agent step structure
+steps = AgentStepValidator(
+    min_steps=3,
+    max_steps=10,
+    required_step_types=["planner", "executor"],
+)
+
+# Evaluate
+tool_calls = [{"tool_name": "classify"}, {"tool_name": "search"}, {"tool_name": "respond"}]
+print(sequence.evaluate(tool_calls))  # passed=True
+print(presence.evaluate(tool_calls))  # passed=True`} />
     </div>
   );
 }

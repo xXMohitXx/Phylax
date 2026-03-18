@@ -87,6 +87,32 @@ evaluator = SurfaceEvaluator()
 evaluator.add_rule(ExactStabilityRule())        # Must match exactly
 evaluator.add_rule(AllowedDriftRule(max_delta=0.05))  # Up to 5% drift`} />
 
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">RAG Pipeline Enforcement</h2>
+      <p className="text-coffee-bean/80 mb-4">Validate RAG outputs with dedicated context-aware rules:</p>
+      <CodeBlock language="python" title="rag_enforcement.py" code={`from phylax._internal.surfaces.rag import (
+    ContextUsedRule,       # Response must reference context terms
+    NoHallucinationRule,   # Response must not contain forbidden claims
+    CitationRequiredRule,  # Response must include citations
+    evaluate_rag,          # Run all rules at once
+)
+
+# Check that response uses at least 3 terms from the context
+context_rule = ContextUsedRule(min_overlap_terms=3)
+
+# Block specific hallucinations
+hallucination_rule = NoHallucinationRule(
+    forbidden_claims=["US law", "2020"]
+)
+
+# Require at least 1 citation
+citation_rule = CitationRequiredRule(min_citations=1)
+
+# Evaluate
+results = evaluate_rag(response, context, 
+    rules=[context_rule, hallucination_rule, citation_rule])
+for r in results:
+    print(f"{r.rule_name}: {'PASS' if r.passed else 'FAIL'}")`} />
+
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Public API Imports</h2>
       <CodeBlock language="python" title="imports.py" code={`from phylax import (
     # Core
