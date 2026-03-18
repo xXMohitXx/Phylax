@@ -1,0 +1,4 @@
+# Phylax Configuration for Support Bot Template
+storage_path: .phylax
+auto_store: true
+default_provider: openai

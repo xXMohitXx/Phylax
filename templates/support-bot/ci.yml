@@ -1,0 +1,29 @@
+name: Phylax Support Bot CI
+on: [push, pull_request]
+
+jobs:
+  behavioral-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install phylax[openai]
+
+      - name: Run golden trace checks
+        run: phylax check
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run dataset contracts
+        run: phylax dataset run templates/support-bot/dataset.yaml
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run execution graph checks
+        run: phylax graph-check

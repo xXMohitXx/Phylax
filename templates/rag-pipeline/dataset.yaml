@@ -1,0 +1,70 @@
+dataset: rag_pipeline
+description: >
+  RAG pipeline validation dataset. Tests context grounding,
+  hallucination resistance, and citation requirements.
+
+cases:
+  # ─── CONTEXT GROUNDING ──────────────────────────────────
+  - input: "What is GDPR?"
+    metadata:
+      context: "GDPR is a European regulation enacted in 2018 that governs data privacy and protection for individuals within the European Union."
+    expectations:
+      must_include: ["European", "regulation"]
+      must_not_include: ["US law", "American"]
+      min_tokens: 15
+
+  - input: "What are the penalties under GDPR?"
+    metadata:
+      context: "Under GDPR, organizations can face fines of up to 20 million euros or 4% of annual global turnover, whichever is higher."
+    expectations:
+      must_include: ["20 million", "4%"]
+      must_not_include: ["no penalties", "free"]
+      min_tokens: 10
+
+  - input: "Who does GDPR apply to?"
+    metadata:
+      context: "GDPR applies to any organization that processes personal data of EU residents, regardless of where the organization is based."
+    expectations:
+      must_include: ["EU", "personal data"]
+      must_not_include: ["only in Europe"]
+      min_tokens: 10
+
+  # ─── HALLUCINATION RESISTANCE ───────────────────────────
+  - input: "When was GDPR enacted?"
+    metadata:
+      context: "GDPR was enacted on May 25, 2018."
+    expectations:
+      must_include: ["2018"]
+      must_not_include: ["2020", "2015", "2010"]
+
+  - input: "What rights does GDPR provide?"
+    metadata:
+      context: "GDPR provides the right to access, right to erasure (right to be forgotten), right to data portability, and right to object."
+    expectations:
+      must_include: ["access", "erasure"]
+      must_not_include: ["right to bear arms", "right to free speech"]
+      min_tokens: 15
+
+  # ─── CITATION REQUIREMENTS ─────────────────────────────
+  - input: "Summarize the key points of GDPR"
+    metadata:
+      context: "GDPR key points: data protection by design, lawful basis for processing, data subject rights, breach notification within 72 hours, and appointment of DPO."
+    expectations:
+      must_include: ["data protection"]
+      min_tokens: 20
+
+  # ─── MISSING CONTEXT HANDLING ──────────────────────────
+  - input: "What is the capital of France?"
+    metadata:
+      context: ""
+    expectations:
+      must_not_include: ["internal_error", "database_query"]
+      min_tokens: 5
+
+  # ─── OUT OF SCOPE HANDLING ─────────────────────────────
+  - input: "Write me a poem about love"
+    metadata:
+      context: "GDPR is a data privacy regulation."
+    expectations:
+      must_not_include: ["poem", "roses", "violets"]
+      min_tokens: 5

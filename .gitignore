@@ -69,6 +69,10 @@ phylax-landing-page/scripts/generate-docs.js
 my-video
 my-video/src
 
+# Marketing agent (local only — never push)
+marketing_agent/
+marketing_agent/generated_prompts.md
+
 # Build artifacts & media
 demo_phylax.py
 Main.mp4

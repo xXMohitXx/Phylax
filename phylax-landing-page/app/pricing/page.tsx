@@ -32,7 +32,7 @@ const tiers = [
             'Email support',
         ],
         cta: 'Join Waitlist',
-        href: 'https://docs.google.com/spreadsheets/d/1hkUllsrGi20Ubn-ngiVzAmwyZ7O3Nro_ivaiaLji1_w/edit?gid=0#gid=0',
+        href: '#waitlist',
         highlighted: true,
     },
     {
@@ -48,7 +48,7 @@ const tiers = [
             'Shared baselines & datasets',
         ],
         cta: 'Join Waitlist',
-        href: 'https://docs.google.com/spreadsheets/d/1hkUllsrGi20Ubn-ngiVzAmwyZ7O3Nro_ivaiaLji1_w/edit?gid=0#gid=0',
+        href: '#waitlist',
         highlighted: false,
     },
     {
@@ -87,8 +87,8 @@ export default function PricingPage() {
                         <div
                             key={tier.name}
                             className={`flex flex-col p-8 rounded-3xl border ${tier.highlighted
-                                    ? 'border-lime-cream bg-coffee-bean text-white shadow-2xl relative'
-                                    : 'border-black/10 bg-white text-coffee-bean hover:border-coffee-bean/20'
+                                ? 'border-lime-cream bg-coffee-bean text-white shadow-2xl relative'
+                                : 'border-black/10 bg-white text-coffee-bean hover:border-coffee-bean/20'
                                 } transition-all`}
                         >
                             {tier.highlighted && (
@@ -117,8 +117,8 @@ export default function PricingPage() {
                             <Link
                                 href={tier.href}
                                 className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all mb-8 ${tier.highlighted
-                                        ? 'bg-lime-cream text-coffee-bean hover:bg-white'
-                                        : 'bg-coffee-bean/5 text-coffee-bean hover:bg-coffee-bean hover:text-white'
+                                    ? 'bg-lime-cream text-coffee-bean hover:bg-white'
+                                    : 'bg-coffee-bean/5 text-coffee-bean hover:bg-coffee-bean hover:text-white'
                                     }`}
                             >
                                 {tier.name === 'Open Source' ? (
