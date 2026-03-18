@@ -62,7 +62,7 @@ const tiers = [
             'Compliance packs (SOC2, HIPAA)',
             'Dedicated support channel',
         ],
-        cta: "Let\\'s Talk",
+        cta: "Let's Talk",
         href: 'mailto:mohit@phylax.dev',
         highlighted: false,
     },
