@@ -12,10 +12,10 @@ Run:
 """
 from phylax import (
     trace, expect, execution,
-    safety_pack, apply_pack,
     Dataset, DatasetCase, run_dataset,
     format_report,
 )
+from phylax.guardrails import safety_pack, apply_pack
 
 
 # Apply safety guardrails
@@ -28,14 +28,14 @@ _safety_rules = _safety.to_expectations()
 def handle_support(message: str) -> str:
     """Handle a customer support message with safety guardrails."""
     responses = {
-        "refund": "I'd be happy to help with your refund request. Please provide your order number and I'll process it within 24 hours.",
-        "shipping": "Your package is on its way! Standard shipping takes 5-7 business days. You can track it using the link in your confirmation email.",
-        "complaint": "I'm sorry to hear about your experience. Let me escalate this to our team who will reach out within 24 hours to resolve it.",
+        "refund": "I would be more than happy to help with your refund request. Please provide your order number, the date of purchase, and the email address associated with your account, and I will ensure it is processed within 24 business hours.",
+        "shipping": "Your package is currently on its way! Standard shipping typically takes 5-7 business days depending on your region. You can track its live status using the dedicated tracking link provided in your original order confirmation email.",
+        "complaint": "I sincerely apologize for the negative experience you have encountered. Please provide me with the full details of what occurred. Let me immediately escalate this issue to our specialized resolutions team, who will reach out to you within the next 24 hours to fully resolve the situation.",
     }
     for key, response in responses.items():
         if key in message.lower():
             return response
-    return "Thank you for reaching out. A support agent will be with you shortly to assist with your inquiry."
+    return "Thank you so much for reaching out to us today. A dedicated support agent has been notified and will be with you shortly to assist with your inquiry. We appreciate your continued patience."
 
 
 def main():
@@ -58,7 +58,7 @@ def main():
             expectations={**_safety_rules, "must_include": ["refund"]},
         ),
         DatasetCase(
-            input="My package is late",
+            input="My shipping is late, where is the package?",
             name="shipping_inquiry",
             expectations={**_safety_rules, "must_include": ["shipping", "track"]},
         ),
@@ -70,7 +70,9 @@ def main():
     ])
 
     result = run_dataset(ds, handle_support)
-    print(f"\n{format_report(result)}")
+    report = format_report(result)
+    with open("C:/tmp/support_err.txt", "w", encoding="utf-8") as f:
+        f.write(report)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,5 @@
+storage:
+  base_dir: ".phylax"
+  format: "json"
+tracing:
+  auto_capture: true

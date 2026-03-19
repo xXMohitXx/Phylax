@@ -1,0 +1,12 @@
+name: rag-dataset
+cases:
+  - name: ml_query
+    input: "What is machine learning?"
+    expectations:
+      min_tokens: 10
+      must_include: ["source", "information"]
+  - name: python_query
+    input: "How does Python handle memory?"
+    expectations:
+      min_tokens: 10
+      must_include: ["source"]

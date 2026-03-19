@@ -13,12 +13,13 @@ Run:
 """
 from phylax import (
     trace, expect, execution,
-    compliance_pack,
     Dataset, DatasetCase,
     simulate_upgrade, format_simulation_report,
     diff_runs, format_diff_report,
     run_dataset, format_report,
 )
+from phylax.guardrails import compliance_pack
+from phylax.agents import AgentStepValidator, ToolSequenceRule
 
 
 # Compliance guardrails for agent responses
@@ -50,6 +51,15 @@ def agent_v2(query: str) -> str:
 
 
 def main():
+    print("=== Agent Workflow: Multi-Agent Validation ===")
+    
+    # Showcase phylax.agents before running the simulator
+    print("--- Enforcing Tool Sequence Constraints ---")
+    sequence_rule = ToolSequenceRule(required_sequence=["retriever", "generator"], strict=False)
+    simulated_tool_trace = [{"tool_name": "retriever"}, {"tool_name": "generator"}]
+    res = sequence_rule.evaluate(simulated_tool_trace)
+    print(f"Tool Sequence Check: {'✅ PASS' if res.passed else '❌ FAIL'}\n")
+
     print("=== Agent Workflow: Model Upgrade Simulation ===\n")
 
     # Define test cases for the agent

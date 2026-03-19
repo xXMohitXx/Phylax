@@ -1,0 +1,10 @@
+name: agent-dataset
+cases:
+  - name: greeting
+    input: "Hello there"
+    expectations:
+      min_tokens: 10
+  - name: weather_query
+    input: "What's the weather in Seattle?"
+    expectations:
+      must_not_include: ["I don't know"]

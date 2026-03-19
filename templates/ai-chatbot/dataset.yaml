@@ -1,0 +1,10 @@
+name: chatbot-dataset
+cases:
+  - name: greeting
+    input: "Hello there"
+    expectations:
+      min_tokens: 5
+  - name: polite_query
+    input: "Can you help me?"
+    expectations:
+      must_not_include: ["I don't know"]

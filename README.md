@@ -303,6 +303,8 @@ pip install phylax[all]   # Install all providers
 | [`templates/ai-chatbot/`](templates/ai-chatbot/) | Chatbot + contracts + CI config |
 | [`templates/ai-agent/`](templates/ai-agent/) | Multi-step agent + execution tracking |
 | [`templates/ai-rag/`](templates/ai-rag/) | RAG pipeline + grounding enforcement |
+| [`templates/rag-pipeline/`](templates/rag-pipeline/) | RAG pipeline template |
+| [`templates/support-bot/`](templates/support-bot/) | Support bot + 25 dataset cases + CI |
 
 ---
 
@@ -362,6 +364,8 @@ phylax/
 ├── _internal/
 │   ├── expectations/    # Deterministic rule engine
 │   ├── surfaces/        # Surface enforcement (JSON, tools, traces)
+│   │   ├── agents.py    # Multi-agent validation
+│   │   └── rag.py       # RAG grounded generation evaluation
 │   ├── datasets/        # Dataset contracts & behavioral diff
 │   ├── guardrails/      # Guardrail packs (safety, quality, compliance)
 │   ├── metrics/         # Expectation health & coverage
@@ -375,7 +379,7 @@ phylax/
 └── ui/                  # Web inspector
 ```
 
-**910 tests** · **v1.6.3** · All 4 axes complete + Dataset Contracts + Behavioral Diff + Model Simulator + CI Kits + Guardrail Packs
+**1146 tests** · **v1.6.3** · All 4 axes complete + Dataset Contracts + Behavioral Diff + Model Simulator + CI Kits + Guardrail Packs
 
 ---
 

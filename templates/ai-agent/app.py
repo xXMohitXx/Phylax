@@ -12,13 +12,14 @@ Usage:
 """
 from phylax import (
     trace, expect, execution,
-    compliance_pack,
     Dataset, DatasetCase, simulate_upgrade,
     format_simulation_report,
 )
-
+from phylax.guardrails import compliance_pack
+from phylax.agents import AgentStepValidator, ToolSequenceRule
 
 _compliance = compliance_pack().to_expectations()
+_tool_rule = ToolSequenceRule(required_sequence=["agent_think", "agent_respond"], strict=False)
 
 
 @trace(provider="mock")
@@ -47,6 +48,11 @@ def main():
     print("=== AI Agent with Compliance Enforcement ===\n")
 
     with execution():
+        # Enforce multi-agent sequence mapping
+        sim_calls = [{"tool_name": "agent_think"}, {"tool_name": "agent_respond"}]
+        res = _tool_rule.evaluate(sim_calls)
+        print(f"Workflow sequence check: {'✅ PASS' if res.passed else '❌ FAIL'}")
+
         thought = agent_think("help with my project")
         response = agent_respond(thought)
         print(f"Response: {response[:80]}...\n")

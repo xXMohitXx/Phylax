@@ -1,0 +1,15 @@
+name: Phylax CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up SDK
+      run: pip install phylax
+    - name: Run Dataset Contracts
+      run: phylax dataset run dataset.yaml -m app -f execute_pipeline
+    - name: Run Graph Checks
+      run: phylax graph-check

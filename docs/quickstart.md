@@ -11,6 +11,7 @@ pip install phylax[all]
 ```
 
 Set your API key:
+
 ```bash
 # Windows PowerShell
 $env:GOOGLE_API_KEY = "your-key"
@@ -27,7 +28,7 @@ export GOOGLE_API_KEY="your-key"
 phylax server
 ```
 
-Open: http://127.0.0.1:8000/ui
+Open: <http://127.0.0.1:8000/ui>
 
 ---
 
@@ -56,11 +57,12 @@ if __name__ == "__main__":
 ```
 
 Run:
+
 ```bash
 python myapp.py
 ```
 
-Check UI at http://127.0.0.1:8000/ui — you should see your trace!
+Check UI at <http://127.0.0.1:8000/ui> — you should see your trace!
 
 ---
 
@@ -83,11 +85,13 @@ with execution() as exec_id:
 ## 5. Bless a Golden (1 min)
 
 **Option A: From the UI (recommended)**
+
 1. Find your trace in the sidebar
 2. Click **⭐ Bless as Golden** button
 3. Trace shows gold border and "GOLDEN" badge
 
 **Option B: From CLI**
+
 ```bash
 phylax bless <trace_id> --yes
 ```
@@ -129,7 +133,7 @@ jobs:
 
 ---
 
-## Done! You now have:
+## Done! You now have
 
 ✅ LLM call tracing  
 ✅ Expectation validation  
@@ -178,6 +182,7 @@ print(format_report(result))
 ```
 
 Or from CLI:
+
 ```bash
 phylax dataset run contracts.yaml
 ```
@@ -224,11 +229,55 @@ print(format_simulation_report(sim))
 
 ---
 
+## 11. Multi-Agent Enforcement (v1.6.3+)
+
+Validate entire agent workflow sequences dynamically:
+
+```python
+from phylax.agents import ToolSequenceRule
+
+sequence = ToolSequenceRule(["search_db", "format_response"])
+trace = [{"tool_name": "search_db"}, {"tool_name": "format_response"}]
+
+result = sequence.evaluate(trace)
+print(result.passed)
+```
+
+---
+
+## 12. RAG Enforcement (v1.6.3+)
+
+Evaluate strict bounds for your Retrieval-Augmented Generation context window:
+
+```python
+from phylax.rag import evaluate_rag
+
+result = evaluate_rag(
+    question="...",
+    context="...",
+    answer="...",
+    rules=["no_hallucination", "context_used"]
+)
+```
+
+---
+
+## 13. Advanced CLI Capabilities (v1.6.3+)
+
+Use `phylax graph-check` natively in CI to validate execution context dependencies mapping accurately:
+
+```bash
+phylax graph-check .phylax/traces
+```
+
+---
+
 ## Next Steps
 
 - [Providers](providers.md) — All supported providers
 - [Error Codes](errors.md) — PHYLAX_Exxx error reference
 - [Correct Usage](correct-usage.md) — Valid configurations
 - [Mental Model](mental-model.md) — What Phylax is
+- [Advanced Guides](advanced/) — Advanced integrations
 - [Examples](../examples/) — Real-world usage patterns
-- [Demos](../demos/) — All 24 feature demos
+- [Demos](../demos/) — All 26 feature demos

@@ -68,6 +68,8 @@ python demos/22_behavioral_diff.py
 | 22 | `22_behavioral_diff.py` | Behavioral Diff | Compare runs, detect regressions |
 | 23 | `23_model_simulator.py` | Model Simulator | Safe model upgrade testing |
 | 24 | `24_guardrail_packs.py` | Guardrail Packs | Pre-built safety/quality/compliance rules |
+| 25 | `25_multi_agent_enforcement.py` | Agents | Validate multi-step agent graphs & tools |
+| 26 | `26_rag_enforcement.py` | RAG | Enforce contexts, citations, and groundings |
 
 ## Requirements
 
@@ -78,6 +80,7 @@ python demos/22_behavioral_diff.py
 ## Expected Behavior
 
 All demos enforce expectations. If a function doesn't have `@expect`, it will fail with:
+
 ```
 [PHYLAX_E101] Function 'X' has no expectations.
 ```

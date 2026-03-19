@@ -1,22 +1,23 @@
 # Phylax Documentation
 
-Complete technical reference for Phylax v1.6.0 -- CI-native regression enforcement for LLM outputs.
+Complete technical reference for Phylax v1.6.3 -- CI-native regression enforcement for LLM outputs.
 
 ---
 
 ## Overview
 
 Phylax enforces contracts so LLM behavior changes are caught before production:
+
 1. **Recording** every LLM call
 2. **Evaluating** explicit expectations (PASS/FAIL)
 3. **Comparing** against golden baselines
 4. **Failing CI** when declared contracts regress
 
-### Status: v1.6.0 STABLE
+### Status: v1.6.3 STABLE
 
 Stable means execution semantics and verdict behavior are frozen.
 Axis 1 (Expectations), Axis 2 (Surfaces), Axis 3 (Scale Safety), and Axis 4 (Ecosystem Discipline) are complete.
-799 tests passing.
+1146 tests passing.
 
 ---
 
@@ -58,6 +59,7 @@ Axis 1 (Expectations), Axis 2 (Surfaces), Axis 3 (Scale Safety), and Axis 4 (Eco
 ## SDK Reference
 
 ### Installation
+
 ```python
 from phylax import trace, expect, execution
 from phylax import GeminiAdapter, OpenAIAdapter, GroqAdapter
@@ -75,6 +77,7 @@ from phylax import (
 ```
 
 ### @trace Decorator
+
 ```python
 @trace(provider="gemini", model="gemini-2.5-flash")
 def my_function(prompt):
@@ -83,6 +86,7 @@ def my_function(prompt):
 ```
 
 ### @expect Decorator
+
 ```python
 @trace(provider="gemini")
 @expect(
@@ -96,6 +100,7 @@ def customer_support(query):
 ```
 
 ### Execution Context
+
 ```python
 from phylax import execution
 
@@ -112,6 +117,7 @@ happens at graph evaluation time.
 ### Adapters
 
 **GeminiAdapter** (uses `google-genai` SDK)
+
 ```python
 adapter = GeminiAdapter()  # uses GOOGLE_API_KEY env
 response, trace = adapter.generate(
@@ -121,6 +127,7 @@ response, trace = adapter.generate(
 ```
 
 **OpenAIAdapter**
+
 ```python
 adapter = OpenAIAdapter()  # uses OPENAI_API_KEY env
 response, trace = adapter.chat_completion(
@@ -130,6 +137,7 @@ response, trace = adapter.chat_completion(
 ```
 
 **GroqAdapter**
+
 ```python
 adapter = GroqAdapter()  # uses GROQ_API_KEY env
 response, trace = adapter.chat_completion(
@@ -139,6 +147,7 @@ response, trace = adapter.chat_completion(
 ```
 
 **MistralAdapter**
+
 ```python
 adapter = MistralAdapter()  # uses MISTRAL_API_KEY env
 response, trace = adapter.generate(
@@ -148,6 +157,7 @@ response, trace = adapter.generate(
 ```
 
 **HuggingFaceAdapter**
+
 ```python
 adapter = HuggingFaceAdapter()  # uses HF_TOKEN env
 response, trace = adapter.generate(
@@ -157,6 +167,7 @@ response, trace = adapter.generate(
 ```
 
 **OllamaAdapter**
+
 ```python
 adapter = OllamaAdapter()  # uses OLLAMA_HOST env (default: localhost:11434)
 response, trace = adapter.generate(
@@ -179,11 +190,83 @@ response, trace = adapter.generate(
 | `min_tokens` | LOW | Minimum response length |
 
 ### Verdict Model
+
 ```python
 class Verdict:
     status: "pass" | "fail"  # Only two values, ever
     severity: "low" | "medium" | "high" | None
     violations: list[str]
+```
+
+---
+
+## Agent & RAG Enforcement
+
+Deterministic validation for multi-step agents and RAG loops.
+
+### Agent Enforcement
+
+```python
+from phylax.agents import ToolSequenceRule, AgentStepValidator
+
+# Validates agent execution steps
+validator = AgentStepValidator(min_steps=1, max_steps=5, required_types={"tool_call"})
+```
+
+### RAG Enforcement
+
+```python
+from phylax.rag import evaluate_rag, ContextUsedRule, NoHallucinationRule, CitationRequiredRule
+
+# Validates grounded generation
+rag_rules = [
+    ContextUsedRule(threshold=0.8),
+    NoHallucinationRule(forbidden_claims=["competitor X"]),
+    CitationRequiredRule(require_brackets=True)
+]
+```
+
+---
+
+## Dataset Contracts & Behavioral Diff
+
+Shift-left evaluation of LLM behaviors over large YAML-defined datasets before production deployment.
+
+### Run a Dataset Contract
+
+```bash
+phylax dataset run contracts.yaml --module app --function handle --json
+```
+
+### Compare Model Behaviors
+
+```bash
+phylax dataset diff runA.json runB.json --json
+```
+
+### Python API
+
+```python
+from phylax._internal.datasets.executor import run_dataset
+from phylax._internal.datasets.diff import diff_runs
+from phylax._internal.datasets.simulator import simulate_upgrade
+```
+
+---
+
+## Guardrail Packs
+
+Productized groupings of expectation rules mapped to real-world domain requirements. (Also available via the `phylax_guardrails` standalone package).
+
+### Using Domain Packs
+
+```python
+from phylax.guardrails import pii_pack, security_pack, finance_pack, healthcare_pack
+
+@expect(*pii_pack())
+@expect(*security_pack())
+def generate_safe_response(prompt: str) -> str:
+    # ...
 ```
 
 ---
@@ -203,6 +286,7 @@ class Verdict:
 | Enterprise | Integrity hashing, snapshots, exports |
 
 ### Graph Verdict
+
 ```python
 class GraphVerdict:
     status: "pass" | "fail"
@@ -212,6 +296,7 @@ class GraphVerdict:
 ```
 
 ### Building Graphs
+
 ```python
 from phylax import ExecutionGraph
 
@@ -226,6 +311,7 @@ snapshot = graph.to_snapshot()
 ## Golden Traces
 
 ### Bless a Trace
+
 ```bash
 phylax bless <trace_id>
 phylax bless <trace_id> --yes    # Skip confirmation
@@ -233,6 +319,7 @@ phylax bless <trace_id> --force  # Override existing
 ```
 
 ### How It Works
+
 1. Output is hashed and stored
 2. One golden per model/provider
 3. `phylax check` compares against golden
@@ -254,6 +341,8 @@ Phylax's primary interface is CI verdict enforcement.
 | `phylax list --failed` | Show only failed traces |
 | `phylax show <id>` | Show trace |
 | `phylax replay <id>` | Re-run trace |
+| `phylax dataset run` | Run YAML dataset contract (Axis 4) |
+| `phylax dataset diff` | Compare two dataset outputs |
 | `phylax --version` | Show version |
 
 ---
@@ -266,6 +355,7 @@ It is not an extensibility platform.
 Base: `http://127.0.0.1:8000`
 
 ### Traces
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/v1/traces` | List |
@@ -274,6 +364,7 @@ Base: `http://127.0.0.1:8000`
 | DELETE | `/v1/traces/{id}` | Delete |
 
 ### Executions & Graphs
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/v1/executions` | List executions |
@@ -287,6 +378,7 @@ Base: `http://127.0.0.1:8000`
 | GET | `/v1/executions/{id}/verify` | Verify integrity |
 
 ### Golden References
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/v1/traces/{id}/bless` | Mark as golden |
@@ -294,18 +386,21 @@ Base: `http://127.0.0.1:8000`
 | GET | `/v1/goldens` | List all golden traces |
 
 ### Replay
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/v1/replay/{id}` | Replay |
 | GET | `/v1/replay/{id}/preview` | Preview |
 
 ### Other
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/v1/chat/completions` | OpenAI compat |
 | GET | `/health` | Health check |
 
 ### Health & Metrics (Axis 3)
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/v1/health/{expectation_id}` | Expectation health report |
@@ -329,6 +424,7 @@ Base: `http://127.0.0.1:8000`
 ## CI Integration (Primary Use Case)
 
 ### GitHub Actions
+
 ```yaml
 - run: phylax check
   env:
@@ -336,8 +432,17 @@ Base: `http://127.0.0.1:8000`
 ```
 
 **Exit codes:**
+
 - `0` — All golden traces pass declared expectations
 - `1` — Contract violation detected
+
+### Pre-configured CI Kits
+
+Phylax provides pre-configured CI/CD templates for easy integration:
+
+- `ci-kits/github-actions/phylax.yml`
+- `ci-kits/gitlab-ci/phylax.yml`
+- `ci-kits/jenkins/Jenkinsfile`
 
 ---
 
@@ -454,7 +559,7 @@ artifact = generate_verdict_artifact(
     expectations_evaluated=10,
     failures=3,
     definition_snapshot_hash="abc123",
-    engine_version="1.4.1",
+    engine_version="1.6.3",
 )
 # Frozen, deterministic, machine-consumable JSON
 # No commentary fields. No explanation. No severity.
@@ -521,4 +626,3 @@ code = resolve_exit_code(verdict="FAIL", mode="observe")  # 0
 - [Constitution](CONSTITUTION.md)
 - [Anti-Features](ANTI_FEATURES.md)
 - [GitHub](https://github.com/xXMohitXx/Phylax)
-

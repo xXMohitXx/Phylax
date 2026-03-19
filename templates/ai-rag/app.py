@@ -12,10 +12,10 @@ Usage:
 """
 from phylax import (
     trace, expect, execution,
-    quality_pack,
     Dataset, DatasetCase, run_dataset, format_report,
 )
-
+from phylax.guardrails import quality_pack
+from phylax.rag import ContextUsedRule, CitationRequiredRule
 
 _quality = quality_pack().to_expectations()
 

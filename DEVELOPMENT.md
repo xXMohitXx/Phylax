@@ -42,6 +42,7 @@ $env:OLLAMA_HOST = "http://localhost:11434" # optional
 ## Running
 
 ### Start Server
+
 ```bash
 phylax server
 # UI: http://127.0.0.1:8000/ui
@@ -49,6 +50,7 @@ phylax server
 ```
 
 ### CLI Commands
+
 ```bash
 phylax init           # Initialize
 phylax list           # List traces
@@ -57,6 +59,8 @@ phylax show <id>      # Show trace
 phylax replay <id>    # Replay
 phylax bless <id>     # Mark golden
 phylax check          # CI check
+phylax dataset run    # Run dataset contract
+phylax dataset diff   # Compare two runs
 phylax --version      # Show version
 ```
 
@@ -65,7 +69,7 @@ phylax --version      # Show version
 ## Testing
 
 ```bash
-# Run all tests (622 tests)
+# Run all tests (1146 tests)
 pytest tests/
 
 # Run Axis 3 tests
@@ -88,7 +92,14 @@ pytest tests/test_context.py -v
 ```
 Phylax/
 ├── phylax/                    # Main package (PyPI)
-│   ├── __init__.py            # Public API (60+ exports)
+│   ├── __init__.py            # Public API exports
+│   ├── agents.py              # Agent API
+│   ├── rag.py                 # RAG API
+│   ├── guardrails.py          # Domain packs API
+│   ├── evidence.py            # Evidence API
+│   ├── expectations.py        # Expectations API
+│   ├── graph.py               # Graph API
+│   ├── errors.py              # Error API
 │   ├── _internal/             # Internal modules
 │   │   ├── schema.py          # Trace schema
 │   │   ├── decorator.py       # @trace, @expect
@@ -96,8 +107,14 @@ Phylax/
 │   │   ├── context.py         # Execution context
 │   │   ├── graph.py           # Graph models
 │   │   ├── errors.py          # Error codes (PHYLAX_Exxx)
+│   │   ├── evidence.py        # Evidence logic
+│   │   ├── artifacts/         # Artifact contracts
+│   │   ├── datasets/          # Dataset contracts
 │   │   ├── expectations/      # 4 rules + evaluator + composition
+│   │   ├── guardrails/        # Domain guardrail packs
 │   │   ├── surfaces/          # Surface enforcement (Axis 2)
+│   │   │   ├── agents.py
+│   │   │   └── rag.py
 │   │   ├── metrics/           # Metrics, ledger, health (Axis 3)
 │   │   ├── modes/             # Enforcement modes (Axis 3)
 │   │   ├── meta/              # Meta-enforcement rules (Axis 3)
@@ -106,8 +123,15 @@ Phylax/
 │   ├── server/                # FastAPI backend + health routes
 │   ├── ui/                    # Web UI (HTML/JS)
 │   └── assets/                # Logo, favicon
-├── tests/                     # Unit tests (622 tests)
-├── demos/                     # Usage demonstrations (16 demos)
+├── tests/                     # Unit tests (1146 tests)
+│   └── phase_tests/
+├── demos/                     # Usage demonstrations (24 demos)
+├── examples/                  # Integration scripts (4 examples)
+├── templates/                 # Scaffolding templates (5 templates)
+│   └── support-bot/
+├── ci-kits/                   # CI/CD platform templates
+├── phylax_guardrails/         # Standalone guardrail package
+├── marketing_agent/           # Groq-powered prompt generator
 ├── docs/                      # Documentation
 ├── config.yaml                # Default configuration
 └── pyproject.toml             # Package config
@@ -158,7 +182,7 @@ twine upload dist/* -u __token__ -p <PYPI_TOKEN>
 
 ```python
 import phylax
-print(phylax.__version__)  # "1.4.1"
+print(phylax.__version__)  # "1.6.3"
 ```
 
 ```bash
@@ -173,7 +197,7 @@ phylax --version
 2. Create a feature branch
 3. Make your changes
 4. Run tests: `pytest tests/`
-5. Ensure all 622 tests pass
+5. Ensure all 1146 tests pass
 6. Submit a pull request
 
 ---
