@@ -1,15 +1,8 @@
 import React from 'react';
 import { CodeBlock } from '@/components/code-block';
 
-export default function CiPipelinesPage() {
-  return (
-    <div className="flex flex-col gap-6 w-full">
-      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-2 text-coffee-bean">CI Pipelines</h1>
-      <p className="text-xl text-coffee-bean/80">End-to-end guide for integrating Phylax into your CI/CD pipeline — from basic checks to advanced dataset simulation.</p>
-      <hr className="my-6 border-black/10" />
-
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">GitHub Actions (Basic)</h2>
-      <CodeBlock language="yaml" title=".github/workflows/phylax.yml" code={`name: Phylax CI
+const CI_BASIC_YAML = `
+name: Phylax CI
 on: [push, pull_request]
 jobs:
   check:
@@ -22,10 +15,11 @@ jobs:
       - run: pip install phylax[all]
       - run: phylax check
         env:
-          OPENAI_API_KEY: \${{ secrets.OPENAI_API_KEY }}`} />
+          OPENAI_API_KEY: \${{ secrets.OPENAI_API_KEY }}
+`;
 
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">GitHub Actions (Dataset Contracts)</h2>
-      <CodeBlock language="yaml" title=".github/workflows/phylax-datasets.yml" code={`name: Phylax Dataset CI
+const CI_DATASET_YAML = `
+name: Phylax Dataset CI
 on: [push, pull_request]
 jobs:
   test:
@@ -38,20 +32,21 @@ jobs:
           OPENAI_API_KEY: \${{ secrets.OPENAI_API_KEY }}
       - run: phylax dataset run datasets/
         env:
-          OPENAI_API_KEY: \${{ secrets.OPENAI_API_KEY }}`} />
+          OPENAI_API_KEY: \${{ secrets.OPENAI_API_KEY }}
+`;
 
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">GitLab CI</h2>
-      <CodeBlock language="yaml" title=".gitlab-ci.yml" code={`phylax:
+const CODE_BLOCK_0 = `
+phylax:
   image: python:3.10
   stage: test
   script:
     - pip install phylax[all]
     - phylax check
   variables:
-    OPENAI_API_KEY: $OPENAI_API_KEY`} />
-
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">CircleCI</h2>
-      <CodeBlock language="yaml" title=".circleci/config.yml" code={`version: 2.1
+    OPENAI_API_KEY: $OPENAI_API_KEY
+`;
+const CODE_BLOCK_1 = `
+version: 2.1
 jobs:
   phylax-check:
     docker:
@@ -59,7 +54,27 @@ jobs:
     steps:
       - checkout
       - run: pip install phylax[all]
-      - run: phylax check`} />
+      - run: phylax check
+`;
+
+export default function CiPipelinesPage() {
+  return (
+    <div className="flex flex-col gap-6 w-full">
+      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-2 text-coffee-bean">CI Pipelines</h1>
+      <p className="text-xl text-coffee-bean/80">End-to-end guide for integrating Phylax into your CI/CD pipeline — from basic checks to advanced dataset simulation.</p>
+      <hr className="my-6 border-black/10" />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">GitHub Actions (Basic)</h2>
+      <CodeBlock language="yaml" title=".github/workflows/phylax.yml" code={CI_BASIC_YAML} />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">GitHub Actions (Dataset Contracts)</h2>
+      <CodeBlock language="yaml" title=".github/workflows/phylax-datasets.yml" code={CI_DATASET_YAML} />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">GitLab CI</h2>
+      <CodeBlock language="yaml" title=".gitlab-ci.yml" code={CODE_BLOCK_0} />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">CircleCI</h2>
+      <CodeBlock language="yaml" title=".circleci/config.yml" code={CODE_BLOCK_1} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Enforcement Mode Strategy</h2>
       <p className="text-coffee-bean/80 mb-4">Gradually roll out contracts without breaking your pipeline:</p>

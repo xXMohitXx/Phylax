@@ -1,6 +1,30 @@
 import React from 'react';
 import { CodeBlock } from '@/components/code-block';
 
+const CODE_BLOCK_0 = `
+from phylax import GeminiAdapter
+
+adapter = GeminiAdapter()  # Uses GOOGLE_API_KEY env var
+
+response, trace = adapter.generate(
+    prompt="Hello!",
+    model="gemini-2.5-flash"
+)
+`;
+const CODE_BLOCK_1 = `
+from phylax import trace, expect, GeminiAdapter
+
+@trace(provider="gemini")
+@expect(must_include=["hello"], max_latency_ms=5000)
+def greet(name):
+    adapter = GeminiAdapter()
+    response, _ = adapter.generate(
+        prompt=f"Say hello to {name}",
+        model="gemini-2.5-flash",
+    )
+    return response
+`;
+
 export default function GeminiPage() {
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -12,26 +36,9 @@ export default function GeminiPage() {
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Environment</h2>
       <CodeBlock language="bash" title="Environment Variable" code={`export GOOGLE_API_KEY="AIza..."`} />
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Usage</h2>
-      <CodeBlock language="python" title="gemini_usage.py" code={`from phylax import GeminiAdapter
-
-adapter = GeminiAdapter()  # Uses GOOGLE_API_KEY env var
-
-response, trace = adapter.generate(
-    prompt="Hello!",
-    model="gemini-2.5-flash"
-)`} />
+      <CodeBlock language="python" title="gemini_usage.py" code={CODE_BLOCK_0} />
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">With Expectations</h2>
-      <CodeBlock language="python" title="gemini_traced.py" code={`from phylax import trace, expect, GeminiAdapter
-
-@trace(provider="gemini")
-@expect(must_include=["hello"], max_latency_ms=5000)
-def greet(name):
-    adapter = GeminiAdapter()
-    response, _ = adapter.generate(
-        prompt=f"Say hello to {name}",
-        model="gemini-2.5-flash",
-    )
-    return response`} />
+      <CodeBlock language="python" title="gemini_traced.py" code={CODE_BLOCK_1} />
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Supported Models</h2>
       <div className="overflow-x-auto"><table className="w-full text-sm border-collapse">
         <thead><tr className="border-b border-black/10"><th className="text-left py-3 pr-4 font-semibold text-coffee-bean">Model</th><th className="text-left py-3 font-semibold text-coffee-bean">Notes</th></tr></thead>

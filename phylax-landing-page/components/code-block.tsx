@@ -9,11 +9,11 @@ interface CodeBlockProps {
 }
 
 export function CodeBlock({ code, language = 'python', title, highlightedLines = [] }: CodeBlockProps) {
-  const lines = code.trim().split('\n');
+  const lines = code.trim().split(/\r?\n/);
 
   return (
     <div className="rounded-xl overflow-hidden border border-black/30 bg-code-bg shadow-2xl backdrop-blur-sm">
-      
+
       <div className="flex items-center justify-between px-4 py-3 border-b border-black/40 bg-coffee-bean">
         <div className="flex items-center gap-2">
           <div className="flex gap-1.5">
@@ -23,7 +23,7 @@ export function CodeBlock({ code, language = 'python', title, highlightedLines =
           </div>
           {title && <span className="ml-2 text-xs font-mono text-porcelain/60">{title}</span>}
         </div>
-        
+
         {language && (
           <div className="flex items-center gap-1.5 text-xs font-mono text-porcelain/40">
             {language === 'bash' ? <Terminal className="w-3.5 h-3.5" /> : null}
@@ -51,8 +51,8 @@ export function CodeBlock({ code, language = 'python', title, highlightedLines =
             .replace(/\b(phylax|trace|expect)\b/g, '<span class="text-porcelain/80 font-bold">$1</span>'); // Phylax specific
 
           return (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={`px-4 -mx-4 flex gap-4 ${isHighlighted ? 'bg-lime-cream/10 border-l-2 border-lime-cream' : 'border-l-2 border-transparent'}`}
             >
               <span className="select-none text-porcelain/30 font-mono w-4 text-right flex-shrink-0">

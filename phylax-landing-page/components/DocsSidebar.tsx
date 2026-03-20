@@ -7,52 +7,75 @@ export default function DocsSidebar() {
       title: 'Getting Started',
       links: [
         { name: 'Overview', href: '/docs' },
-        { name: 'Quickstart', href: '/docs/quickstart' },
-        { name: 'Dataset Contracts', href: '/docs/dataset-contracts' },
-        { name: 'CI Integration', href: '/docs/ci-integration' },
-        { name: 'Model Upgrade Testing', href: '/docs/model-upgrade-testing' }
+        { name: 'Installation', href: '/docs/getting-started/installation' },
+        { name: 'Quickstart', href: '/docs/getting-started/quickstart' },
+        { name: 'Providers', href: '/docs/getting-started/providers' },
       ]
     },
     {
-      title: 'Concepts',
+      title: 'Core Concepts',
       links: [
-        { name: 'Traces', href: '/docs/concepts/traces' },
-        { name: 'Expectations', href: '/docs/concepts/expectations' },
-        { name: 'Execution Graphs', href: '/docs/concepts/execution-graphs' },
-        { name: 'Surfaces', href: '/docs/concepts/surfaces' }
+        { name: 'Traces & Expectations', href: '/docs/concepts/traces-expectations' },
+        { name: 'Execution Context', href: '/docs/concepts/execution-context' },
+        { name: 'Graph Model', href: '/docs/concepts/graph-model' },
       ]
     },
     {
-      title: 'Guides',
+      title: 'Axis 1: Advanced Expectations',
       links: [
-        { name: 'Testing AI Systems', href: '/docs/guides/testing-ai-systems' },
-        { name: 'Debugging Failures', href: '/docs/guides/debugging-failures' },
-        { name: 'Agent Testing', href: '/docs/guides/agent-testing' },
-        { name: 'CI Pipelines', href: '/docs/guides/ci-pipelines' }
+        { name: 'Composition', href: '/docs/axis-1/composition' },
+        { name: 'Conditionals', href: '/docs/axis-1/conditionals' },
+        { name: 'Scoping', href: '/docs/axis-1/scoping' },
+        { name: 'Templates', href: '/docs/axis-1/templates' },
       ]
     },
     {
-      title: 'Integrations',
+      title: 'Axis 2: Surface Abstraction',
       links: [
-        { name: 'OpenAI', href: '/docs/integrations/openai' },
-        { name: 'Gemini', href: '/docs/integrations/gemini' },
-        { name: 'Ollama', href: '/docs/integrations/ollama' },
-        { name: 'Langchain', href: '/docs/integrations/langchain' }
+        { name: 'Structured Output', href: '/docs/axis-2/structured-output' },
+        { name: 'Tool Calling', href: '/docs/axis-2/tool-calling' },
+        { name: 'Execution Traces', href: '/docs/axis-2/execution-traces' },
+        { name: 'Cross-Run Stability', href: '/docs/axis-2/cross-run-stability' },
       ]
     },
     {
-      title: 'Architecture',
+      title: 'Axis 3: Scale & Health',
       links: [
-        { name: 'Axis 1 - Expectations', href: '/docs/architecture/axis1-expectations' },
-        { name: 'Axis 2 - Surfaces', href: '/docs/architecture/axis2-surfaces' },
-        { name: 'Axis 3 - Metrics', href: '/docs/architecture/axis3-metrics' },
-        { name: 'Axis 4 - Artifacts', href: '/docs/architecture/axis4-artifacts' }
+        { name: 'Metrics Foundation', href: '/docs/axis-3/metrics-foundation' },
+        { name: 'Health API', href: '/docs/axis-3/health-api' },
+        { name: 'Enforcement Modes', href: '/docs/axis-3/enforcement-modes' },
+        { name: 'Meta-Enforcement', href: '/docs/axis-3/meta-enforcement' },
       ]
     },
     {
-      title: 'Reference',
+      title: 'Axis 4: Artifact Contracts',
       links: [
-        { name: 'API', href: '/docs/api' }
+        { name: 'Verdicts', href: '/docs/axis-4/verdicts' },
+        { name: 'Anti-Integration', href: '/docs/axis-4/anti-integration' },
+      ]
+    },
+    {
+      title: 'Evaluation & Datasets',
+      links: [
+        { name: 'Contracts', href: '/docs/datasets/contracts' },
+        { name: 'Behavioral Diffs', href: '/docs/datasets/behavioral-diffs' },
+        { name: 'Model Upgrades', href: '/docs/datasets/model-upgrades' },
+      ]
+    },
+    {
+      title: 'Applied Guides',
+      links: [
+        { name: 'Guardrail Packs', href: '/docs/guides/guardrail-packs' },
+        { name: 'Multi-Agent', href: '/docs/guides/multi-agent' },
+        { name: 'RAG Enforcement', href: '/docs/guides/rag-enforcement' },
+      ]
+    },
+    {
+      title: 'CI/CD Integration',
+      links: [
+        { name: 'GitHub Actions', href: '/docs/ci/github-actions' },
+        { name: 'GitLab CI', href: '/docs/ci/gitlab-ci' },
+        { name: 'Jenkins', href: '/docs/ci/jenkins' },
       ]
     }
   ];

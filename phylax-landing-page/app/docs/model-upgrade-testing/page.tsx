@@ -1,22 +1,27 @@
 import React from 'react';
 import { CodeBlock } from '@/components/code-block';
 
-export default function ModelUpgradeTestingPage() {
-  return (
-    <div className="flex flex-col gap-6 w-full">
-      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-2 text-coffee-bean">Model Upgrade Testing</h1>
-      <p className="text-xl text-coffee-bean/80">
-        Safely test model upgrades before deploying. Phylax runs your Dataset Contracts against both the current and candidate model, compares results, and tells you whether the upgrade is safe.
-      </p>
-      <hr className="my-6 border-black/10" />
+const UPGRADE_CI_YAML = `
+name: Model Upgrade Test
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_model:
+        description: 'New model to test'
+        required: true
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install phylax[openai]
+      - run: phylax simulate --from gpt-4 --to \${{ inputs.candidate_model }} datasets/
+        env:
+          OPENAI_API_KEY: \${{ secrets.OPENAI_API_KEY }}
+`;
 
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">The Problem</h2>
-      <p className="text-coffee-bean/80 mb-4">
-        When OpenAI releases GPT-4.5 or you want to switch from Gemini to Groq, how do you know your app&apos;s behavioral contracts still hold? Without systematic testing, model upgrades become &quot;deploy and pray.&quot;
-      </p>
-
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">simulate_upgrade()</h2>
-      <CodeBlock language="python" title="simulation.py" code={`from phylax import (
+const CODE_BLOCK_0 = `
+from phylax import (
     Dataset, DatasetCase, load_dataset,
     simulate_upgrade, SimulationResult, format_simulation_report,
 )
@@ -47,10 +52,10 @@ else:
     print("❌ Model upgrade introduces regressions")
 
 # Full report
-print(format_simulation_report(sim))`} />
-
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">CLI Usage</h2>
-      <CodeBlock language="bash" title="Terminal" code={`$ phylax simulate --from gpt-4 --to gpt-4.5 datasets/support_bot.yaml
+print(format_simulation_report(sim))
+`;
+const CODE_BLOCK_1 = `
+$ phylax simulate --from gpt-4 --to gpt-4.5 datasets/support_bot.yaml
 
 [Simulating 450 contract interactions...]
 
@@ -63,7 +68,28 @@ print(format_simulation_report(sim))`} />
    Violation: must_include("refund_policy")
 
 Results: 448/450 passed, 2 failed
-CI Blocked. Model upgrade rejected.`} />
+CI Blocked. Model upgrade rejected.
+`;
+
+export default function ModelUpgradeTestingPage() {
+  return (
+    <div className="flex flex-col gap-6 w-full">
+      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-2 text-coffee-bean">Model Upgrade Testing</h1>
+      <p className="text-xl text-coffee-bean/80">
+        Safely test model upgrades before deploying. Phylax runs your Dataset Contracts against both the current and candidate model, compares results, and tells you whether the upgrade is safe.
+      </p>
+      <hr className="my-6 border-black/10" />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">The Problem</h2>
+      <p className="text-coffee-bean/80 mb-4">
+        When OpenAI releases GPT-4.5 or you want to switch from Gemini to Groq, how do you know your app&apos;s behavioral contracts still hold? Without systematic testing, model upgrades become &quot;deploy and pray.&quot;
+      </p>
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">simulate_upgrade()</h2>
+      <CodeBlock language="python" title="simulation.py" code={CODE_BLOCK_0} />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">CLI Usage</h2>
+      <CodeBlock language="bash" title="Terminal" code={CODE_BLOCK_1} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">What It Tests</h2>
       <ul className="space-y-3 text-coffee-bean/80 list-disc pl-6 marker:text-lime-cream">
@@ -75,22 +101,7 @@ CI Blocked. Model upgrade rejected.`} />
       </ul>
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">CI Integration</h2>
-      <CodeBlock language="yaml" title=".github/workflows/model-upgrade.yml" code={`name: Model Upgrade Test
-on:
-  workflow_dispatch:
-    inputs:
-      candidate_model:
-        description: 'New model to test'
-        required: true
-jobs:
-  simulate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: pip install phylax[openai]
-      - run: phylax simulate --from gpt-4 --to \${{ inputs.candidate_model }} datasets/
-        env:
-          OPENAI_API_KEY: \${{ secrets.OPENAI_API_KEY }}`} />
+      <CodeBlock language="yaml" title=".github/workflows/model-upgrade.yml" code={UPGRADE_CI_YAML} />
     </div>
   );
 }

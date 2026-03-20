@@ -1,6 +1,61 @@
 import React from 'react';
 import { CodeBlock } from '@/components/code-block';
 
+const CODE_BLOCK_0 = `
+class Trace:
+    trace_id: str           # UUID, immutable after creation
+    execution_id: str       # Links to execution context
+    node_id: str            # Graph node identifier
+    parent_node_id: str     # Parent in DAG hierarchy
+    timestamp: str          # ISO-8601 timestamp
+    request: TraceRequest   # Input (prompt, model, params)
+    response: TraceResponse # Output (text, tokens, latency)
+    verdict: Verdict | None # PASS/FAIL result
+    blessed: bool           # Golden reference flag
+`;
+const CODE_BLOCK_1 = `
+from phylax import trace, expect
+
+@trace(provider="openai")
+@expect(must_include=["refund"], max_latency_ms=3000)
+def handle_refund(message: str) -> str:
+    # Everything inside is recorded:
+    # - Input: message parameter
+    # - Output: return value
+    # - Latency: execution time
+    # - Tokens: input + output token count
+    return llm(message)
+`;
+const CODE_BLOCK_2 = `
+class Verdict:
+    status: "pass" | "fail"           # Only two values, ever
+    severity: "low" | "medium" | "high" | None
+    violations: list[str]             # List of violated rules
+`;
+const CODE_BLOCK_3 = `
+# Bless a trace as golden
+phylax bless <trace_id> --yes
+
+# Force overwrite existing golden
+phylax bless <trace_id> --force
+
+# View all golden traces
+phylax list --blessed
+`;
+const CODE_BLOCK_4 = `
+# List all traces
+phylax list
+
+# List only failed traces
+phylax list --failed
+
+# Inspect a specific trace
+phylax show <trace_id>
+
+# Replay a trace (re-run against the model)
+phylax replay <trace_id>
+`;
+
 export default function TracesPage() {
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -17,41 +72,19 @@ export default function TracesPage() {
       </p>
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Trace Schema</h2>
-      <CodeBlock language="python" title="Trace Model" code={`class Trace:
-    trace_id: str           # UUID, immutable after creation
-    execution_id: str       # Links to execution context
-    node_id: str            # Graph node identifier
-    parent_node_id: str     # Parent in DAG hierarchy
-    timestamp: str          # ISO-8601 timestamp
-    request: TraceRequest   # Input (prompt, model, params)
-    response: TraceResponse # Output (text, tokens, latency)
-    verdict: Verdict | None # PASS/FAIL result
-    blessed: bool           # Golden reference flag`} />
+      <CodeBlock language="python" title="Trace Model" code={CODE_BLOCK_0} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Creating Traces</h2>
       <p className="text-coffee-bean/80 mb-4">
         The <code className="px-1.5 py-0.5 rounded-md bg-beige text-coffee-bean text-sm">@trace</code> decorator captures all LLM interactions automatically:
       </p>
-      <CodeBlock language="python" title="Decorator Usage" code={`from phylax import trace, expect
-
-@trace(provider="openai")
-@expect(must_include=["refund"], max_latency_ms=3000)
-def handle_refund(message: str) -> str:
-    # Everything inside is recorded:
-    # - Input: message parameter
-    # - Output: return value
-    # - Latency: execution time
-    # - Tokens: input + output token count
-    return llm(message)`} />
+      <CodeBlock language="python" title="Decorator Usage" code={CODE_BLOCK_1} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Verdict Model</h2>
       <p className="text-coffee-bean/80 mb-4">
         Every trace that has expectations produces a binary verdict — exactly two possible outcomes:
       </p>
-      <CodeBlock language="python" title="Verdict Schema" code={`class Verdict:
-    status: "pass" | "fail"           # Only two values, ever
-    severity: "low" | "medium" | "high" | None
-    violations: list[str]             # List of violated rules`} />
+      <CodeBlock language="python" title="Verdict Schema" code={CODE_BLOCK_2} />
 
       <div className="bg-beige/40 border border-coffee-bean/10 rounded-lg p-6 mt-4">
         <p className="text-coffee-bean/90 font-semibold mb-2">Key Invariants:</p>
@@ -67,27 +100,10 @@ def handle_refund(message: str) -> str:
       <p className="text-coffee-bean/80 mb-4">
         A trace can be <strong>blessed</strong> as a golden reference. When blessed, its output hash is locked — future <code className="px-1.5 py-0.5 rounded-md bg-beige text-coffee-bean text-sm">phylax check</code> runs compare against this hash.
       </p>
-      <CodeBlock language="bash" title="Golden Management" code={`# Bless a trace as golden
-phylax bless <trace_id> --yes
-
-# Force overwrite existing golden
-phylax bless <trace_id> --force
-
-# View all golden traces
-phylax list --blessed`} />
+      <CodeBlock language="bash" title="Golden Management" code={CODE_BLOCK_3} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Viewing Traces</h2>
-      <CodeBlock language="bash" title="CLI Commands" code={`# List all traces
-phylax list
-
-# List only failed traces
-phylax list --failed
-
-# Inspect a specific trace
-phylax show <trace_id>
-
-# Replay a trace (re-run against the model)
-phylax replay <trace_id>`} />
+      <CodeBlock language="bash" title="CLI Commands" code={CODE_BLOCK_4} />
     </div>
   );
 }

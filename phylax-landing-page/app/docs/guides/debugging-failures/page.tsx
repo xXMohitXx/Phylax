@@ -1,33 +1,25 @@
 import React from 'react';
 import { CodeBlock } from '@/components/code-block';
 
-export default function DebuggingFailuresPage() {
-  return (
-    <div className="flex flex-col gap-6 w-full">
-      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-2 text-coffee-bean">Debugging Failures</h1>
-      <p className="text-xl text-coffee-bean/80">When Phylax catches a regression, here&apos;s how to diagnose, localize, and fix the problem.</p>
-      <hr className="my-6 border-black/10" />
-
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Step 1: Read the Violation</h2>
-      <CodeBlock language="bash" title="Terminal Output" code={`$ phylax check
+const CODE_BLOCK_0 = `
+$ phylax check
 ❌ FAIL — trace-abc123
    Violation: must_include("refund_policy")
    Expected: substring "refund_policy" in response
    Actual: "We apologize for the inconvenience..."
    Latency: 1204ms
-   Model: gpt-4`} />
-
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Step 2: Inspect the Trace</h2>
-      <CodeBlock language="bash" title="Terminal" code={`# View full trace details
+   Model: gpt-4
+`;
+const CODE_BLOCK_1 = `
+# View full trace details
 phylax show <trace_id>
 
 # Or use the Web UI
 phylax server
-# → http://127.0.0.1:8000/ui`} />
-
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Step 3: Investigate the Graph</h2>
-      <p className="text-coffee-bean/80 mb-4">For multi-step agents, use investigation paths to find the root:</p>
-      <CodeBlock language="python" title="investigate.py" code={`from phylax import ExecutionGraph
+# → http://127.0.0.1:8000/ui
+`;
+const CODE_BLOCK_2 = `
+from phylax import ExecutionGraph
 
 graph = ExecutionGraph.from_traces(traces)
 verdict = graph.compute_verdict()
@@ -40,14 +32,35 @@ print(f"Tainted (downstream): {verdict.tainted_count}")
 # Automated investigation path
 path = graph.investigation_path()
 for step in path:
-    print(f"  Investigate: {step}")`} />
-
-      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Step 4: Compare with Golden</h2>
-      <CodeBlock language="bash" title="API Endpoints" code={`# Diff two executions
+    print(f"  Investigate: {step}")
+`;
+const CODE_BLOCK_3 = `
+# Diff two executions
 GET /v1/executions/{golden_id}/diff/{failing_id}
 
 # Replay the failing trace against the current model
-phylax replay <trace_id>`} />
+phylax replay <trace_id>
+`;
+
+export default function DebuggingFailuresPage() {
+  return (
+    <div className="flex flex-col gap-6 w-full">
+      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-2 text-coffee-bean">Debugging Failures</h1>
+      <p className="text-xl text-coffee-bean/80">When Phylax catches a regression, here&apos;s how to diagnose, localize, and fix the problem.</p>
+      <hr className="my-6 border-black/10" />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Step 1: Read the Violation</h2>
+      <CodeBlock language="bash" title="Terminal Output" code={CODE_BLOCK_0} />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Step 2: Inspect the Trace</h2>
+      <CodeBlock language="bash" title="Terminal" code={CODE_BLOCK_1} />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Step 3: Investigate the Graph</h2>
+      <p className="text-coffee-bean/80 mb-4">For multi-step agents, use investigation paths to find the root:</p>
+      <CodeBlock language="python" title="investigate.py" code={CODE_BLOCK_2} />
+
+      <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Step 4: Compare with Golden</h2>
+      <CodeBlock language="bash" title="API Endpoints" code={CODE_BLOCK_3} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Common Failure Patterns</h2>
       <div className="overflow-x-auto">

@@ -1,6 +1,33 @@
 import React from 'react';
 import { CodeBlock } from '@/components/code-block';
 
+const CODE_BLOCK_0 = `
+from phylax import trace, expect
+
+# Level 1: Basic content checks
+@trace(provider="openai")
+@expect(must_include=["refund"])
+def basic_support(msg): ...
+
+# Level 2: Add safety guardrails
+@trace(provider="openai")
+@expect(
+    must_include=["refund"],
+    must_not_include=["internal_error", "SQL", "password"]
+)
+def safe_support(msg): ...
+
+# Level 3: Add performance bounds
+@trace(provider="openai")
+@expect(
+    must_include=["refund"],
+    must_not_include=["internal_error"],
+    max_latency_ms=2000,
+    min_tokens=50
+)
+def production_support(msg): ...
+`;
+
 export default function TestingAiSystemsPage() {
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -29,30 +56,7 @@ export default function TestingAiSystemsPage() {
       </ul>
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Strategy: Start Simple, Layer Up</h2>
-      <CodeBlock language="python" title="progressive_testing.py" code={`from phylax import trace, expect
-
-# Level 1: Basic content checks
-@trace(provider="openai")
-@expect(must_include=["refund"])
-def basic_support(msg): ...
-
-# Level 2: Add safety guardrails
-@trace(provider="openai")
-@expect(
-    must_include=["refund"],
-    must_not_include=["internal_error", "SQL", "password"]
-)
-def safe_support(msg): ...
-
-# Level 3: Add performance bounds
-@trace(provider="openai")
-@expect(
-    must_include=["refund"],
-    must_not_include=["internal_error"],
-    max_latency_ms=2000,
-    min_tokens=50
-)
-def production_support(msg): ...`} />
+      <CodeBlock language="python" title="progressive_testing.py" code={CODE_BLOCK_0} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">When to Use Phylax</h2>
       <div className="overflow-x-auto">

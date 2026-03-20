@@ -2,6 +2,39 @@ import React from 'react';
 import Link from 'next/link';
 import { CodeBlock } from '@/components/code-block';
 
+const CODE_BLOCK_0 = `
+# Install with all provider adapters
+pip install phylax[all]
+
+# Or install only what you need
+pip install phylax[openai]       # OpenAI (GPT-4, GPT-4o)
+pip install phylax[google]       # Google Gemini
+pip install phylax[groq]         # Groq (Llama 3, Mixtral)
+pip install phylax[mistral]      # Mistral AI
+pip install phylax[huggingface]  # HuggingFace Inference API
+pip install phylax[ollama]       # Ollama (local models)
+`;
+const CODE_BLOCK_1 = `
+# Choose your provider
+export OPENAI_API_KEY="sk-..."      # OpenAI
+export GOOGLE_API_KEY="AIza..."     # Google Gemini
+export GROQ_API_KEY="gsk_..."       # Groq
+export MISTRAL_API_KEY="..."        # Mistral
+export HF_TOKEN="hf_..."            # HuggingFace
+export OLLAMA_HOST="localhost:11434" # Ollama (default)
+
+# Optional: custom Phylax home directory
+export PHYLAX_HOME="~/.phylax"      # Default location
+`;
+const CODE_BLOCK_2 = `
+~/.phylax/
+├── config.yaml          # Configuration
+├── traces/
+│   └── YYYY-MM-DD/
+│       └── <trace_id>.json  # Immutable trace records
+└── phylax.db            # SQLite index
+`;
+
 export default function GettingStartedPage() {
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -39,38 +72,15 @@ export default function GettingStartedPage() {
       </ul>
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Installation</h2>
-      <CodeBlock language="bash" title="Terminal" code={`# Install with all provider adapters
-pip install phylax[all]
-
-# Or install only what you need
-pip install phylax[openai]       # OpenAI (GPT-4, GPT-4o)
-pip install phylax[google]       # Google Gemini
-pip install phylax[groq]         # Groq (Llama 3, Mixtral)
-pip install phylax[mistral]      # Mistral AI
-pip install phylax[huggingface]  # HuggingFace Inference API
-pip install phylax[ollama]       # Ollama (local models)`} />
+      <CodeBlock language="bash" title="Terminal" code={CODE_BLOCK_0} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Environment Setup</h2>
       <p className="text-coffee-bean/80 mb-4">Configure your provider&apos;s API key as an environment variable:</p>
-      <CodeBlock language="bash" title="Environment Variables" code={`# Choose your provider
-export OPENAI_API_KEY="sk-..."      # OpenAI
-export GOOGLE_API_KEY="AIza..."     # Google Gemini
-export GROQ_API_KEY="gsk_..."       # Groq
-export MISTRAL_API_KEY="..."        # Mistral
-export HF_TOKEN="hf_..."            # HuggingFace
-export OLLAMA_HOST="localhost:11434" # Ollama (default)
-
-# Optional: custom Phylax home directory
-export PHYLAX_HOME="~/.phylax"      # Default location`} />
+      <CodeBlock language="bash" title="Environment Variables" code={CODE_BLOCK_1} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Storage</h2>
       <p className="text-coffee-bean/80 mb-4">Phylax stores all data locally — no cloud, no external dependencies:</p>
-      <CodeBlock language="bash" title="File Structure" code={`~/.phylax/
-├── config.yaml          # Configuration
-├── traces/
-│   └── YYYY-MM-DD/
-│       └── <trace_id>.json  # Immutable trace records
-└── phylax.db            # SQLite index`} />
+      <CodeBlock language="bash" title="File Structure" code={CODE_BLOCK_2} />
 
       <h2 className="text-2xl font-semibold text-coffee-bean mt-8 mb-4">Core Concepts</h2>
       <div className="grid md:grid-cols-2 gap-4">
