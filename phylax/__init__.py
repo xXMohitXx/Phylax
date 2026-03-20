@@ -201,7 +201,7 @@ from phylax._internal.guardrails import (
     compliance_pack,
 )
 
-__version__ = "1.6.3"
+__version__ = "1.6.4"
 __all__ = [
     # Core decorators
     "trace",
