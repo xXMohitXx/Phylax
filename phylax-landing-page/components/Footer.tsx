@@ -34,7 +34,7 @@ export function Footer() {
               <li><Link href="/docs/concepts/execution-graphs" className="hover:text-lime-cream transition-colors">Execution Graphs</Link></li>
               <li><Link href="/docs/model-upgrade-testing" className="hover:text-lime-cream transition-colors">Model Upgrades</Link></li>
               <li><Link href="/why-phylax" className="hover:text-lime-cream transition-colors">Why Phylax?</Link></li>
-              <li><Link href="/pricing" className="hover:text-lime-cream transition-colors">Pricing</Link></li>
+              {/* <li><Link href="/pricing" className="hover:text-lime-cream transition-colors">Pricing</Link></li> */}
             </ul>
           </div>
 
