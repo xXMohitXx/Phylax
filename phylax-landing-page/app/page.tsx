@@ -10,11 +10,11 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col w-full">
       {/* 1. Hero Section */}
-      <section className="relative pt-8 pb-12 md:pt-16 md:pb-20 overflow-hidden px-4 bg-porcelain">
+      <section className="relative pt-6 pb-8 md:pt-16 md:pb-20 overflow-hidden px-4 bg-porcelain">
         {/* Subtle grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#e4e6c3_1px,transparent_1px),linear-gradient(to_bottom,#e4e6c3_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center" style={{marginTop: "3rem", marginBottom: "3rem"}}>
+
+        <div className="max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center" style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-beige border border-coffee-bean/10 text-sm text-coffee-bean mb-8">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-cream opacity-75"></span>
@@ -22,30 +22,30 @@ export default function LandingPage() {
             </span>
             Phylax v1.6.4 is now available
           </div>
-          
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-coffee-bean mb-6 max-w-4xl space-y-2">
+
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-coffee-bean mb-4 md:mb-6 max-w-4xl space-y-1 md:space-y-2">
             <span className="block">CI for AI Behavior</span>
             <span className="block">
               Stop regressions before production.
             </span>
           </h1>
-          
-          <p className="text-xl text-coffee-bean/80 max-w-2xl mb-10 leading-relaxed">
-            Phylax is an infrastructure system for enforcing deterministic behavioral contracts on LLM outputs. 
+
+          <p className="text-base md:text-xl text-coffee-bean/80 max-w-2xl mb-6 md:mb-10 leading-relaxed px-2 md:px-0">
+            Phylax is an infrastructure system for enforcing deterministic behavioral contracts on LLM outputs.
             No latency-heavy &quot;LLM-as-a-judge&quot;. Just predictable, binary test enforcement in your CI pipelines.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <Link href="/docs/quickstart">
-              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-lime-cream hover:bg-lime-cream/90 text-coffee-bean rounded-md text-lg font-bold transition-all shadow-sm">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-lime-cream hover:bg-lime-cream/90 text-coffee-bean rounded-md text-base md:text-lg font-bold transition-all shadow-sm">
                 Read the Docs <ArrowRight className="w-5 h-5" />
               </button>
             </Link>
-            
-            <div className="w-full sm:w-auto flex items-center gap-3 px-6 py-4 bg-transparent border-2 border-coffee-bean rounded-md text-coffee-bean font-mono text-sm">
-              <Terminal className="w-4 h-4 text-coffee-bean" />
-              <span>pip install phylax</span>
-              <button className="ml-2 hover:text-coffee-bean/70 transition-colors" title="Copy to clipboard">
+
+            <div className="w-full sm:w-auto flex items-center gap-2 md:gap-3 px-4 py-3 md:px-6 md:py-4 bg-transparent border-2 border-coffee-bean rounded-md text-coffee-bean font-mono text-xs md:text-sm overflow-hidden">
+              <Terminal className="w-4 h-4 text-coffee-bean flex-shrink-0" />
+              <span className="truncate">pip install phylax</span>
+              <button className="ml-auto flex-shrink-0 hover:text-coffee-bean/70 transition-colors" title="Copy to clipboard">
                 <Copy className="w-4 h-4" />
               </button>
             </div>
@@ -54,16 +54,16 @@ export default function LandingPage() {
       </section>
 
       {/* 2. Dual Panel: Problem vs Solution */}
-      <section className="py-20 bg-coffee-bean border-y border-black/10 relative">
+      <section className="py-12 md:py-20 bg-coffee-bean border-y border-black/10 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="grid md:grid-cols-2 gap-12 lg:gap-24 items-center">
             {/* The Problem */}
             <div>
-              <h2 className="text-3xl font-bold text-porcelain mb-4">The Problem with AI Testing</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-porcelain mb-4">The Problem with AI Testing</h2>
               <p className="text-beige mb-6 leading-relaxed">
-                LLMs update their weights. Prompts drift. Developers push code. 
-                Suddenly, your meticulously tuned support bot starts hallucinating or breaking its structured JSON formatting. 
+                LLMs update their weights. Prompts drift. Developers push code.
+                Suddenly, your meticulously tuned support bot starts hallucinating or breaking its structured JSON formatting.
                 <br /><br />
                 Monitoring catches this in production—<strong>after the damage is done.</strong>
               </p>
@@ -85,7 +85,7 @@ export default function LandingPage() {
 
             {/* The Solution */}
             <div className="relative">
-              <CodeBlock 
+              <CodeBlock
                 title="test_support_bot.py"
                 language="python"
                 highlightedLines={[4, 5]}
@@ -108,63 +108,63 @@ def handle_refund(message: str) -> str:
       </section>
 
       {/* 3. Core Capabilities Grid — All Features */}
-      <section className="py-24 relative bg-beige">
+      <section className="py-12 md:py-24 relative bg-beige">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-coffee-bean mb-6">Built for Serious Infrastructure</h2>
+            <h2 className="text-2xl md:text-4xl font-bold text-coffee-bean mb-4 md:mb-6">Built for Serious Infrastructure</h2>
             <p className="text-lg text-coffee-bean/80">Everything you need to enforce behavioral contracts on LLM outputs across your entire stack.</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard 
+            <FeatureCard
               variant="glow"
-              title="Deterministic Rules" 
+              title="Deterministic Rules"
               description="No probabilistic AI scoring. Enforce strict contracts via must_include, must_not_include, max_latency_ms, min_tokens — all producing binary PASS/FAIL verdicts."
-              icon={Shield} 
+              icon={Shield}
             />
-            <FeatureCard 
+            <FeatureCard
               variant="glow"
-              title="Execution Graphs (DAG)" 
+              title="Execution Graphs (DAG)"
               description="Group traces across complex, multi-agent workflows. Automatically track parent-child cascades to pinpoint exactly which internal LLM thought failed first."
-              icon={Workflow} 
+              icon={Workflow}
             />
-            <FeatureCard 
+            <FeatureCard
               variant="glow"
-              title="Surface Enforcement" 
+              title="Surface Enforcement"
               description="Don't just test text. Parse and validate structured JSON outputs, tool calls, execution traces, and cross-run stability with the Surface Abstraction Layer."
-              icon={FileJson} 
+              icon={FileJson}
             />
-            <FeatureCard 
+            <FeatureCard
               variant="glow"
-              title="Enforcement Modes" 
+              title="Enforcement Modes"
               description="Three modes for every stage: enforce (block CI), quarantine (block + log), observe (log only). Gradually roll out contracts without breaking your pipeline."
-              icon={Lock} 
+              icon={Lock}
             />
-            <FeatureCard 
+            <FeatureCard
               variant="glow"
-              title="Guardrail Packs" 
+              title="Guardrail Packs"
               description="Pre-built contract templates for common use cases: safety (blocks PII, hate speech), quality (min length, latency), and compliance (regulatory output constraints)."
-              icon={Package} 
+              icon={Package}
             />
-            <FeatureCard 
+            <FeatureCard
               variant="glow"
-              title="Dataset Contracts" 
+              title="Dataset Contracts"
               description="Define behavioral contracts in YAML. Batch-test hundreds of prompts against live models. Run in CI to catch regressions before they merge."
-              icon={Layers} 
+              icon={Layers}
             />
           </div>
         </div>
       </section>
 
       {/* 4. How Phylax Works — Step by Step */}
-      <section className="py-24 bg-porcelain relative">
+      <section className="py-12 md:py-24 bg-porcelain relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-coffee-bean mb-6">How It Works</h2>
+            <h2 className="text-2xl md:text-4xl font-bold text-coffee-bean mb-4 md:mb-6">How It Works</h2>
             <p className="text-lg text-coffee-bean/80">From instrumentation to CI enforcement in 4 steps.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {[
               { step: "01", title: "Trace", desc: "Wrap your LLM calls with @trace. Phylax records every input, output, latency, and token count.", icon: "📝" },
               { step: "02", title: "Expect", desc: "Declare behavioral contracts with @expect — must_include, must_not_include, latency bounds, token minimums.", icon: "✅" },
@@ -172,11 +172,11 @@ def handle_refund(message: str) -> str:
               { step: "04", title: "Enforce", desc: "Run phylax check in CI. Exit code 0 = all pass. Exit code 1 = regression detected. PR blocked.", icon: "🚫" },
             ].map((item) => (
               <div key={item.step} className="relative group">
-                <div className="bg-white rounded-xl border border-black/10 p-6 hover:shadow-[0_8px_30px_rgba(38,28,21,0.08)] transition-all h-full">
-                  <div className="text-3xl mb-4">{item.icon}</div>
-                  <div className="text-xs font-mono text-lime-cream mb-2">STEP {item.step}</div>
-                  <h3 className="text-xl font-bold text-coffee-bean mb-2">{item.title}</h3>
-                  <p className="text-coffee-bean/70 text-sm leading-relaxed">{item.desc}</p>
+                <div className="bg-white rounded-xl border border-black/10 p-4 md:p-6 hover:shadow-[0_8px_30px_rgba(38,28,21,0.08)] transition-all h-full">
+                  <div className="text-2xl md:text-3xl mb-3 md:mb-4">{item.icon}</div>
+                  <div className="text-[10px] md:text-xs font-mono text-lime-cream mb-1 md:mb-2">STEP {item.step}</div>
+                  <h3 className="text-base md:text-xl font-bold text-coffee-bean mb-1 md:mb-2">{item.title}</h3>
+                  <p className="text-coffee-bean/70 text-xs md:text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -185,12 +185,12 @@ def handle_refund(message: str) -> str:
       </section>
 
       {/* 5. Dataset Contracts & Simulation Showcase */}
-      <section className="py-24 bg-coffee-bean border-y border-black/20 relative overflow-hidden">
+      <section className="py-12 md:py-24 bg-coffee-bean border-y border-black/20 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            
+
             <div className="order-2 lg:order-1 space-y-6">
-              <CodeBlock 
+              <CodeBlock
                 title="Terminal"
                 language="bash"
                 code={`$ phylax simulate --from gpt-4 --to gpt-4.5 dataset.yaml
@@ -211,12 +211,12 @@ CI Blocked. Model upgrade rejected.`}
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-lime-cream/10 border border-lime-cream/20 text-lime-cream text-sm mb-6 font-mono">
                 <Play className="w-4 h-4" /> Simulation Engine
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-porcelain mb-6">Model Upgrade Simulation</h2>
+              <h2 className="text-2xl md:text-4xl font-bold text-porcelain mb-4 md:mb-6">Model Upgrade Simulation</h2>
               <p className="text-lg text-beige mb-6">
-                OpenAI drops a new model variant. Is it safe to deploy? 
+                OpenAI drops a new model variant. Is it safe to deploy?
               </p>
               <p className="text-lg text-beige mb-8">
-                Point Phylax at your Dataset Contracts YAML. It runs your thousands of prompts against the new remote model, maps it against your deterministic boundaries, and immediately flags behavioral drifts. 
+                Point Phylax at your Dataset Contracts YAML. It runs your thousands of prompts against the new remote model, maps it against your deterministic boundaries, and immediately flags behavioral drifts.
               </p>
               <ul className="space-y-4">
                 <li className="flex items-center gap-3 text-porcelain/90">
@@ -236,11 +236,11 @@ CI Blocked. Model upgrade rejected.`}
       </section>
 
       {/* 6. Supported Providers */}
-      <section className="py-20 bg-beige">
+      <section className="py-12 md:py-20 bg-beige">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-coffee-bean mb-4">Works with Every Provider</h2>
-            <p className="text-lg text-coffee-bean/80">One interface, any model. All adapters share the same <code className="px-1.5 py-0.5 bg-porcelain rounded text-sm">generate()</code> and <code className="px-1.5 py-0.5 bg-porcelain rounded text-sm">chat_completion()</code> API.</p>
+            <h2 className="text-2xl md:text-4xl font-bold text-coffee-bean mb-4">Works with Every Provider</h2>
+            <p className="text-base md:text-lg text-coffee-bean/80">One interface, any model. All adapters share the same <code className="px-1.5 py-0.5 bg-porcelain rounded text-xs md:text-sm">generate()</code> and <code className="px-1.5 py-0.5 bg-porcelain rounded text-xs md:text-sm">chat_completion()</code> API.</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -263,11 +263,11 @@ CI Blocked. Model upgrade rejected.`}
       </section>
 
       {/* 7. CLI Commands Reference */}
-      <section className="py-20 bg-porcelain">
+      <section className="py-12 md:py-20 bg-porcelain">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-coffee-bean mb-6">Powerful CLI</h2>
+              <h2 className="text-2xl md:text-4xl font-bold text-coffee-bean mb-4 md:mb-6">Powerful CLI</h2>
               <p className="text-lg text-coffee-bean/80 mb-8">
                 Everything you need from one command: trace management, golden baselines, CI enforcement, dataset execution, and model simulation.
               </p>
@@ -281,15 +281,15 @@ CI Blocked. Model upgrade rejected.`}
                   { cmd: "phylax dataset run", desc: "Execute dataset contracts" },
                   { cmd: "phylax simulate", desc: "Model upgrade simulation" },
                 ].map((item) => (
-                  <div key={item.cmd} className="flex items-center gap-4 p-3 bg-white rounded-lg border border-black/5">
-                    <code className="text-sm font-mono text-lime-cream bg-code-bg px-3 py-1 rounded flex-shrink-0">{item.cmd}</code>
-                    <span className="text-sm text-coffee-bean/70">{item.desc}</span>
+                  <div key={item.cmd} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 bg-white rounded-lg border border-black/5">
+                    <code className="text-xs md:text-sm font-mono text-lime-cream bg-code-bg px-3 py-1 rounded self-start">{item.cmd}</code>
+                    <span className="text-xs md:text-sm text-coffee-bean/70">{item.desc}</span>
                   </div>
                 ))}
               </div>
             </div>
             <div>
-              <CodeBlock 
+              <CodeBlock
                 title="Terminal"
                 language="bash"
                 code={`$ phylax check
@@ -315,19 +315,19 @@ Exit code: 1`}
       <BetaSignup />
 
       {/* 9. Final CTA */}
-      <section className="py-32 relative text-center bg-beige">
-        <h2 className="text-4xl md:text-5xl font-bold text-coffee-bean mb-8">Stop testing AI with vibes.</h2>
-        <p className="text-xl text-coffee-bean/80 mb-10 max-w-2xl mx-auto">
+      <section className="py-16 md:py-32 relative text-center bg-beige px-4">
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-coffee-bean mb-6 md:mb-8">Stop testing AI with vibes.</h2>
+        <p className="text-base md:text-xl text-coffee-bean/80 mb-8 md:mb-10 max-w-2xl mx-auto">
           Start enforcing deterministic software contracts on your LLMs today. Open source and ready for scale.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/docs/quickstart">
-            <button className="px-8 py-4 bg-coffee-bean hover:bg-coffee-bean/90 text-lime-cream rounded-md text-lg font-bold transition-all shadow-sm">
+            <button className="px-6 py-3 md:px-8 md:py-4 bg-coffee-bean hover:bg-coffee-bean/90 text-lime-cream rounded-md text-base md:text-lg font-bold transition-all shadow-sm">
               Read the Documentation
             </button>
           </Link>
           <a href="https://github.com/xXMohitXx/Phylax" target="_blank" rel="noreferrer">
-            <button className="px-8 py-4 bg-transparent border-2 border-coffee-bean hover:bg-coffee-bean/5 text-coffee-bean rounded-md text-lg font-bold transition-all">
+            <button className="px-6 py-3 md:px-8 md:py-4 bg-transparent border-2 border-coffee-bean hover:bg-coffee-bean/5 text-coffee-bean rounded-md text-base md:text-lg font-bold transition-all">
               Star on GitHub
             </button>
           </a>

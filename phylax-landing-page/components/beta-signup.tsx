@@ -38,10 +38,10 @@ export function BetaSignup() {
   };
 
   return (
-    <section className="py-24 relative bg-coffee-bean overflow-hidden">
+    <section className="py-12 md:py-24 relative bg-coffee-bean overflow-hidden">
       {/* Subtle grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-cream/10 border border-lime-cream/20 text-lime-cream text-sm font-medium mb-6">
@@ -52,7 +52,7 @@ export function BetaSignup() {
             Phylax Cloud — Zero Infrastructure CI
           </h2>
           <p className="text-lg text-beige max-w-2xl mx-auto">
-            Managed CI enforcement for teams. No server setup, no config, no maintenance. 
+            Managed CI enforcement for teams. No server setup, no config, no maintenance.
             Push your contracts, we enforce them. Join the private beta waitlist.
           </p>
         </div>

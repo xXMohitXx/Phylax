@@ -32,7 +32,7 @@ export function CodeBlock({ code, language = 'python', title, highlightedLines =
         )}
       </div>
 
-      <div className="p-4 overflow-x-auto text-sm font-mono leading-relaxed text-porcelain">
+      <div className="p-3 md:p-4 overflow-x-auto text-xs md:text-sm font-mono leading-relaxed text-porcelain">
         {lines.map((line, i) => {
           const isHighlighted = highlightedLines.includes(i + 1);
           // Escape HTML characters to prevent < and > (e.g., in type hints -> or imports) being treated as actual HTML tags.
