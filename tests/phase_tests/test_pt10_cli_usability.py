@@ -63,8 +63,8 @@ class TestVersion:
     def test_version_exists(self):
         assert hasattr(phylax, "__version__")
 
-    def test_version_is_1_6_3(self):
-        assert phylax.__version__ == "1.6.3"
+    def test_version_current(self):
+        assert phylax.__version__ == "1.6.5"
 
     def test_version_is_semver(self):
         parts = phylax.__version__.split(".")

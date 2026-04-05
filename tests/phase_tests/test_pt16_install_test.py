@@ -14,7 +14,7 @@ class TestPackageMetadata:
     def test_version_in_init(self):
         import phylax
         assert hasattr(phylax, "__version__")
-        assert phylax.__version__ == "1.6.3"
+        assert phylax.__version__ == "1.6.5"
 
     def test_package_name(self):
         import phylax
