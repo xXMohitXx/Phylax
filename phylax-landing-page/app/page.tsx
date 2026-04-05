@@ -20,7 +20,7 @@ export default function LandingPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-cream opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-lime-cream"></span>
             </span>
-            Phylax v1.6.4 is now available
+            Phylax v1.6.5 is now available
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-coffee-bean mb-4 md:mb-6 max-w-4xl space-y-1 md:space-y-2">

@@ -157,6 +157,26 @@ class CaptureLayer:
                 return choice.message.content or ""
             if hasattr(choice, "text"):
                 return choice.text or ""
+        # Handle Google Gemini SDK responses (GenerateContentResponse)
+        # The Gemini SDK response has a `.text` property that extracts the text
+        # from candidates[0].content.parts[0].text
+        if hasattr(response_data, "text") and not isinstance(response_data, str):
+            try:
+                text = response_data.text
+                if text and isinstance(text, str):
+                    return text
+            except Exception:
+                pass
+        # Fallback: try candidates structure directly
+        if hasattr(response_data, "candidates") and response_data.candidates:
+            try:
+                candidate = response_data.candidates[0]
+                if hasattr(candidate, "content") and candidate.content:
+                    parts = candidate.content.parts
+                    if parts:
+                        return parts[0].text or ""
+            except Exception:
+                pass
         return str(response_data)
     
     def _extract_usage(self, response_data: Any) -> Optional[dict[str, int]]:

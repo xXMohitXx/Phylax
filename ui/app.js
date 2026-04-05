@@ -318,37 +318,44 @@ async function selectTrace(traceId) {
             }
         }
 
+        const messages = (trace.request && trace.request.messages) || [];
+
         // Trace details (below the failure summary)
         html += `
             <div class="trace-details">
                 <div class="detail-section">
                     <h4 class="section-title">Request</h4>
                     <div class="trace-id">ID: ${trace.trace_id}</div>
-                    <div class="model-info">${trace.request.model} (${trace.request.provider})</div>
+                    <div class="model-info">${trace.request?.model || 'Unknown'} (${trace.request?.provider || 'Unknown'})</div>
                 </div>
                 
                 <div class="detail-section">
                     <h4 class="section-title">Prompt</h4>
                     <div class="prompt-box">
-                        ${trace.request.messages.map(msg => `
-                            <div class="message ${msg.role}">
-                                <span class="role">${msg.role}:</span>
-                                <span class="content">${escapeHtml(msg.content)}</span>
+                        ${messages.length > 0 ? messages.map(msg => `
+                            <div class="message ${msg?.role || 'user'}">
+                                <span class="role">${msg?.role || 'user'}:</span>
+                                <span class="content">${escapeHtml(msg?.content || '')}</span>
                             </div>
-                        `).join('')}
+                        `).join('') : '<span class="text-muted">No prompt messages found</span>'}
                     </div>
                 </div>
                 
                 <div class="detail-section">
                     <h4 class="section-title">Response</h4>
-                    <div class="response-box">${escapeHtml(trace.response.text)}</div>
+                    <div class="response-box">${escapeHtml(trace.response?.text || '')}</div>
+                </div>
+                
+                <div class="detail-section" style="background-color: var(--bg-primary);">
+                    <h4 class="section-title" style="color: var(--accent);">Raw CLI Response (JSON)</h4>
+                    <div class="response-box" style="white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: 11px;">${escapeHtml(JSON.stringify(trace.response || trace, null, 2))}</div>
                 </div>
                 
                 <div class="detail-section meta-section">
                     <div class="meta-grid">
                         <div class="meta-item">
                             <span class="meta-label">Latency</span>
-                            <span class="meta-value">${trace.response.latency_ms}ms</span>
+                            <span class="meta-value">${trace.response?.latency_ms || 0}ms</span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">Timestamp</span>
@@ -604,7 +611,7 @@ function renderGraph(graph) {
     }
 
     // Get verdict for header
-    const verdict = graph.verdict || { status: 'unknown' };
+    const verdict = graph.verdict || { status: 'PENDING / UNVERIFIED' };
     const verdictIcon = verdict.status === 'pass' ? '✅' : verdict.status === 'fail' ? '❌' : '⏳';
 
     // Header showing current execution ID
@@ -615,7 +622,7 @@ function renderGraph(graph) {
                 <span class="graph-header-value" title="${graph.execution_id}">${graph.execution_id}</span>
             </div>
             <div class="graph-header-stats">
-                ${verdictIcon} ${verdict.status?.toUpperCase() || 'UNKNOWN'} · 
+                ${verdictIcon} ${(verdict.status === 'unknown' || verdict.status === 'PENDING / UNVERIFIED') ? 'PENDING / NO VERDICT' : (verdict.status?.toUpperCase() || 'PENDING / NO VERDICT')} · 
                 ${graph.node_count || graph.nodes.length} nodes · 
                 ${graph.total_latency_ms}ms
             </div>

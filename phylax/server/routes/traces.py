@@ -17,7 +17,7 @@ storage = FileStorage()
 
 @router.get("/traces")
 async def list_traces(
-    limit: int = Query(default=50, le=100),
+    limit: int = Query(default=50, ge=1),
     offset: int = Query(default=0, ge=0),
     model: Optional[str] = None,
     provider: Optional[str] = None,

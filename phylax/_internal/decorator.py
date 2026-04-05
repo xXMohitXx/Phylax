@@ -143,12 +143,21 @@ def _extract_messages(args: tuple, kwargs: dict) -> list[dict[str, str]]:
     # Check kwargs first
     if "messages" in kwargs:
         return kwargs["messages"]
+    if "prompt" in kwargs:
+        return [{"role": "user", "content": kwargs["prompt"]}]
     
     # Check first positional argument
     if args and isinstance(args[0], list):
         first = args[0]
         if first and isinstance(first[0], dict) and "role" in first[0]:
             return first
+    
+    # Reconstruct messages from string positional args
+    # Common pattern: greet_user("World") -> user message "World"
+    if args:
+        string_args = [str(a) for a in args if isinstance(a, str)]
+        if string_args:
+            return [{"role": "user", "content": " ".join(string_args)}]
     
     return []
 
@@ -171,8 +180,22 @@ def _extract_model(kwargs: dict, result: Any) -> str:
     if "model" in kwargs:
         return kwargs["model"]
     
+    # OpenAI-style response
     if hasattr(result, "model"):
         return result.model
+    
+    # Google Gemini SDK response: try model_version attribute
+    if hasattr(result, "model_version") and result.model_version:
+        return result.model_version
+    
+    # Try to get from candidates metadata
+    if hasattr(result, "candidates") and result.candidates:
+        try:
+            candidate = result.candidates[0]
+            if hasattr(candidate, "model") and candidate.model:
+                return candidate.model
+        except Exception:
+            pass
     
     return "unknown"
 

@@ -749,7 +749,7 @@ def _infer_semantics(trace, index: int, total: int) -> tuple:
         # Capitalize first letter
         human_label = label_text[0].upper() + label_text[1:] if label_text else ""
     else:
-        human_label = f"{role.value.title()} ({model})"
+        human_label = role.value.title() if (not model or model == "unknown") else f"{role.value.title()} ({model})"
     
     # Generate description
     role_desc = {

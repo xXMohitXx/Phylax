@@ -14,11 +14,13 @@ from pathlib import Path
 
 from server.routes import traces, replay, chat
 
+from phylax import __version__
+
 # Create FastAPI app
 app = FastAPI(
     title="Phylax",
     description="CI-native regression enforcement for LLM outputs",
-    version="1.4.1",
+    version=__version__,
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -56,9 +58,10 @@ if assets_path.exists():
 @app.get("/")
 async def root():
     """Root endpoint with API info."""
+    from phylax import __version__
     return {
         "name": "Phylax",
-        "version": "1.4.1",
+        "version": __version__,
         "description": "CI-native regression enforcement for LLM outputs",
         "docs": "/docs",
         "ui": "/ui",
