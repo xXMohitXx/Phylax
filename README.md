@@ -389,6 +389,16 @@ Phylax is **CI for AI behavior**. It records LLM outputs, evaluates them against
 
 ---
 
+## ✨ Contributors
+
+A massive thank you to the people who help build and maintain this project!
+
+<a href="https://github.com/SaahilDadhania">
+  <img src="https://github.com/SaahilDadhania.png" width="50" height="50" style="border-radius: 50%; margin: 5px;" alt="Saahil Parasbhai Dadhania"/>
+</a>
+
+---
+
 ## License
 
 MIT License
